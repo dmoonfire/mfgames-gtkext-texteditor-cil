@@ -122,6 +122,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\MfGames.GtkExt.Actions.0.0.4.0\lib\net45\MfGames.GtkExt.Actions.dll</HintPath>
     </Reference>
+    <Reference Include="MfGames.Languages">
+      <HintPath>..\packages\MfGames.Languages.1.0.0.0\lib\net45\MfGames.Languages.dll</HintPath>
+    </Reference>
     <Reference Include="Mono.Cairo, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\packages\Mono.Cairo.2.0.0\lib\Mono.Cairo.dll</HintPath>
@@ -170,8 +173,6 @@
     <Compile Include="Renderers\Cache\CachedLine.cs" />
     <Compile Include="Renderers\Cache\CachedTextRenderer.cs" />
     <Compile Include="Renderers\Cache\CachedWindow.cs" />
-    <Compile Include="Editing\EnglishWordSplitter.cs" />
-    <Compile Include="Editing\OffsetWordSplitter.cs" />
     <Compile Include="Renderers\DrawingUtility.cs" />
     <Compile Include="Editing\ActionEntry.cs" />
     <Compile Include="Editing\Caret.cs" />
@@ -185,7 +186,6 @@
     <Compile Include="Renderers\SelectionRenderer.cs" />
     <Compile Include="Renderers\EditorViewRenderer.cs" />
     <Compile Include="Interfaces\IRenderContext.cs" />
-    <Compile Include="Interfaces\IWordSplitter.cs" />
     <Compile Include="IndicatorView.cs" />
     <Compile Include="Renderers\LineNumberMarginRenderer.cs" />
     <Compile Include="Renderers\MarginRenderer.cs" />

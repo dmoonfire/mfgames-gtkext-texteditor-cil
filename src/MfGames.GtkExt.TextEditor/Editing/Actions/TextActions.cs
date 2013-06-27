@@ -236,7 +236,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			//{
 			//	// Pull out the text and see if we are entering a word boundary.
 			//	string stateText = actionState.Text + unicode;
-			//	int wordBoundary = displayContext.WordSplitter.GetNextWordBoundary(
+			//	int wordBoundary = displayContext.WordTokenizer.GetNextWordBoundary(
 			//		stateText, 0);
 
 			//	if (wordBoundary == stateText.Length)

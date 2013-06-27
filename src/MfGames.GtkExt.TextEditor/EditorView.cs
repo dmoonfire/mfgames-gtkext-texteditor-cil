@@ -19,6 +19,7 @@ using MfGames.GtkExt.TextEditor.Models.Styles;
 using MfGames.GtkExt.TextEditor.Renderers;
 using MfGames.GtkExt.TextEditor.Renderers.Cache;
 using MfGames.GtkExt.TextEditor.Visuals;
+using MfGames.Languages;
 using Pango;
 using CairoHelper = Gdk.CairoHelper;
 using Color = Cairo.Color;
@@ -144,10 +145,10 @@ namespace MfGames.GtkExt.TextEditor
 		/// Gets or sets the word splitter.
 		/// </summary>
 		/// <value>The word splitter.</value>
-		public IWordSplitter WordSplitter
+		public IWordTokenizer WordTokenizer
 		{
-			get { return wordSplitter; }
-			set { wordSplitter = value ?? new OffsetWordSplitter(); }
+			get { return wordTokenizer; }
+			set { wordTokenizer = value ?? new WordTokenizer(); }
 		}
 
 		/// <summary>
@@ -919,7 +920,7 @@ namespace MfGames.GtkExt.TextEditor
 
 			// Set up the text editor controller.
 			controller = new EditorViewController(this);
-			wordSplitter = new EnglishWordSplitter();
+			wordTokenizer = new WordTokenizer();
 			Clipboard = Clipboard.Get(Atom.Intern("CLIPBOARD", true));
 
 			controller.BeginAction += OnBeginAction;
@@ -951,7 +952,7 @@ namespace MfGames.GtkExt.TextEditor
 		private Rectangle scrollPaddingRegion;
 		private Theme theme;
 		private Adjustment verticalAdjustment;
-		private IWordSplitter wordSplitter;
+		private IWordTokenizer wordTokenizer;
 
 		#endregion
 	}

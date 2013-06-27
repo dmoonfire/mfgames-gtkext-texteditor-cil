@@ -7,6 +7,7 @@ using MfGames.GtkExt.TextEditor.Editing;
 using MfGames.GtkExt.TextEditor.Models;
 using MfGames.GtkExt.TextEditor.Models.Styles;
 using MfGames.GtkExt.TextEditor.Renderers;
+using MfGames.Languages;
 using Pango;
 using Layout = Pango.Layout;
 using Rectangle = Cairo.Rectangle;
@@ -98,7 +99,7 @@ namespace MfGames.GtkExt.TextEditor.Interfaces
 		/// Gets or sets the word splitter.
 		/// </summary>
 		/// <value>The word splitter.</value>
-		IWordSplitter WordSplitter { get; set; }
+		IWordTokenizer WordTokenizer { get; set; }
 
 		#endregion
 

@@ -231,7 +231,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 				position.LineIndex, LineContexts.None);
 
 			// If there is no left boundary, we move up a line.
-			int leftBoundary = displayContext.WordSplitter.GetPreviousWordBoundary(
+			int leftBoundary = displayContext.WordTokenizer.GetPreviousWordBoundary(
 				text, position.CharacterIndex);
 
 			if (leftBoundary == -1)
@@ -395,7 +395,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 				position.LineIndex, LineContexts.Unformatted);
 
 			// If there is no right boundary, we move down a line.
-			int rightBoundary = displayContext.WordSplitter.GetNextWordBoundary(
+			int rightBoundary = displayContext.WordTokenizer.GetNextWordBoundary(
 				text, position.CharacterIndex);
 
 			if (rightBoundary == Int32.MaxValue)
@@ -614,11 +614,11 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			// Find the boundaries for the current word.
 			int startIndex = Math.Max(
 				0,
-				displayContext.WordSplitter.GetPreviousWordBoundary(
+				displayContext.WordTokenizer.GetPreviousWordBoundary(
 					lineText, position.CharacterIndex));
 			int endIndex = Math.Min(
 				lineText.Length,
-				displayContext.WordSplitter.GetNextWordBoundary(
+				displayContext.WordTokenizer.GetNextWordBoundary(
 					lineText, position.CharacterIndex));
 
 			// Set the selection to the boundaries.
