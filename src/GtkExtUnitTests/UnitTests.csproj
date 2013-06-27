@@ -59,19 +59,44 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-    <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-    <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-    <Reference Include="nunit.framework, Version=2.5.10.11092, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+    <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Private>True</Private>
+      <HintPath>..\packages\Gtk.2.12.0.0\lib\atk-sharp.dll</HintPath>
+    </Reference>
+    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Private>True</Private>
+      <HintPath>..\packages\Gtk.2.12.0.0\lib\gdk-sharp.dll</HintPath>
+    </Reference>
+    <Reference Include="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Private>True</Private>
+      <HintPath>..\packages\Gtk.2.12.0.0\lib\glade-sharp.dll</HintPath>
+    </Reference>
+    <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Private>True</Private>
+      <HintPath>..\packages\Gtk.2.12.0.0\lib\glib-sharp.dll</HintPath>
+    </Reference>
+    <Reference Include="gtk-dotnet, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Private>True</Private>
+      <HintPath>..\packages\Gtk.2.12.0.0\lib\gtk-dotnet.dll</HintPath>
+    </Reference>
+    <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Private>True</Private>
+      <HintPath>..\packages\Gtk.2.12.0.0\lib\gtk-sharp.dll</HintPath>
+    </Reference>
+    <Reference Include="MfGames, Version=4.0.1.0, Culture=neutral, PublicKeyToken=f4b9b04ed1870f79, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NUnit.2.5.10.11092\lib\nunit.framework.dll</HintPath>
+      <HintPath>..\packages\MfGames.4.0.1.0\lib\net40\MfGames.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.mocks">
-      <HintPath>..\packages\NUnit.2.5.10.11092\lib\nunit.mocks.dll</HintPath>
+    <Reference Include="MfGames.Commands, Version=0.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\MfGames.Commands.0.1.1.0\lib\net45\MfGames.Commands.dll</HintPath>
     </Reference>
-    <Reference Include="pnunit.framework">
-      <HintPath>..\packages\NUnit.2.5.10.11092\lib\pnunit.framework.dll</HintPath>
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Private>True</Private>
+      <HintPath>..\packages\Gtk.2.12.0.0\lib\pango-sharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -122,6 +147,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MfGames.GtkExt.TextEditor.Models\MfGames.GtkExt.TextEditor.Models.csproj">
+      <Project>{1f3ad3b8-7459-41ea-a730-334df89eb6f0}</Project>
+      <Name>MfGames.GtkExt.TextEditor.Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MfGames.GtkExt.TextEditor\MfGames.GtkExt.TextEditor.csproj">
+      <Project>{c4aadfa8-6268-4d61-b44b-78f1a69d3eaf}</Project>
+      <Name>MfGames.GtkExt.TextEditor</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

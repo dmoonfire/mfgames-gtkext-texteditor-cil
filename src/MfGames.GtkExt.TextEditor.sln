@@ -3,10 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Support", "Support", "{94993FB2-3AB7-4F80-9881-2F2D3CCA39B1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MfGames.GtkExt", "MfGames.GtkExt\MfGames.GtkExt.csproj", "{DC4BE5FB-0A89-4210-BC19-B4D01E5D901F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GtkExtDemo", "GtkExtDemo\GtkExtDemo.csproj", "{B1823551-D11A-4C41-BD44-DD60BAA2ABF6}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MfGames.GtkExt.TextEditor", "MfGames.GtkExt.TextEditor\MfGames.GtkExt.TextEditor.csproj", "{C4AADFA8-6268-4D61-B44B-78F1A69D3EAF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreateExhaustiveSelectionTests", "CreateExhaustiveSelectionTests\CreateExhaustiveSelectionTests.csproj", "{3FB956E6-40FB-4ED3-8047-1CCDC8DECE3B}"
@@ -15,9 +11,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MfGames.GtkExt.TextEditor.M
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "GtkExtUnitTests\UnitTests.csproj", "{2EB3E9A0-514D-4194-A74D-F6386366E394}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MfGames.GtkExt.Actions", "MfGames.GtkExt.Actions\MfGames.GtkExt.Actions.csproj", "{E0A0DD4B-5D5D-41BD-81C3-FFDB3981263A}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MfGames.GtkExt.Configurators", "MfGames.GtkExt.Configurators\MfGames.GtkExt.Configurators.csproj", "{BBB2BB6A-1FA3-449D-B390-9206D2CBC126}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{1005DDDC-4C69-41EB-AC17-07F61AEE041B}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,20 +26,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{DC4BE5FB-0A89-4210-BC19-B4D01E5D901F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DC4BE5FB-0A89-4210-BC19-B4D01E5D901F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DC4BE5FB-0A89-4210-BC19-B4D01E5D901F}.Debug|x86.ActiveCfg = Debug|x86
-		{DC4BE5FB-0A89-4210-BC19-B4D01E5D901F}.Debug|x86.Build.0 = Debug|x86
-		{DC4BE5FB-0A89-4210-BC19-B4D01E5D901F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DC4BE5FB-0A89-4210-BC19-B4D01E5D901F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DC4BE5FB-0A89-4210-BC19-B4D01E5D901F}.Release|x86.ActiveCfg = Release|x86
-		{DC4BE5FB-0A89-4210-BC19-B4D01E5D901F}.Release|x86.Build.0 = Release|x86
-		{B1823551-D11A-4C41-BD44-DD60BAA2ABF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B1823551-D11A-4C41-BD44-DD60BAA2ABF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B1823551-D11A-4C41-BD44-DD60BAA2ABF6}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{B1823551-D11A-4C41-BD44-DD60BAA2ABF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B1823551-D11A-4C41-BD44-DD60BAA2ABF6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B1823551-D11A-4C41-BD44-DD60BAA2ABF6}.Release|x86.ActiveCfg = Release|Any CPU
 		{C4AADFA8-6268-4D61-B44B-78F1A69D3EAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C4AADFA8-6268-4D61-B44B-78F1A69D3EAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4AADFA8-6268-4D61-B44B-78F1A69D3EAF}.Debug|x86.ActiveCfg = Debug|x86
@@ -67,18 +52,6 @@ Global
 		{2EB3E9A0-514D-4194-A74D-F6386366E394}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2EB3E9A0-514D-4194-A74D-F6386366E394}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2EB3E9A0-514D-4194-A74D-F6386366E394}.Release|x86.ActiveCfg = Release|Any CPU
-		{E0A0DD4B-5D5D-41BD-81C3-FFDB3981263A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E0A0DD4B-5D5D-41BD-81C3-FFDB3981263A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E0A0DD4B-5D5D-41BD-81C3-FFDB3981263A}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{E0A0DD4B-5D5D-41BD-81C3-FFDB3981263A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E0A0DD4B-5D5D-41BD-81C3-FFDB3981263A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E0A0DD4B-5D5D-41BD-81C3-FFDB3981263A}.Release|x86.ActiveCfg = Release|Any CPU
-		{BBB2BB6A-1FA3-449D-B390-9206D2CBC126}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BBB2BB6A-1FA3-449D-B390-9206D2CBC126}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BBB2BB6A-1FA3-449D-B390-9206D2CBC126}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{BBB2BB6A-1FA3-449D-B390-9206D2CBC126}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BBB2BB6A-1FA3-449D-B390-9206D2CBC126}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BBB2BB6A-1FA3-449D-B390-9206D2CBC126}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
