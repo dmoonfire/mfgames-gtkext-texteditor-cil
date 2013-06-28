@@ -87,9 +87,17 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\MfGames.4.0.1.0\lib\net40\MfGames.dll</HintPath>
     </Reference>
-    <Reference Include="MfGames.Commands, Version=0.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="MfGames.Commands, Version=0.1.4.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\MfGames.Commands.0.1.1.0\lib\net45\MfGames.Commands.dll</HintPath>
+      <HintPath>..\packages\MfGames.Commands.0.1.4.0\lib\net45\MfGames.Commands.dll</HintPath>
+    </Reference>
+    <Reference Include="MfGames.Commands.TextEditing, Version=0.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\MfGames.Commands.TextEditing.0.0.3.0\lib\net45\MfGames.Commands.TextEditing.dll</HintPath>
+    </Reference>
+    <Reference Include="MfGames.Languages, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\MfGames.Languages.1.0.0.0\lib\net45\MfGames.Languages.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
