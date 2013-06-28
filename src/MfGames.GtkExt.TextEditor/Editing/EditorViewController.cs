@@ -291,7 +291,7 @@ namespace MfGames.GtkExt.TextEditor.Editing
 			Commands.Add(command);
 
 			// Scroll to the command's end position.
-			displayContext.Caret.Position = command.EndPosition;
+			displayContext.Caret.SetAndScrollToPosition(command.EndPosition);
 			displayContext.RequestScrollToCaret();
 		}
 
@@ -309,8 +309,7 @@ namespace MfGames.GtkExt.TextEditor.Editing
 
 			// This explictly sets the buffer position after the commands.
 			command.EndPosition = bufferPosition;
-			displayContext.Caret.Position = command.EndPosition;
-			displayContext.RequestScrollToCaret();
+			displayContext.Caret.SetAndScrollToPosition(command.EndPosition);
 		}
 
 		/// <summary>
