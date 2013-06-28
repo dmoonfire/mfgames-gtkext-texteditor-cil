@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{1005DD
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MfGames.GtkExt.TextEditor.Demo", "MfGames.GtkExt.TextEditor.Demo\MfGames.GtkExt.TextEditor.Demo.csproj", "{B1823551-D11A-4C41-BD44-DD60BAA2ABF6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -52,6 +54,12 @@ Global
 		{2EB3E9A0-514D-4194-A74D-F6386366E394}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2EB3E9A0-514D-4194-A74D-F6386366E394}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2EB3E9A0-514D-4194-A74D-F6386366E394}.Release|x86.ActiveCfg = Release|Any CPU
+		{B1823551-D11A-4C41-BD44-DD60BAA2ABF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1823551-D11A-4C41-BD44-DD60BAA2ABF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1823551-D11A-4C41-BD44-DD60BAA2ABF6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B1823551-D11A-4C41-BD44-DD60BAA2ABF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1823551-D11A-4C41-BD44-DD60BAA2ABF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1823551-D11A-4C41-BD44-DD60BAA2ABF6}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
