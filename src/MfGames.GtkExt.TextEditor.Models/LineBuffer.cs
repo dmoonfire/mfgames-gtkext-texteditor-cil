@@ -210,6 +210,16 @@ namespace MfGames.GtkExt.TextEditor.Models
 			int lineIndex,
 			LineContexts lineContexts);
 
+		public string GetLineText(int lineIndex)
+		{
+			return GetLineText(lineIndex, LineContexts.Unformatted);
+		}
+
+		public string GetLineText(LinePosition line)
+		{
+			return GetLineText(line.Index, LineContexts.Unformatted);
+		}
+
 		public string GetLineText(
 			LinePosition line,
 			LineContexts lineContexts)

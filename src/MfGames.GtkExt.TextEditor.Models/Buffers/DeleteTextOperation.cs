@@ -54,7 +54,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 			var buffer = new StringBuilder(lineText);
 
 			// Normalize the character ranges.
-			int startCharacterIndex =
+			startCharacterIndex =
 				new CharacterPosition(CharacterRange.StartIndex).NormalizeIndex(
 					lineText, CharacterRange.EndIndex, WordSearchDirection.Left);
 			int endCharacterIndex =
@@ -73,6 +73,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 			// If we are updating the position, we need to do it here.
 			if (UpdateTextPosition.HasFlag(DoTypes.Do))
 			{
+				originalPosition = state.Position;
 				state.Results =
 					new LineBufferOperationResults(
 						new BufferPosition(LineIndex, startCharacterIndex));
@@ -92,12 +93,6 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 			var buffer = new StringBuilder(lineText);
 
 			// Normalize the character ranges.
-			int startCharacterIndex =
-				new CharacterPosition(CharacterRange.StartIndex).NormalizeIndex(
-					lineText, CharacterRange.EndIndex, WordSearchDirection.Left);
-			int endCharacterIndex =
-				new CharacterPosition(CharacterRange.EndIndex).NormalizeIndex(
-					lineText, CharacterRange.StartIndex, WordSearchDirection.Right);
 			buffer.Insert(startCharacterIndex, originalText);
 
 			// Set the line in the buffer.
@@ -109,7 +104,8 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 			{
 				state.Results =
 					new LineBufferOperationResults(
-						new BufferPosition(LineIndex, endCharacterIndex));
+						new BufferPosition(
+							originalPosition.Line.Index, originalPosition.Character.Index));
 			}
 		}
 
@@ -168,7 +164,9 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 
 		#region Fields
 
+		private TextPosition originalPosition;
 		private string originalText;
+		private int startCharacterIndex;
 
 		#endregion
 	}

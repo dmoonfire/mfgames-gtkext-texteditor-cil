@@ -324,7 +324,6 @@ namespace GtkExtDemo.TextEditor
 					+ "up on the indicator bar on the right side of the window.",
 			};
 
-
 			// Set the text on the lines with the prefix so they can be styled
 			// as part of the set operation.
 			InsertLines(0, lines.Length);

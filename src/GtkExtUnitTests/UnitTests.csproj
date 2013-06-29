@@ -120,6 +120,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DeleteLeftWordCommandFactoryTests.cs" />
+    <Compile Include="DeleteRightWordCommandFactoryTests.cs" />
     <Compile Include="Exhaustive\AttributeCenterSelectionExhaustiveTests.cs" />
     <Compile Include="Exhaustive\AttributeEndSelectionExhaustiveTests.cs" />
     <Compile Include="Exhaustive\AttributeStartSelectionExhaustiveTests.cs" />

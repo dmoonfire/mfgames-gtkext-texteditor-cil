@@ -95,13 +95,25 @@ namespace MfGames.GtkExt.TextEditor.Editing
 			y -= displayContext.BufferOffsetY;
 
 			// Shift the contents to compenstate for the margins.
-			LineBlockStyle style = displayContext.Renderer.GetLineStyle(Position.LineIndex,LineContexts.None);
+			LineBlockStyle style =
+				displayContext.Renderer.GetLineStyle(Position.LineIndex, LineContexts.None);
 
 			x += displayContext.TextX;
 			x += style.Left;
 
 			// Return the resulting rectangle.
 			return new Rectangle(x, y, 1, lineHeight);
+		}
+
+		/// <summary>
+		/// Sets the position and scroll to the new location.
+		/// </summary>
+		/// <param name="position">The position.</param>
+		public void SetAndScrollToPosition(BufferPosition position)
+		{
+			Position = position;
+			displayContext.ScrollToCaret(displayContext.Caret.Position);
+			displayContext.RequestScrollToCaret();
 		}
 
 		#endregion
@@ -129,16 +141,5 @@ namespace MfGames.GtkExt.TextEditor.Editing
 		private readonly IDisplayContext displayContext;
 
 		#endregion
-
-		/// <summary>
-		/// Sets the position and scroll to the new location.
-		/// </summary>
-		/// <param name="position">The position.</param>
-		public void SetAndScrollToPosition(BufferPosition position)
-		{
-			Position = position;
-			displayContext.ScrollToCaret(displayContext.Caret.Position);
-			displayContext.RequestScrollToCaret();
-		}
 	}
 }

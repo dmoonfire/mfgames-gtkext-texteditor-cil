@@ -9,7 +9,6 @@ using Gdk;
 using Gtk;
 using MfGames.GtkExt.Extensions.Cairo;
 using MfGames.GtkExt.Extensions.Pango;
-using MfGames.GtkExt.TextEditor.Buffers;
 using MfGames.GtkExt.TextEditor.Editing;
 using MfGames.GtkExt.TextEditor.Interfaces;
 using MfGames.GtkExt.TextEditor.Margins;

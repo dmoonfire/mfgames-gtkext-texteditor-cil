@@ -57,7 +57,8 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 			// If we have a text position, we need to set it.
 			if (operationContext.Results.HasValue)
 			{
-				displayContext.Caret.SetAndScrollToPosition(operationContext.Results.Value.BufferPosition);
+				displayContext.Caret.SetAndScrollToPosition(
+					operationContext.Results.Value.BufferPosition);
 			}
 		}
 
