@@ -378,6 +378,9 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			object sender,
 			LineChangedArgs args)
 		{
+			// Make sure we allocated all the windows.
+			AllocateWindows();
+
 			// Get the window for the line change and reset that line.
 			int cachedWindowIndex = GetWindowIndex(args.LineIndex);
 			CachedWindow cachedWindow = windows[cachedWindowIndex];

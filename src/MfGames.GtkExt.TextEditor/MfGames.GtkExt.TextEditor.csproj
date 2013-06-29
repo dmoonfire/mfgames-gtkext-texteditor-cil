@@ -219,7 +219,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="MfGames.GtkExt.TextEditor.nuspec" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MfGames.GtkExt.TextEditor.Models\MfGames.GtkExt.TextEditor.Models.csproj">
