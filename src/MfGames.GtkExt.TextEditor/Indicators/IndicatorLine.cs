@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using C5;
 using Cairo;
 using MfGames.GtkExt.TextEditor.Interfaces;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
@@ -158,10 +157,10 @@ namespace MfGames.GtkExt.TextEditor.Indicators
 				{
 					if (indicators == null)
 					{
-						indicators = new ArrayList<ILineIndicator>();
+						indicators = new List<ILineIndicator>();
 					}
 
-					indicators.AddAll(lineIndicators);
+					indicators.AddRange(lineIndicators);
 				}
 			}
 
@@ -212,8 +211,8 @@ namespace MfGames.GtkExt.TextEditor.Indicators
 		{
 			// Create a dictionary of the individual styles and their counts.
 			Theme theme = displayContext.Theme;
-			var styles = new HashDictionary<string, IndicatorStyle>();
-			var counts = new HashDictionary<string, int>();
+			var styles = new Dictionary<string, IndicatorStyle>();
+			var counts = new Dictionary<string, int>();
 			double total = 0;
 
 			foreach (ILineIndicator indicator in indicators)
@@ -221,20 +220,20 @@ namespace MfGames.GtkExt.TextEditor.Indicators
 				// Make sure this indicator has a style.
 				string styleName = indicator.LineIndicatorStyle;
 
-				if (!theme.IndicatorStyles.Contains(styleName))
+				if (!theme.IndicatorStyles.ContainsKey(styleName))
 				{
 					continue;
 				}
 
 				// Check to see if we already have the style.
-				if (!styles.Contains(styleName))
+				if (!styles.ContainsKey(styleName))
 				{
 					IndicatorStyle style = theme.IndicatorStyles[styleName];
 					styles[styleName] = style;
 				}
 
 				// Increment the counter for this style.
-				if (counts.Contains(styleName))
+				if (counts.ContainsKey(styleName))
 				{
 					counts[styleName]++;
 				}
@@ -247,9 +246,9 @@ namespace MfGames.GtkExt.TextEditor.Indicators
 			}
 
 			// Get a list of sorted styles, ordered by priority.
-			var sortedStyles = new ArrayList<IndicatorStyle>();
+			var sortedStyles = new List<IndicatorStyle>();
 
-			sortedStyles.AddAll(styles.Values);
+			sortedStyles.AddRange(styles.Values);
 			sortedStyles.Sort();
 
 			// Go through the styles and build up the ratios and colors.
@@ -288,7 +287,7 @@ namespace MfGames.GtkExt.TextEditor.Indicators
 				// one, then just skip it.
 				ILineIndicator indicator = indicators[index];
 
-				if (!theme.IndicatorStyles.Contains(indicator.LineIndicatorStyle))
+				if (!theme.IndicatorStyles.ContainsKey(indicator.LineIndicatorStyle))
 				{
 					// No style, nothing to render.
 					continue;
@@ -330,7 +329,7 @@ namespace MfGames.GtkExt.TextEditor.Indicators
 		#region Fields
 
 		private Color[] colors;
-		private ArrayList<ILineIndicator> indicators;
+		private List<ILineIndicator> indicators;
 		private double[] ratios;
 
 		#endregion

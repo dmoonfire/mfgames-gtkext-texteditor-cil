@@ -3,8 +3,8 @@
 // http://mfgames.com/mfgames-gtkext-cil/license
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using C5;
 using Cairo;
 using MfGames.GtkExt.TextEditor.Interfaces;
 using MfGames.GtkExt.TextEditor.Models.Styles;
@@ -16,7 +16,7 @@ namespace MfGames.GtkExt.TextEditor.Margins
 	/// Encapsulates a list of margin renderers. This handles the packing code
 	/// and processing visbility, widths, and heights.
 	/// </summary>
-	public class MarginRendererCollection: LinkedList<MarginRenderer>
+	public class MarginRendererCollection: List<MarginRenderer>
 	{
 		#region Properties
 
@@ -42,11 +42,11 @@ namespace MfGames.GtkExt.TextEditor.Margins
 
 		#region Methods
 
-		public override bool Add(MarginRenderer item)
+		public new void Add(MarginRenderer item)
 		{
 			item.WidthChanged += OnWidthChanged;
 			RecalculateWidth();
-			return base.Add(item);
+			base.Add(item);
 		}
 
 		/// <summary>
@@ -91,7 +91,7 @@ namespace MfGames.GtkExt.TextEditor.Margins
 			}
 		}
 
-		public override void Insert(
+		public new void Insert(
 			int i,
 			MarginRenderer item)
 		{
@@ -100,7 +100,7 @@ namespace MfGames.GtkExt.TextEditor.Margins
 			base.Insert(i, item);
 		}
 
-		public override bool Remove(MarginRenderer item)
+		public new bool Remove(MarginRenderer item)
 		{
 			item.WidthChanged -= OnWidthChanged;
 			RecalculateWidth();

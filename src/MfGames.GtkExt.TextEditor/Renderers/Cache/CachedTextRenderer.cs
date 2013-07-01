@@ -3,8 +3,9 @@
 // http://mfgames.com/mfgames-gtkext-cil/license
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using C5;
+using MfGames.Extensions.System.Collections.Generic;
 using MfGames.GtkExt.TextEditor.Buffers;
 using MfGames.GtkExt.TextEditor.Interfaces;
 using MfGames.GtkExt.TextEditor.Models;
@@ -366,7 +367,9 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			}
 
 			// Return the first set of allocated lines in the array.
-			return allocatedLines.Pop();
+			CachedLine[] first = allocatedLines[0];
+			allocatedLines.RemoveAt(0);
+			return first;
 		}
 
 		/// <summary>
@@ -592,10 +595,10 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			this.windowSize = windowSize;
 
 			// Create the collection of windows.
-			windows = new ArrayList<CachedWindow>();
+			windows = new List<CachedWindow>();
 
 			// Pre-create the window arrays.
-			allocatedLines = new ArrayList<CachedLine[]>();
+			allocatedLines = new List<CachedLine[]>();
 
 			for (int index = 0;
 				index < maximumLoadedWindows;
@@ -624,7 +627,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		/// not in use. This is to avoid memory pressure by allocating them once
 		/// and not freeing the memory until the class is freed.
 		/// </summary>
-		private readonly ArrayList<CachedLine[]> allocatedLines;
+		private readonly List<CachedLine[]> allocatedLines;
 
 		private int? lineHeight;
 
@@ -636,7 +639,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		/// <summary>
 		/// Contains all the windows in this cache.
 		/// </summary>
-		private readonly ArrayList<CachedWindow> windows;
+		private readonly List<CachedWindow> windows;
 
 		#endregion
 	}

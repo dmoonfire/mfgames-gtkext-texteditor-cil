@@ -2,7 +2,7 @@
 // Released under the MIT license
 // http://mfgames.com/mfgames-gtkext-cil/license
 
-using C5;
+using System.Collections.Generic;
 
 namespace MfGames.GtkExt.TextEditor.Models.Styles
 {
@@ -10,8 +10,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Styles
 	/// Implements a dictionary for managing block styles.
 	/// </summary>
 	/// <typeparam name="TBlockStyle">The type of the block style.</typeparam>
-	public class BlockStyleDictionary<TBlockStyle>:
-		HashDictionary<string, TBlockStyle>
+	public class BlockStyleDictionary<TBlockStyle>: Dictionary<string, TBlockStyle>
 		where TBlockStyle: BlockStyle
 	{
 		#region Properties
@@ -19,11 +18,11 @@ namespace MfGames.GtkExt.TextEditor.Models.Styles
 		/// <summary>
 		/// Gets or sets the <see cref="TBlockStyle"/> with the specified key.
 		/// </summary>
-		public override TBlockStyle this[string key]
+		public new TBlockStyle this[string key]
 		{
 			get
 			{
-				return Contains(key)
+				return ContainsKey(key)
 					? base[key]
 					: null;
 			}

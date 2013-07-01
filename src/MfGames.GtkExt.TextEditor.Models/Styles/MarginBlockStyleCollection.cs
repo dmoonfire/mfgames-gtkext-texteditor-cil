@@ -3,14 +3,14 @@
 // http://mfgames.com/mfgames-gtkext-cil/license
 
 using System;
-using C5;
+using System.Collections.Generic;
 
 namespace MfGames.GtkExt.TextEditor.Models.Styles
 {
 	/// <summary>
 	/// Contains a list of margin block styles.
 	/// </summary>
-	public class MarginBlockStyleCollection: ArrayList<MarginBlockStyle>
+	public class MarginBlockStyleCollection: List<MarginBlockStyle>
 	{
 		#region Methods
 

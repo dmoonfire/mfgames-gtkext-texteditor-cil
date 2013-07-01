@@ -2,8 +2,8 @@
 // Released under the MIT license
 // http://mfgames.com/mfgames-gtkext-cil/license
 
+using System.Collections.Generic;
 using System.Diagnostics;
-using C5;
 
 namespace MfGames.GtkExt.TextEditor.Models.Styles
 {
@@ -21,7 +21,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Styles
 		/// Gets the children styles associated with this one.
 		/// </summary>
 		/// <value>The children.</value>
-		public LinkedList<LineBlockStyle> Children
+		public List<LineBlockStyle> Children
 		{
 			[DebuggerStepThrough] get { return children; }
 		}
@@ -75,7 +75,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Styles
 		/// </summary>
 		public LineBlockStyle()
 		{
-			children = new LinkedList<LineBlockStyle>();
+			children = new List<LineBlockStyle>();
 			MarginStyles = new MarginBlockStyleCollection(this);
 		}
 
@@ -93,7 +93,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Styles
 
 		#region Fields
 
-		private readonly LinkedList<LineBlockStyle> children;
+		private readonly List<LineBlockStyle> children;
 		private LineBlockStyle parent;
 
 		#endregion

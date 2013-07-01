@@ -3,7 +3,7 @@
 // http://mfgames.com/mfgames-gtkext-cil/license
 
 using System;
-using C5;
+using System.Collections.Generic;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
 
 namespace GtkExtDemo.TextEditor
@@ -70,10 +70,10 @@ namespace GtkExtDemo.TextEditor
 		/// </summary>
 		/// <param name="inputText">The input text.</param>
 		/// <returns></returns>
-		public static ArrayList<KeywordMarkupEntry> ParseText(string inputText)
+		public static List<KeywordMarkupEntry> ParseText(string inputText)
 		{
 			// Create a linked list of markups.
-			var entries = new ArrayList<KeywordMarkupEntry>();
+			var entries = new List<KeywordMarkupEntry>();
 
 			// Parse the various keywords used as defaults. We do case-insenstive
 			// searching to make everything uppercase.
@@ -97,7 +97,7 @@ namespace GtkExtDemo.TextEditor
 		/// <param name="markup">The markup.</param>
 		private static void ParseText(
 			string inputText,
-			IExtensible<KeywordMarkupEntry> entries,
+			List<KeywordMarkupEntry> entries,
 			string search,
 			KeywordMarkupType markup)
 		{

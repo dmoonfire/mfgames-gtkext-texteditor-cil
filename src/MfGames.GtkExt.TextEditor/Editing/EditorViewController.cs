@@ -3,9 +3,9 @@
 // http://mfgames.com/mfgames-gtkext-cil/license
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
-using C5;
 using Cairo;
 using Gdk;
 using Gtk;
@@ -353,7 +353,7 @@ namespace MfGames.GtkExt.TextEditor.Editing
 			// Check to see if we have an action for this.
 			ModifierType isNormalOrShifted = filteredModifiers & ~ModifierType.ShiftMask;
 			bool isCharacter = unicodeKey != 0 && isNormalOrShifted == ModifierType.None;
-			bool isAction = keyBindings.Contains(keyCode);
+			bool isAction = keyBindings.ContainsKey(keyCode);
 
 			if (isAction || isCharacter)
 			{
@@ -659,8 +659,8 @@ namespace MfGames.GtkExt.TextEditor.Editing
 			displayContext = editorView;
 
 			// Bind the initial keybindings.
-			keyBindings = new HashDictionary<int, ActionEntry>();
-			actions = new HashDictionary<string, ActionEntry>();
+			keyBindings = new Dictionary<int, ActionEntry>();
+			actions = new Dictionary<string, ActionEntry>();
 
 			// Bind the action states.
 			states = new ActionStateCollection();
@@ -677,12 +677,12 @@ namespace MfGames.GtkExt.TextEditor.Editing
 
 		#region Fields
 
-		private readonly HashDictionary<string, ActionEntry> actions;
+		private readonly Dictionary<string, ActionEntry> actions;
 		private ITextEditingCommandController<OperationContext> commandController;
 		private readonly IDisplayContext displayContext;
 		private bool inAction;
 		private bool inTextSelect;
-		private readonly HashDictionary<int, ActionEntry> keyBindings;
+		private readonly Dictionary<int, ActionEntry> keyBindings;
 		private BufferSegment previousTextSelection;
 		private readonly ActionStateCollection states;
 

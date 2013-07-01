@@ -3,7 +3,7 @@
 // http://mfgames.com/mfgames-gtkext-cil/license
 
 using System;
-using C5;
+using System.Collections.Generic;
 using Cairo;
 using Gtk;
 using GtkExtDemo.TextEditor;
@@ -218,9 +218,9 @@ namespace GtkExtDemo
 				lineIndex, LineContexts.None);
 
 			// Create a reverse of the text.
-			var characters = new ArrayList<char>();
+			var characters = new List<char>();
 
-			characters.AddAll(lineText);
+			characters.AddRange(lineText);
 			characters.Reverse();
 
 			var reverseText = new string(characters.ToArray());

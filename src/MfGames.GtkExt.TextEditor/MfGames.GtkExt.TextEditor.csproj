@@ -85,10 +85,6 @@
       <Private>True</Private>
       <HintPath>..\packages\Gtk.2.12.0.0\lib\atk-sharp.dll</HintPath>
     </Reference>
-    <Reference Include="C5, Version=2.2.4881.16939, Culture=neutral, PublicKeyToken=282361b99ded7e8e, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\C5.2.2.4881.16939\lib\portable-win+net40+sl40+wp+Xbox40\C5.dll</HintPath>
-    </Reference>
     <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
       <Private>True</Private>
     </Reference>
@@ -108,7 +104,8 @@
       <Private>True</Private>
       <HintPath>..\packages\Gtk.2.12.0.0\lib\gtk-sharp.dll</HintPath>
     </Reference>
-    <Reference Include="MfGames">
+    <Reference Include="MfGames, Version=4.0.1.0, Culture=neutral, PublicKeyToken=f4b9b04ed1870f79, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\MfGames.4.0.1.0\lib\net40\MfGames.dll</HintPath>
     </Reference>
     <Reference Include="MfGames.Commands, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -122,10 +119,6 @@
     <Reference Include="MfGames.GtkExt, Version=0.0.4.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\MfGames.GtkExt.0.0.4.0\lib\net45\MfGames.GtkExt.dll</HintPath>
-    </Reference>
-    <Reference Include="MfGames.GtkExt.Actions, Version=0.0.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\MfGames.GtkExt.Actions.0.0.4.0\lib\net45\MfGames.GtkExt.Actions.dll</HintPath>
     </Reference>
     <Reference Include="MfGames.Languages">
       <HintPath>..\packages\MfGames.Languages.0.1.0.0\lib\net45\MfGames.Languages.dll</HintPath>

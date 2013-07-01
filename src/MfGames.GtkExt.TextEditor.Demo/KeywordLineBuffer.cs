@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using C5;
 using MfGames.GtkExt.TextEditor.Models;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
 
@@ -43,8 +42,7 @@ namespace GtkExtDemo.TextEditor
 
 			// Parse through the markup and get a list of entries. If we don't
 			// get any out of this, return null.
-			ArrayList<KeywordMarkupEntry> entries =
-				KeywordMarkupEntry.ParseText(partialText);
+			List<KeywordMarkupEntry> entries = KeywordMarkupEntry.ParseText(partialText);
 
 			if (entries.Count == 0)
 			{
@@ -52,9 +50,9 @@ namespace GtkExtDemo.TextEditor
 			}
 
 			// Return the list of keyword entries which are also indicators.
-			var indicators = new ArrayList<ILineIndicator>(entries.Count);
+			var indicators = new List<ILineIndicator>(entries.Count);
 
-			indicators.AddAll(entries);
+			indicators.AddRange(entries);
 
 			return indicators;
 		}
@@ -74,7 +72,7 @@ namespace GtkExtDemo.TextEditor
 			// Parse through the markup and get a list of entries. We go through
 			// the list in reverse so we can use the character entries without
 			// adjusting for the text we're adding.
-			ArrayList<KeywordMarkupEntry> entries = KeywordMarkupEntry.ParseText(markup);
+			List<KeywordMarkupEntry> entries = KeywordMarkupEntry.ParseText(markup);
 
 			entries.Reverse();
 

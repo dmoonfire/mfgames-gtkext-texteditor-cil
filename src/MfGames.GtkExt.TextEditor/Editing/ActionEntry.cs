@@ -3,7 +3,7 @@
 // http://mfgames.com/mfgames-gtkext-cil/license
 
 using System;
-using C5;
+using System.Collections.Generic;
 
 namespace MfGames.GtkExt.TextEditor.Editing
 {
@@ -27,7 +27,7 @@ namespace MfGames.GtkExt.TextEditor.Editing
 		/// uses.
 		/// </summary>
 		/// <value>The state types.</value>
-		public ArrayList<Type> StateTypes
+		public List<Type> StateTypes
 		{
 			get { return stateTypes; }
 		}
@@ -68,7 +68,7 @@ namespace MfGames.GtkExt.TextEditor.Editing
 			Name = name;
 
 			// Create a list of state types needed.
-			stateTypes = new ArrayList<Type>();
+			stateTypes = new List<Type>();
 		}
 
 		#endregion
@@ -80,7 +80,7 @@ namespace MfGames.GtkExt.TextEditor.Editing
 		/// </summary>
 		public Action<EditorViewController> Action;
 
-		private readonly ArrayList<Type> stateTypes;
+		private readonly List<Type> stateTypes;
 
 		#endregion
 	}

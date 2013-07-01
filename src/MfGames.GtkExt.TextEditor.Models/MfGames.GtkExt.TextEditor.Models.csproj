@@ -62,9 +62,6 @@
       <Private>True</Private>
       <HintPath>..\packages\Gtk.2.12.0.0\lib\atk-sharp.dll</HintPath>
     </Reference>
-    <Reference Include="C5">
-      <HintPath>..\packages\C5.2.2.4881.16939\lib\portable-win+net40+sl40+wp+Xbox40\C5.dll</HintPath>
-    </Reference>
     <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
       <Private>True</Private>
       <HintPath>..\packages\Gtk.2.12.0.0\lib\gdk-sharp.dll</HintPath>

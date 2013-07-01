@@ -2,7 +2,6 @@
 // Released under the MIT license
 // http://mfgames.com/mfgames-gtkext-cil/license
 
-using C5;
 using Pango;
 using Color = Cairo.Color;
 using IDictionary = System.Collections.Generic;
@@ -39,7 +38,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Styles
 		/// Gets the indicator styles in this theme.
 		/// </summary>
 		/// <value>The indicator styles.</value>
-		public IDictionary<string, IndicatorStyle> IndicatorStyles
+		public IDictionary.IDictionary<string, IndicatorStyle> IndicatorStyles
 		{
 			get { return indicatorStyles; }
 		}
@@ -48,7 +47,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Styles
 		/// Gets the selector styles.
 		/// </summary>
 		/// <value>The selectors.</value>
-		public IDictionary<string, LineBlockStyle> LineStyles
+		public IDictionary.IDictionary<string, LineBlockStyle> LineStyles
 		{
 			get { return lineStyles; }
 		}
@@ -56,7 +55,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Styles
 		/// <summary>
 		/// Gets the region styles.
 		/// </summary>
-		public IDictionary<string, RegionBlockStyle> RegionStyles
+		public IDictionary.IDictionary<string, RegionBlockStyle> RegionStyles
 		{
 			get { return regionStyles; }
 		}
@@ -131,7 +130,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Styles
 				currentWrappedLineRegionStyle;
 
 			// Indicator styles.
-			indicatorStyles = new HashDictionary<string, IndicatorStyle>();
+			indicatorStyles = new IDictionary.Dictionary<string, IndicatorStyle>();
 		}
 
 		#endregion
@@ -174,7 +173,9 @@ namespace MfGames.GtkExt.TextEditor.Models.Styles
 		/// </summary>
 		public const string TextStyle = "Text";
 
-		private readonly HashDictionary<string, IndicatorStyle> indicatorStyles;
+		private readonly IDictionary.Dictionary<string, IndicatorStyle>
+			indicatorStyles;
+
 		private readonly BlockStyleDictionary<LineBlockStyle> lineStyles;
 		private readonly BlockStyleDictionary<RegionBlockStyle> regionStyles;
 

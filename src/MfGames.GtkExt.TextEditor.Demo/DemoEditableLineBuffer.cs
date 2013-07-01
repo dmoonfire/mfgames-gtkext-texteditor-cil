@@ -3,8 +3,8 @@
 // http://mfgames.com/mfgames-gtkext-cil/license
 
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using C5;
 using MfGames.GtkExt.TextEditor.Models;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
 
@@ -32,7 +32,7 @@ namespace GtkExtDemo.TextEditor
 			// See if we have the line in the styles.
 			var lineType = DemoLineStyleType.Default;
 
-			if (styles.Contains(lineIndex))
+			if (styles.ContainsKey(lineIndex))
 			{
 				// If this is a heading line, and it has no value, and it is
 				// not the current line, we color it differently to make it
@@ -72,7 +72,7 @@ namespace GtkExtDemo.TextEditor
 			var lineType = DemoLineStyleType.Default;
 			int lineLength = base.GetLineLength(lineIndex, LineContexts.Unformatted);
 
-			if (styles.Contains(lineIndex))
+			if (styles.ContainsKey(lineIndex))
 			{
 				// If this is a heading line, and it has no value, and it is
 				// not the current line, we put in different text for a
@@ -183,7 +183,7 @@ namespace GtkExtDemo.TextEditor
 			{
 				// If we have a key, shift it.
 				if (lineIndex >= operation.LineIndex
-					&& styles.Contains(lineIndex))
+					&& styles.ContainsKey(lineIndex))
 				{
 					styles[lineIndex + operation.Count] = styles[lineIndex];
 					styles.Remove(lineIndex);
@@ -211,7 +211,7 @@ namespace GtkExtDemo.TextEditor
 			{
 				// If we have a key, shift it.
 				if (lineIndex >= operation.Line
-					&& styles.Contains(lineIndex))
+					&& styles.ContainsKey(lineIndex))
 				{
 					styles[lineIndex - operation.Count] = styles[lineIndex];
 					styles.Remove(lineIndex);
@@ -308,7 +308,7 @@ namespace GtkExtDemo.TextEditor
 		public DemoEditableLineBuffer()
 		{
 			// Set up the line styles.
-			styles = new HashDictionary<int, DemoLineStyleType>();
+			styles = new Dictionary<int, DemoLineStyleType>();
 
 			// Create the initial lines. There is already one in the buffer before
 			// this insert operates.
@@ -345,7 +345,7 @@ namespace GtkExtDemo.TextEditor
 		/// </summary>
 		private static readonly Regex removeExcessiveSpaces;
 
-		private readonly HashDictionary<int, DemoLineStyleType> styles;
+		private readonly Dictionary<int, DemoLineStyleType> styles;
 
 		#endregion
 	}

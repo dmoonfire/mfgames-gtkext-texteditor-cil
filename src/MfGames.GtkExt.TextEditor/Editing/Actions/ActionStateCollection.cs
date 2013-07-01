@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using C5;
 using MfGames.GtkExt.TextEditor.Interfaces;
 
 namespace MfGames.GtkExt.TextEditor.Editing.Actions
@@ -13,7 +12,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 	/// Contains a collection of action states that can be conditionally
 	/// removed with various states removed.
 	/// </summary>
-	public class ActionStateCollection: ArrayList<IActionState>
+	public class ActionStateCollection: List<IActionState>
 	{
 		#region Methods
 
@@ -61,7 +60,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 		public void RemoveAllExcluding(IEnumerable<Type> excludeTypes)
 		{
 			// Go through a list and build up a list of things to remove.
-			var removeStates = new ArrayList<IActionState>();
+			var removeStates = new List<IActionState>();
 
 			foreach (IActionState state in this)
 			{

@@ -2,6 +2,7 @@
 // Released under the MIT license
 // http://mfgames.com/mfgames-gtkext-cil/license
 
+using MfGames.Extensions.System.Collections.Generic;
 using MfGames.GtkExt.TextEditor.Interfaces;
 using MfGames.GtkExt.TextEditor.Models;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
@@ -43,7 +44,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			{
 				// Even with the delete selection, the final operation will
 				// be the set text operation.
-				return (InsertTextOperation) Command.Operations.Last;
+				return (InsertTextOperation) Command.Operations.GetLast();
 			}
 		}
 

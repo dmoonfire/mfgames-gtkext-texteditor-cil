@@ -2,7 +2,7 @@
 // Released under the MIT license
 // http://mfgames.com/mfgames-gtkext-cil/license
 
-using C5;
+using System.Collections.Generic;
 
 namespace MfGames.GtkExt.TextEditor.Models.Buffers
 {
@@ -23,7 +23,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 		/// <summary>
 		/// Gets the operations for the command.
 		/// </summary>
-		public ArrayList<ILineBufferOperation> Operations { get; private set; }
+		public List<ILineBufferOperation> Operations { get; private set; }
 
 		/// <summary>
 		/// Gets or sets the position for the start of the operations.
@@ -34,7 +34,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 		/// <summary>
 		/// Gets the undo operations for this command.
 		/// </summary>
-		public ArrayList<ILineBufferOperation> UndoOperations { get; private set; }
+		public List<ILineBufferOperation> UndoOperations { get; private set; }
 
 		#endregion
 
@@ -45,8 +45,8 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 		/// </summary>
 		public Command()
 		{
-			Operations = new ArrayList<ILineBufferOperation>();
-			UndoOperations = new ArrayList<ILineBufferOperation>();
+			Operations = new List<ILineBufferOperation>();
+			UndoOperations = new List<ILineBufferOperation>();
 		}
 
 		/// <summary>
