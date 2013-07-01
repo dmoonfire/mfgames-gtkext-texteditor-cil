@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <licenseUrl>http://mfgames.com/mfgames-gtkext-cil/license</licenseUrl>
+    <projectUrl>http://mfgames.com/mfgames-gtkext-cil</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>Copyright 2011-2013</copyright>
+    <tags>Gtk#</tags>
+  </metadata>
+</package>
