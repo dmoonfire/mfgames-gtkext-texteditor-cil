@@ -457,8 +457,10 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		{
 			// Pull out some of the common things we'll be using in this method.
 			EditorViewRenderer buffer = displayContext.Renderer;
+			int lineIndex = Math.Min(
+				bufferPosition.LineIndex, displayContext.LineBuffer.LineCount);
 			int bufferLineIndex =
-				buffer.LineBuffer.NormalizeLineIndex(bufferPosition.LineIndex);
+				buffer.LineBuffer.NormalizeLineIndex(lineIndex);
 			Layout layout = buffer.GetLineLayout(
 				bufferLineIndex, LineContexts.Unformatted);
 			LineBlockStyle style = buffer.GetLineStyle(
@@ -480,7 +482,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			// value to calculate it. This actually uses UTF-8 encoding to
 			// calculate the indexes.
 			string lineText =
-				displayContext.LineBuffer.GetLineText(bufferPosition.LineIndex);
+				displayContext.LineBuffer.GetLineText(lineIndex);
 			int unicodeCharacter = ToUnicodeCharacterIndex(
 				lineText, bufferPosition.CharacterIndex);
 
