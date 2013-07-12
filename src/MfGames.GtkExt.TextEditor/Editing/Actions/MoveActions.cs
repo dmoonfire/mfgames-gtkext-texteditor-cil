@@ -116,6 +116,11 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 
 			position.CharacterIndex = characterIndex;
 
+			if (trailing > 0)
+			{
+				position.CharacterIndex++;
+			}
+
 			// Draw the new location of the caret.
 			displayContext.ScrollToCaret(position);
 		}
@@ -704,6 +709,11 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 
 			position.CharacterIndex = characterIndex;
 
+			if (trailing > 0)
+			{
+				position.CharacterIndex++;
+			}
+
 			// Draw the new location of the caret.
 			displayContext.ScrollToCaret(position);
 		}
@@ -726,12 +736,27 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 
 			if (state == null)
 			{
-				// Calculate the line state from the caret position.
+				// Calculate the line state from the caret position. The cursor
+				// is always to the left of the character unless we're at the
+				// end, and then it's considered trailing of the previous
+				// character.
 				string lineText =
 					controller.DisplayContext.LineBuffer.GetLineText(position.LineIndex);
+				int characterIndex = position.CharacterIndex;
+				bool trailing = false;
+
+				if (characterIndex == lineText.Length)
+				{
+					characterIndex--;
+					trailing = true;
+				}
+
+				// Because Pango works with UTF-8-based indexes, we need to
+				// convert the C# character index into that index to properly
+				// identify the character.
 				int unicodeIndex = BufferPositionHelper.ToUnicodeCharacterIndex(
-					lineText, position.CharacterIndex);
-				lineX = wrappedLine.IndexToX(unicodeIndex, false);
+					lineText, characterIndex);
+				lineX = wrappedLine.IndexToX(unicodeIndex, trailing);
 
 				// Save a new state into the states.
 				state = new VerticalMovementActionState(lineX);

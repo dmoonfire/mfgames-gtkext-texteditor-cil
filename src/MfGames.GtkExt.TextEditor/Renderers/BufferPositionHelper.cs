@@ -349,7 +349,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 				}
 
 				// If we are zero or less, we're done.
-				if (unicodeCharacter <= 0)
+				if (unicodeCharacter < 0)
 				{
 					break;
 				}
