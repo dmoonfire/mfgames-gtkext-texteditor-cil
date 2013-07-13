@@ -22,15 +22,21 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 
 		public override void Do(OperationContext state)
 		{
-			// Grab the text from the source line.
+			// Figure out the indexes in the source line we'll be using to
+			// pull out a substring.
 			string sourceLine = state.LineBuffer.GetLineText(
 				SourceRange.Line, LineContexts.Unformatted);
 			int sourceBegin = SourceRange.CharacterBegin.NormalizeIndex(
 				sourceLine, SourceRange.CharacterEnd, WordSearchDirection.Left);
 			int sourceEnd = SourceRange.CharacterEnd.NormalizeIndex(
 				sourceLine, SourceRange.CharacterBegin, WordSearchDirection.Right);
-			string sourceText = sourceLine.Substring(
-				sourceBegin, sourceEnd - sourceBegin);
+
+			// Grab the text from the source line. If the source begin is at the
+			// end of the string, then our source will always be a blank line.
+			// Otherwise, it will be a portion of that source line.
+			sourceLength = sourceEnd - sourceBegin;
+
+			string sourceText = sourceLine.Substring(sourceBegin, sourceLength);
 
 			// Insert the text from the source line into the destination.
 			string destinationLine =
@@ -43,7 +49,6 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 			buffer.Insert(characterIndex, sourceText);
 
 			// Save the source text length so we can delete it.
-			sourceLength = sourceText.Length;
 			originalCharacterIndex = characterIndex;
 
 			// Set the line in the buffer.

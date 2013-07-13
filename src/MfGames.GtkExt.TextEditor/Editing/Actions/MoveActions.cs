@@ -150,6 +150,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 		{
 			IDisplayContext displayContext = controller.DisplayContext;
 			Caret caret = displayContext.Caret;
+
 			displayContext.ScrollToCaret(
 				caret.Position.ToEndOfWrappedLine(displayContext));
 		}
