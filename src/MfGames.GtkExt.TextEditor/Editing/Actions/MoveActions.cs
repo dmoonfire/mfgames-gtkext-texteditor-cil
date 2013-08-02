@@ -103,10 +103,23 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			// The wrapped line has the current wrapped line, so use the lineX
 			// to figure out which character to use.
 			int trailing;
-			int index;
+			int unicodeIndex;
 
-			wrappedLine.XToIndex(lineX, out index, out trailing);
-			position.CharacterIndex = index;
+			wrappedLine.XToIndex(lineX, out unicodeIndex, out trailing);
+
+			// Calculate the character position, but we have to map UTF-8
+			// characters because Pango uses that instead of C# strings.
+			string lineText =
+				controller.DisplayContext.LineBuffer.GetLineText(position.LineIndex);
+			int characterIndex = BufferPositionHelper.ToCharacterIndex(
+				lineText, unicodeIndex);
+
+			position.CharacterIndex = characterIndex;
+
+			if (trailing > 0)
+			{
+				position.CharacterIndex++;
+			}
 
 			// Draw the new location of the caret.
 			displayContext.ScrollToCaret(position);
@@ -137,6 +150,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 		{
 			IDisplayContext displayContext = controller.DisplayContext;
 			Caret caret = displayContext.Caret;
+
 			displayContext.ScrollToCaret(
 				caret.Position.ToEndOfWrappedLine(displayContext));
 		}
@@ -173,11 +187,16 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 
 			// Determines where in the layout is the point.
 			int pangoLayoutX = Units.FromPixels((int) layoutX);
-			int characterIndex,
-				trailing;
+			int unicodeIndex;
+			int trailing;
 
-			layout.XyToIndex(
-				pangoLayoutX, pangoLayoutY, out characterIndex, out trailing);
+			layout.XyToIndex(pangoLayoutX, pangoLayoutY, out unicodeIndex, out trailing);
+
+			// When dealing with UTF-8 characters, we have to convert the
+			// Unicode index into a C# index.
+			string lineText = displayContext.LineBuffer.GetLineText(lineIndex);
+			int characterIndex = BufferPositionHelper.ToCharacterIndex(
+				lineText, unicodeIndex);
 
 			// Return the buffer position.
 			return new BufferPosition(lineIndex, characterIndex + trailing);
@@ -678,10 +697,23 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			// The wrapped line has the current wrapped line, so use the lineX
 			// to figure out which character to use.
 			int trailing;
-			int index;
+			int unicodeIndex;
 
-			wrappedLine.XToIndex(lineX, out index, out trailing);
-			position.CharacterIndex = index;
+			wrappedLine.XToIndex(lineX, out unicodeIndex, out trailing);
+
+			// Calculate the character position, but we have to map UTF-8
+			// characters because Pango uses that instead of C# strings.
+			string lineText =
+				controller.DisplayContext.LineBuffer.GetLineText(position.LineIndex);
+			int characterIndex = BufferPositionHelper.ToCharacterIndex(
+				lineText, unicodeIndex);
+
+			position.CharacterIndex = characterIndex;
+
+			if (trailing > 0)
+			{
+				position.CharacterIndex++;
+			}
 
 			// Draw the new location of the caret.
 			displayContext.ScrollToCaret(position);
@@ -705,8 +737,27 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 
 			if (state == null)
 			{
-				// Calculate the line state from the caret position.
-				lineX = wrappedLine.IndexToX(position.CharacterIndex, false);
+				// Calculate the line state from the caret position. The cursor
+				// is always to the left of the character unless we're at the
+				// end, and then it's considered trailing of the previous
+				// character.
+				string lineText =
+					controller.DisplayContext.LineBuffer.GetLineText(position.LineIndex);
+				int characterIndex = position.CharacterIndex;
+				bool trailing = false;
+
+				if (characterIndex == lineText.Length)
+				{
+					characterIndex--;
+					trailing = true;
+				}
+
+				// Because Pango works with UTF-8-based indexes, we need to
+				// convert the C# character index into that index to properly
+				// identify the character.
+				int unicodeIndex = BufferPositionHelper.ToUnicodeCharacterIndex(
+					lineText, characterIndex);
+				lineX = wrappedLine.IndexToX(unicodeIndex, trailing);
 
 				// Save a new state into the states.
 				state = new VerticalMovementActionState(lineX);

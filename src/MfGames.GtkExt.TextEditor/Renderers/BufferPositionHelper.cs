@@ -2,6 +2,7 @@
 // Released under the MIT license
 // http://mfgames.com/mfgames-gtkext-cil/license
 
+using System;
 using Cairo;
 using MfGames.GtkExt.TextEditor.Interfaces;
 using MfGames.GtkExt.TextEditor.Models;
@@ -23,6 +24,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// <summary>
 		/// Gets the wrapped line associated with this buffer position.
 		/// </summary>
+		/// <param name="bufferPosition">The buffer position.</param>
 		/// <param name="displayContext">The display context.</param>
 		/// <returns></returns>
 		public static LayoutLine GetWrappedLine(
@@ -39,6 +41,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// <summary>
 		/// Gets the wrapped line associated with this buffer position.
 		/// </summary>
+		/// <param name="bufferPosition">The buffer position.</param>
 		/// <param name="displayContext">The display context.</param>
 		/// <param name="layout">The layout.</param>
 		/// <param name="wrappedLineIndex">Index of the wrapped line.</param>
@@ -49,15 +52,18 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			out Layout layout,
 			out int wrappedLineIndex)
 		{
-			// Get the layout associated with the line.
+			// Get the layout and text associated with the line.
+			string text = displayContext.LineBuffer.GetLineText(bufferPosition.LineIndex);
+
 			layout = displayContext.Renderer.GetLineLayout(
 				bufferPosition.LineIndex, LineContexts.Unformatted);
 
 			// Get the wrapped line associated with this character position.
+			int unicodeIndex = ToUnicodeCharacterIndex(
+				text, bufferPosition.CharacterIndex);
 			int x;
 
-			layout.IndexToLineX(
-				bufferPosition.CharacterIndex, false, out wrappedLineIndex, out x);
+			layout.IndexToLineX(unicodeIndex, false, out wrappedLineIndex, out x);
 
 			// Return the resulting line.
 			return layout.Lines[wrappedLineIndex];
@@ -66,9 +72,10 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// <summary>
 		/// Determines whether the position is at the beginning of a wrapped line.
 		/// </summary>
+		/// <param name="bufferPosition">The buffer position.</param>
 		/// <param name="displayContext">The display context.</param>
 		/// <returns>
-		/// 	<c>true</c> if [is begining of wrapped line] [the specified display context]; otherwise, <c>false</c>.
+		///   <c>true</c> if [is begining of wrapped line] [the specified display context]; otherwise, <c>false</c>.
 		/// </returns>
 		public static bool IsBeginingOfWrappedLine(
 			this BufferPosition bufferPosition,
@@ -81,9 +88,10 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// <summary>
 		/// Determines whether the position is at the beginning of the line.
 		/// </summary>
+		/// <param name="bufferPosition">The buffer position.</param>
 		/// <param name="buffer">The buffer.</param>
 		/// <returns>
-		/// 	<c>true</c> if [is beginning of buffer] [the specified buffer]; otherwise, <c>false</c>.
+		///   <c>true</c> if [is beginning of buffer] [the specified buffer]; otherwise, <c>false</c>.
 		/// </returns>
 		public static bool IsBeginningOfBuffer(
 			this BufferPosition bufferPosition,
@@ -303,9 +311,65 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			this BufferPosition bufferPosition,
 			IDisplayContext displayContext)
 		{
-			return new BufferPosition(
-				bufferPosition.LineIndex,
-				bufferPosition.GetWrappedLine(displayContext).StartIndex);
+			// Wrapped lines (via Pango) work with UTF-8 encoding, not the
+			// normal C# string indexes. We need to get the index and convert
+			// it to a character string since that is what this library uses.
+			LayoutLine wrappedLine = bufferPosition.GetWrappedLine(displayContext);
+			int unicodeIndex = wrappedLine.StartIndex;
+
+			// Because the wrappedLine works with UTF-8 encoding, we need to
+			// convert it back to a C# string.
+			string lineText =
+				displayContext.LineBuffer.GetLineText(bufferPosition.LineIndex);
+			int characterIndex = ToCharacterIndex(lineText, unicodeIndex);
+
+			// Create a new buffer position from the elements and return it.
+			return new BufferPosition(bufferPosition.LineIndex, characterIndex);
+		}
+
+		/// <summary>
+		/// Converts a Unicode index into a C# character index.
+		/// </summary>
+		/// <param name="lineText">The line text.</param>
+		/// <param name="unicodeCharacter">The unicode character.</param>
+		/// <returns></returns>
+		public static int ToCharacterIndex(
+			string lineText,
+			int unicodeCharacter)
+		{
+			// Go through and figure out the appropriate index.
+			int characterIndex = 0;
+
+			foreach (int c in lineText)
+			{
+				if (c < 128)
+				{
+					unicodeCharacter -= 1;
+				}
+				else if (c < 2048)
+				{
+					unicodeCharacter -= 2;
+				}
+				else if (c < 65536)
+				{
+					unicodeCharacter -= 3;
+				}
+				else
+				{
+					unicodeCharacter -= 4;
+				}
+
+				// If we are zero or less, we're done.
+				if (unicodeCharacter < 0)
+				{
+					break;
+				}
+
+				// Increment the character index.
+				characterIndex++;
+			}
+
+			return characterIndex;
 		}
 
 		/// <summary>
@@ -326,7 +390,9 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// <summary>
 		/// Moves the position to the end of buffer.
 		/// </summary>
+		/// <param name="bufferPosition">The buffer position.</param>
 		/// <param name="displayContext">The display context.</param>
+		/// <returns></returns>
 		public static BufferPosition ToEndOfBuffer(
 			this BufferPosition bufferPosition,
 			IDisplayContext displayContext)
@@ -379,14 +445,21 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 
 			// Move to the end of the wrapped line. If this isn't the last, we
 			// need to shift back one character.
-			int index = wrappedLine.StartIndex + wrappedLine.Length;
+			int unicodeIndex = wrappedLine.StartIndex + wrappedLine.Length;
 
 			if (wrappedLineIndex != layout.LineCount - 1)
 			{
-				index--;
+				unicodeIndex--;
 			}
 
-			return new BufferPosition(bufferPosition.LineIndex, index);
+			// Because the wrappedLine works with UTF-8 encoding, we need to
+			// convert it back to a C# string.
+			string lineText =
+				displayContext.LineBuffer.GetLineText(bufferPosition.LineIndex);
+			int characterIndex = ToCharacterIndex(lineText, unicodeIndex);
+
+			// Create a new buffer position from the elements and return it.
+			return new BufferPosition(bufferPosition.LineIndex, characterIndex);
 		}
 
 		/// <summary>
@@ -404,8 +477,9 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		{
 			// Pull out some of the common things we'll be using in this method.
 			EditorViewRenderer buffer = displayContext.Renderer;
-			int bufferLineIndex =
-				buffer.LineBuffer.NormalizeLineIndex(bufferPosition.LineIndex);
+			int lineIndex = Math.Min(
+				bufferPosition.LineIndex, displayContext.LineBuffer.LineCount);
+			int bufferLineIndex = buffer.LineBuffer.NormalizeLineIndex(lineIndex);
 			Layout layout = buffer.GetLineLayout(
 				bufferLineIndex, LineContexts.Unformatted);
 			LineBlockStyle style = buffer.GetLineStyle(
@@ -422,20 +496,27 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			// Add the style offset for the top-padding.
 			y += style.Top;
 
+			// The cursor position code uses Unicode instead of C# character
+			// positions. This means we have to advance more than just one
+			// value to calculate it. This actually uses UTF-8 encoding to
+			// calculate the indexes.
+			string lineText = displayContext.LineBuffer.GetLineText(lineIndex);
+			int unicodeCharacter = ToUnicodeCharacterIndex(
+				lineText, bufferPosition.CharacterIndex);
+
 			// We need to figure out the relative position. If the position equals
 			// the length of the string, we want to put the caret at the end of the
 			// character. Otherwise, we put it on the front of the character to
 			// indicate insert point.
 			bool trailing = false;
-			int character = bufferPosition.CharacterIndex;
 			int lineLength = buffer.LineBuffer.GetLineLength(
 				bufferLineIndex, LineContexts.Unformatted);
 
-			if (character == lineLength)
+			if (unicodeCharacter == lineLength)
 			{
 				// Shift back one character to calculate the position and put
 				// the cursor at the end of the character.
-				character--;
+				unicodeCharacter--;
 				trailing = true;
 			}
 
@@ -444,10 +525,11 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			// then we want to move to the end of it.
 			int wrappedLineIndex;
 			int layoutX;
-			layout.IndexToLineX(character, trailing, out wrappedLineIndex, out layoutX);
+			layout.IndexToLineX(
+				unicodeCharacter, trailing, out wrappedLineIndex, out layoutX);
 
 			// Get the relative offset into the wrapped lines.
-			Rectangle layoutPoint = layout.IndexToPos(bufferPosition.CharacterIndex);
+			Rectangle layoutPoint = layout.IndexToPos(unicodeCharacter);
 
 			y += Units.ToPixels(layoutPoint.Y);
 
@@ -460,6 +542,51 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 
 			// Return the results.
 			return new PointD(Units.ToPixels(layoutX), y);
+		}
+
+		/// <summary>
+		/// Calculates the UTF-8-based character index from the C# text and
+		/// character index.
+		/// </summary>
+		/// <param name="lineText">The line text to parse for the index.</param>
+		/// <param name="character">The character index into the given string.</param>
+		/// <returns>The Unicode character index into the underlying C string.</returns>
+		public static int ToUnicodeCharacterIndex(
+			string lineText,
+			int character)
+		{
+			// Make sure we don't go beyond the string.
+			int stop = Math.Min(lineText.Length, character);
+
+			// Go through and calculate the UTF-8 index.
+			int unicodeCharacter = 0;
+
+			for (int index = 0;
+				index < stop;
+				index++)
+			{
+				// Get the character at this point
+				int c = lineText[index];
+
+				if (c < 128)
+				{
+					unicodeCharacter += 1;
+				}
+				else if (c < 2048)
+				{
+					unicodeCharacter += 2;
+				}
+				else if (c < 65536)
+				{
+					unicodeCharacter += 3;
+				}
+				else
+				{
+					unicodeCharacter += 4;
+				}
+			}
+
+			return unicodeCharacter;
 		}
 
 		#endregion
