@@ -2,4 +2,5 @@ Incremental release to handle bug fixed in the process of using Author Intrusion
 
 # Unicode
 
-- Reworked how cursor movement and caret rendering took into account with how Pango works with Unicode characters. Also better handling of trailing glyph edges while navigating to reduce the jumping of a single character while moving. +Changed
+- Reworked how cursor movement and caret rendering took into account with how Pango works with Unicode characters. +Changed
+- Better handling of trailing glyph edges while navigating to reduce the jumping of a single character while moving. +Changed
