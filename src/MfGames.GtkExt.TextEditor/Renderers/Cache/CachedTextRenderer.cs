@@ -91,6 +91,8 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 
 			// We need to get a write lock on the entire cache to avoid
 			// anything else making changes.
+			Layout layout;
+
 			using (new WriteLock(access))
 			{
 				// Make sure we have all the windows allocated.
@@ -102,9 +104,14 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 				CachedWindow window = windows[windowIndex];
 
 				// Get the layout from the window.
-				Layout layout = window.GetLineLayout(DisplayContext, lineIndex);
-				return layout;
+				layout = window.GetLineLayout(DisplayContext, lineIndex);
 			}
+
+			// Process any queued changes.
+			ProcessQueuedLineChanges();
+
+			// Return the resulting layout.
+			return layout;
 		}
 
 		/// <summary>
@@ -119,16 +126,19 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		{
 			// We need to get a write lock on the entire cache to avoid
 			// anything else making changes.
+			int height;
+
 			using (new WriteLock(access))
 			{
-				// Make sure we have all the windows allocated.
 				AllocateWindows();
-
-				int height = InternalGetLineLayoutHeight(startLineIndex, endLineIndex);
-
-				// Return the resulting height of the region.
-				return height;
+				height = InternalGetLineLayoutHeight(startLineIndex, endLineIndex);
 			}
+
+			// Process any queued changes.
+			ProcessQueuedLineChanges();
+
+			// Return the resulting height of the region.
+			return height;
 		}
 
 		/// <summary>
@@ -139,6 +149,8 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		{
 			// We need to get a write lock on the entire cache to avoid
 			// anything else making changes.
+			int height;
+
 			using (new WriteLock(access))
 			{
 				if (!lineHeight.HasValue)
@@ -146,8 +158,14 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 					lineHeight = base.GetLineLayoutHeight();
 				}
 
-				return lineHeight.Value;
+				height = lineHeight.Value;
 			}
+
+			// Process any queued changes.
+			ProcessQueuedLineChanges();
+
+			// Return the resulting height.
+			return height;
 		}
 
 		/// <summary>
@@ -233,6 +251,9 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 				endLine = windows[endWindowIndex].GetLineLayoutContaining(
 					DisplayContext, endWindowOffset);
 			}
+
+			// Process any queued changes.
+			ProcessQueuedLineChanges();
 		}
 
 		/// <summary>
@@ -253,6 +274,8 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 
 			// We need to get a write lock on the entire cache to avoid
 			// anything else making changes.
+			LineBlockStyle style;
+
 			using (new WriteLock(access))
 			{
 				// Make sure we have all the windows allocated.
@@ -264,9 +287,14 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 				CachedWindow window = windows[windowIndex];
 
 				// Get the layout from the window.
-				LineBlockStyle style = window.GetLineStyle(DisplayContext, lineIndex);
-				return style;
+				style = window.GetLineStyle(DisplayContext, lineIndex);
 			}
+
+			// Process any queued changes.
+			ProcessQueuedLineChanges();
+
+			// Return the resulting style.
+			return style;
 		}
 
 		/// <summary>
@@ -288,6 +316,9 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 					Clear(window);
 				}
 			}
+
+			// Process any queued changes.
+			ProcessQueuedLineChanges();
 		}
 
 		/// <summary>
@@ -354,6 +385,9 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 				// Call the base implementation.
 				// TODO base.UpdateSelection(displayContext, previousSelection);
 			}
+
+			// Process any queued changes.
+			ProcessQueuedLineChanges();
 		}
 
 		/// <summary>
@@ -432,19 +466,13 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			object sender,
 			LineChangedArgs args)
 		{
-			// We need to get a write lock on the entire cache to avoid
-			// anything else making changes.
-			using (new WriteLock(access))
-			{
-				// Make sure we allocated all the windows.
-				AllocateWindows();
+			// Queue up a line change since we need to keep track of the changes
+			// but this might be called while another thread is locked.
+			QueueLineChange(args.LineIndex);
 
-				// Get the window for the line change and reset that line.
-				int cachedWindowIndex = GetWindowIndex(args.LineIndex);
-				CachedWindow cachedWindow = windows[cachedWindowIndex];
-
-				cachedWindow.Reset(args.LineIndex - cachedWindow.WindowStartLine);
-			}
+			// Attempt to resolve the updates. This will do nothing if a lock
+			// is currently acquired.
+			ProcessQueuedLineChanges();
 
 			// Call the base implementation to cascade the events up.
 			base.OnLineChanged(sender, args);
@@ -459,13 +487,13 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			object sender,
 			LineRangeEventArgs args)
 		{
-			// We need to get a write lock on the entire cache to avoid
-			// anything else making changes.
-			using (new WriteLock(access))
-			{
-				Clear();
-				AllocateWindows();
-			}
+			// Queue up a line change since we need to keep track of the changes
+			// but this might be called while another thread is locked.
+			QueueLineChange(-1);
+
+			// Attempt to resolve the updates. This will do nothing if a lock
+			// is currently acquired.
+			ProcessQueuedLineChanges();
 
 			// Call the base implementation.
 			base.OnLinesDeleted(sender, args);
@@ -480,13 +508,13 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			object sender,
 			LineRangeEventArgs args)
 		{
-			// We need to get a write lock on the entire cache to avoid
-			// anything else making changes.
-			using (new WriteLock(access))
-			{
-				Clear();
-				AllocateWindows();
-			}
+			// Queue up a line change since we need to keep track of the changes
+			// but this might be called while another thread is locked.
+			QueueLineChange(-1);
+
+			// Attempt to resolve the updates. This will do nothing if a lock
+			// is currently acquired.
+			ProcessQueuedLineChanges();
 
 			// Call the base implementation.
 			base.OnLinesInserted(sender, args);
@@ -618,6 +646,84 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			return window;
 		}
 
+		/// <summary>
+		/// Processes any queued line changes. If a lock cannot be acquired,
+		/// then this does nothing.
+		/// </summary>
+		private void ProcessQueuedLineChanges()
+		{
+			// We have to make sure we aren't making changes to the queue
+			// while we're processing these changes.
+			lock (queueLineChanges)
+			{
+				// Try to get a write lock on the access object. We choose not
+				// to wait any time since we'll try again after each lock.
+				if (access.TryEnterWriteLock(0))
+				{
+					try
+					{
+						// We are inside the lock, so process the changes.
+						foreach (int lineIndex in queueLineChanges)
+						{
+							// If we are -1, then we do a full reset.
+							if (lineIndex < 0)
+							{
+								// Clear out everything and reallocate the windows.
+								Clear();
+								AllocateWindows();
+							}
+							else
+							{
+								// Make sure we allocated all the windows.
+								AllocateWindows();
+
+								// Get the window for the line change and reset that line.
+								int cachedWindowIndex = GetWindowIndex(lineIndex);
+								CachedWindow cachedWindow = windows[cachedWindowIndex];
+
+								cachedWindow.Reset(lineIndex - cachedWindow.WindowStartLine);
+							}
+						}
+
+						// Clear out the queued chanegs lock.
+						queueLineChanges.Clear();
+					}
+					finally
+					{
+						// We need to release the write lock.
+						access.ExitWriteLock();
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Queues a line change for processing.
+		/// </summary>
+		/// <param name="lineIndex">Index of the line.</param>
+		private void QueueLineChange(int lineIndex)
+		{
+			// Add the line index into the queued changes. If we have a
+			// negative already in there, then we don't add in new changes.
+			// Likewise, if we now have a -1, we make sure it is the only
+			// one in the list.
+			lock (queueLineChanges)
+			{
+				if (lineIndex < 0)
+				{
+					queueLineChanges.Clear();
+					queueLineChanges.Add(-1);
+				}
+				else
+				{
+					if (!queueLineChanges.Contains(-1))
+					{
+						queueLineChanges.Add(lineIndex);
+					}
+				}
+			}
+		}
+
 		#endregion
 
 		#region Constructors
@@ -662,6 +768,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		{
 			// Set the cache window properties.
 			access = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+			queueLineChanges = new HashSet<int>();
 			this.windowSize = windowSize;
 
 			// Create the collection of windows.
@@ -706,6 +813,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		private readonly List<CachedLine[]> allocatedLines;
 
 		private int? lineHeight;
+		private HashSet<int> queueLineChanges;
 
 		/// <summary>
 		/// Contains the size of the individual windows.
