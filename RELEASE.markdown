@@ -1,6 +1,10 @@
-Incremental release to handle bug fixed in the process of using Author Intrusion to write a novella.
+Incremental release to improve performance and handling.
 
 # Unicode
 
-- Reworked how cursor movement and caret rendering took into account with how Pango works with Unicode characters. +Changed
-- Better handling of trailing glyph edges while navigating to reduce the jumping of a single character while moving. +Changed
+- Additional work to handle Unicode characters with navigation and mouse clicking. +Changed
+- Moved the UTF-8 processing into MfGames.GtkExt
+
+# Dependencies
+
+- MfGames.GtkExt 0.2.0

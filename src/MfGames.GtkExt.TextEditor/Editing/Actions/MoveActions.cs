@@ -111,12 +111,14 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			// characters because Pango uses that instead of C# strings.
 			string lineText =
 				controller.DisplayContext.LineBuffer.GetLineText(position.LineIndex);
-			int characterIndex = BufferPositionHelper.ToCharacterIndex(
+			unicodeIndex = NormalizeEmptyStrings(lineText, unicodeIndex);
+			int characterIndex = PangoUtility.TranslatePangoToStringIndex(
 				lineText, unicodeIndex);
 
 			position.CharacterIndex = characterIndex;
 
-			if (trailing > 0)
+			if (lineText.Length > 0
+				&& trailing > 0)
 			{
 				position.CharacterIndex++;
 			}
@@ -195,8 +197,15 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			// When dealing with UTF-8 characters, we have to convert the
 			// Unicode index into a C# index.
 			string lineText = displayContext.LineBuffer.GetLineText(lineIndex);
-			int characterIndex = BufferPositionHelper.ToCharacterIndex(
+			unicodeIndex = NormalizeEmptyStrings(lineText, unicodeIndex);
+			int characterIndex = PangoUtility.TranslatePangoToStringIndex(
 				lineText, unicodeIndex);
+
+			// If the source text is empty, then we disable the trailing.
+			if (lineText.Length == 0)
+			{
+				trailing = 0;
+			}
 
 			// Return the buffer position.
 			return new BufferPosition(lineIndex, characterIndex + trailing);
@@ -349,8 +358,8 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			int lineX = Units.ToPixels(GetLineX(controller, wrappedLine, position));
 
 			// Move to the calculated point.
-			Point(
-				displayContext, new PointD(lineX, bufferY - displayContext.BufferOffsetY));
+			var newPoint = new PointD(lineX, bufferY - displayContext.BufferOffsetY);
+			Point(displayContext, newPoint);
 		}
 
 		/// <summary>
@@ -363,7 +372,10 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			PointD widgetPoint)
 		{
 			// Move to and draw the caret.
-			displayContext.ScrollToCaret(GetBufferPosition(widgetPoint, displayContext));
+			BufferPosition bufferPosition = GetBufferPosition(
+				widgetPoint, displayContext);
+
+			displayContext.ScrollToCaret(bufferPosition);
 		}
 
 		/// <summary>
@@ -705,12 +717,14 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			// characters because Pango uses that instead of C# strings.
 			string lineText =
 				controller.DisplayContext.LineBuffer.GetLineText(position.LineIndex);
-			int characterIndex = BufferPositionHelper.ToCharacterIndex(
+			unicodeIndex = NormalizeEmptyStrings(lineText, unicodeIndex);
+			int characterIndex = PangoUtility.TranslateStringToPangoIndex(
 				lineText, unicodeIndex);
 
 			position.CharacterIndex = characterIndex;
 
-			if (trailing > 0)
+			if (lineText.Length > 0
+				&& trailing > 0)
 			{
 				position.CharacterIndex++;
 			}
@@ -746,7 +760,8 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 				int characterIndex = position.CharacterIndex;
 				bool trailing = false;
 
-				if (characterIndex == lineText.Length)
+				if (characterIndex == lineText.Length
+					&& lineText.Length > 0)
 				{
 					characterIndex--;
 					trailing = true;
@@ -755,7 +770,8 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 				// Because Pango works with UTF-8-based indexes, we need to
 				// convert the C# character index into that index to properly
 				// identify the character.
-				int unicodeIndex = BufferPositionHelper.ToUnicodeCharacterIndex(
+				characterIndex = NormalizeEmptyStrings(lineText, characterIndex);
+				int unicodeIndex = PangoUtility.TranslateStringToPangoIndex(
 					lineText, characterIndex);
 				lineX = wrappedLine.IndexToX(unicodeIndex, trailing);
 
@@ -770,6 +786,25 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			}
 
 			return lineX;
+		}
+
+		/// <summary>
+		/// Normalizes indexes when the source text is empty instead of a
+		/// replacement value.
+		/// </summary>
+		/// <param name="text">The text.</param>
+		/// <param name="index">The index.</param>
+		/// <returns></returns>
+		private static int NormalizeEmptyStrings(
+			string text,
+			int index)
+		{
+			if (string.IsNullOrEmpty(text))
+			{
+				return 0;
+			}
+
+			return index;
 		}
 
 		/// <summary>
