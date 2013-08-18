@@ -229,7 +229,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			}
 
 			// Use the text editor to populate the height.
-			Height = Renderer.GetLineLayoutHeight(WindowStartLine, WindowEndLine);
+			Height = Renderer.InternalGetLineLayoutHeight(WindowStartLine, WindowEndLine);
 
 			return Height.Value;
 		}
