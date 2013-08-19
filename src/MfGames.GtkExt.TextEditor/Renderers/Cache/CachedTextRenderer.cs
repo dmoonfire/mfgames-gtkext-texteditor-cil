@@ -468,14 +468,11 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		{
 			// Queue up a line change since we need to keep track of the changes
 			// but this might be called while another thread is locked.
-			QueueLineChange(args.LineIndex);
+			QueueLineEvent(() => ProcessLineChanged(sender, args));
 
 			// Attempt to resolve the updates. This will do nothing if a lock
 			// is currently acquired.
 			ProcessQueuedLineChanges();
-
-			// Call the base implementation to cascade the events up.
-			base.OnLineChanged(sender, args);
 		}
 
 		/// <summary>
@@ -489,14 +486,11 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		{
 			// Queue up a line change since we need to keep track of the changes
 			// but this might be called while another thread is locked.
-			QueueLineChange(-1);
+			QueueLineEvent(() => ProcessLinesDeleted(sender, args));
 
 			// Attempt to resolve the updates. This will do nothing if a lock
 			// is currently acquired.
 			ProcessQueuedLineChanges();
-
-			// Call the base implementation.
-			base.OnLinesDeleted(sender, args);
 		}
 
 		/// <summary>
@@ -510,14 +504,11 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		{
 			// Queue up a line change since we need to keep track of the changes
 			// but this might be called while another thread is locked.
-			QueueLineChange(-1);
+			QueueLineEvent(() => ProcessLinesInserted(sender, args));
 
 			// Attempt to resolve the updates. This will do nothing if a lock
 			// is currently acquired.
 			ProcessQueuedLineChanges();
-
-			// Call the base implementation.
-			base.OnLinesInserted(sender, args);
 		}
 
 		/// <summary>
@@ -647,6 +638,65 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		}
 
 		/// <summary>
+		/// Processes the line changed. This will never be called inside the
+		/// access' write lock.
+		/// </summary>
+		/// <param name="sender">The sender.</param>
+		/// <param name="args">The args.</param>
+		private void ProcessLineChanged(
+			object sender,
+			LineChangedArgs args)
+		{
+			// Make sure we allocated all the windows.
+			AllocateWindows();
+
+			// Get the window for the line change and reset that line.
+			int cachedWindowIndex = GetWindowIndex(args.LineIndex);
+			CachedWindow cachedWindow = windows[cachedWindowIndex];
+
+			cachedWindow.Reset(args.LineIndex - cachedWindow.WindowStartLine);
+
+			// Call the base implementation to cascade the events up.
+			base.OnLineChanged(sender, args);
+		}
+
+		/// <summary>
+		/// Processes the lines deleted. This will never be called inside the
+		/// access' write lock.
+		/// </summary>
+		/// <param name="sender">The sender.</param>
+		/// <param name="args">The <see cref="LineRangeEventArgs"/> instance containing the event data.</param>
+		private void ProcessLinesDeleted(
+			object sender,
+			LineRangeEventArgs args)
+		{
+			// Clear out everything and reallocate the windows.
+			Clear();
+			AllocateWindows();
+
+			// Call the base implementation to cascade the events up.
+			base.OnLinesDeleted(sender, args);
+		}
+
+		/// <summary>
+		/// Processes the lines inserted. This will never be called inside the
+		/// access' write lock.
+		/// </summary>
+		/// <param name="sender">The sender.</param>
+		/// <param name="args">The <see cref="LineRangeEventArgs"/> instance containing the event data.</param>
+		private void ProcessLinesInserted(
+			object sender,
+			LineRangeEventArgs args)
+		{
+			// Clear out everything and reallocate the windows.
+			Clear();
+			AllocateWindows();
+
+			// Call the base implementation to cascade the events up.
+			base.OnLinesInserted(sender, args);
+		}
+
+		/// <summary>
 		/// Processes any queued line changes. If a lock cannot be acquired,
 		/// then this does nothing.
 		/// </summary>
@@ -654,7 +704,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		{
 			// We have to make sure we aren't making changes to the queue
 			// while we're processing these changes.
-			lock (queueLineChanges)
+			lock (queuedLineEvents)
 			{
 				// Try to get a write lock on the access object. We choose not
 				// to wait any time since we'll try again after each lock.
@@ -663,30 +713,13 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 					try
 					{
 						// We are inside the lock, so process the changes.
-						foreach (int lineIndex in queueLineChanges)
+						foreach (Action action in queuedLineEvents)
 						{
-							// If we are -1, then we do a full reset.
-							if (lineIndex < 0)
-							{
-								// Clear out everything and reallocate the windows.
-								Clear();
-								AllocateWindows();
-							}
-							else
-							{
-								// Make sure we allocated all the windows.
-								AllocateWindows();
-
-								// Get the window for the line change and reset that line.
-								int cachedWindowIndex = GetWindowIndex(lineIndex);
-								CachedWindow cachedWindow = windows[cachedWindowIndex];
-
-								cachedWindow.Reset(lineIndex - cachedWindow.WindowStartLine);
-							}
+							action();
 						}
 
 						// Clear out the queued chanegs lock.
-						queueLineChanges.Clear();
+						queuedLineEvents.Clear();
 					}
 					finally
 					{
@@ -700,27 +733,16 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		/// <summary>
 		/// Queues a line change for processing.
 		/// </summary>
-		/// <param name="lineIndex">Index of the line.</param>
-		private void QueueLineChange(int lineIndex)
+		/// <param name="action">The action.</param>
+		private void QueueLineEvent(Action action)
 		{
 			// Add the line index into the queued changes. If we have a
 			// negative already in there, then we don't add in new changes.
 			// Likewise, if we now have a -1, we make sure it is the only
 			// one in the list.
-			lock (queueLineChanges)
+			lock (queuedLineEvents)
 			{
-				if (lineIndex < 0)
-				{
-					queueLineChanges.Clear();
-					queueLineChanges.Add(-1);
-				}
-				else
-				{
-					if (!queueLineChanges.Contains(-1))
-					{
-						queueLineChanges.Add(lineIndex);
-					}
-				}
+				queuedLineEvents.Add(action);
 			}
 		}
 
@@ -768,7 +790,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		{
 			// Set the cache window properties.
 			access = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
-			queueLineChanges = new HashSet<int>();
+			queuedLineEvents = new List<Action>();
 			this.windowSize = windowSize;
 
 			// Create the collection of windows.
@@ -813,7 +835,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		private readonly List<CachedLine[]> allocatedLines;
 
 		private int? lineHeight;
-		private HashSet<int> queueLineChanges;
+		private readonly List<Action> queuedLineEvents;
 
 		/// <summary>
 		/// Contains the size of the individual windows.
