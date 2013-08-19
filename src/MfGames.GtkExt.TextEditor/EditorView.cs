@@ -786,7 +786,7 @@ namespace MfGames.GtkExt.TextEditor
 			object sender,
 			EventArgs e)
 		{
-			SetAdjustments();
+			Application.Invoke(delegate { SetAdjustments(); });
 		}
 
 		/// <summary>
