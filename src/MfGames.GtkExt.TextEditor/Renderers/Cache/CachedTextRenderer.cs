@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-using MfGames.Extensions.System.Collections.Generic;
 using MfGames.GtkExt.TextEditor.Buffers;
 using MfGames.GtkExt.TextEditor.Interfaces;
 using MfGames.GtkExt.TextEditor.Models;
@@ -60,15 +59,6 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			}
 		}
 
-		/// <summary>
-		/// Gets the size of a window cache.
-		/// </summary>
-		/// <value>The size of the window.</value>
-		public int WindowSize
-		{
-			get { return windowSize; }
-		}
-
 		#endregion
 
 		#region Methods
@@ -93,18 +83,10 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			// anything else making changes.
 			Layout layout;
 
-			using (new WriteLock(access))
+			using (new ReadLock(access))
 			{
-				// Make sure we have all the windows allocated.
-				AllocateWindows();
-
-				// Go through the windows and find the starting one.
-				lineIndex = LineBuffer.NormalizeLineIndex(lineIndex);
-				int windowIndex = GetWindowIndex(lineIndex);
-				CachedWindow window = windows[windowIndex];
-
-				// Get the layout from the window.
-				layout = window.GetLineLayout(DisplayContext, lineIndex);
+				CachedLine line = GetCachedLine(lineIndex);
+				layout = line.Layout;
 			}
 
 			// Process any queued changes.
@@ -126,19 +108,41 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		{
 			// We need to get a write lock on the entire cache to avoid
 			// anything else making changes.
-			int height;
+			int results = 0;
 
-			using (new WriteLock(access))
+			using (new ReadLock(access))
 			{
-				AllocateWindows();
-				height = InternalGetLineLayoutHeight(startLineIndex, endLineIndex);
+				// Normalize to our line count.
+				endLineIndex = Math.Min(endLineIndex, LineBuffer.LineCount - 1);
+
+				// Go through the lines and get the count.
+				for (int index = startLineIndex;
+					index <= endLineIndex;
+					index++)
+				{
+					CachedLine line = GetCachedLine(index);
+
+					results += line.Height;
+				}
 			}
 
 			// Process any queued changes.
 			ProcessQueuedLineChanges();
 
 			// Return the resulting height of the region.
-			return height;
+			return results;
+		}
+
+		/// <summary>
+		/// Gets the cached line and ensures it is populated.
+		/// </summary>
+		/// <param name="lineIndex">The line.</param>
+		/// <returns></returns>
+		private CachedLine GetCachedLine(int lineIndex)
+		{
+			CachedLine cachedLine = lines[lineIndex];
+			cachedLine.Cache(EditorViewRenderer,lineIndex);
+			return cachedLine;
 		}
 
 		/// <summary>
@@ -147,25 +151,8 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		/// <returns></returns>
 		public override int GetLineLayoutHeight()
 		{
-			// We need to get a write lock on the entire cache to avoid
-			// anything else making changes.
-			int height;
-
-			using (new WriteLock(access))
-			{
-				if (!lineHeight.HasValue)
-				{
-					lineHeight = base.GetLineLayoutHeight();
-				}
-
-				height = lineHeight.Value;
-			}
-
-			// Process any queued changes.
-			ProcessQueuedLineChanges();
-
-			// Return the resulting height.
-			return height;
+			int results = GetLineLayoutHeight(0, LineBuffer.LineCount);
+			return results;
 		}
 
 		/// <summary>
@@ -181,75 +168,41 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		{
 			// We need to get a write lock on the entire cache to avoid
 			// anything else making changes.
-			using (new WriteLock(access))
+			using (new ReadLock(access))
 			{
-				// Go through and find the windows that have the starting and ending
-				// area.
+				// Start the start and end line to the first one.
+				startLine = endLine = 0;
+
+				// Go through and find the lines that are within range of the
+				// view port.
 				int height = 0;
-				int startWindowIndex = -1;
-				int endWindowIndex = -1;
-				int startWindowHeight = 0;
-				int endWindowHeight = 0;
 				double bottom = viewArea.Y + viewArea.Height;
 
-				foreach (CachedWindow window in windows)
+				for (int lineIndex = 0;
+					lineIndex < lines.Count;
+					lineIndex++)
 				{
-					// Get the window height.
-					int windowHeight = window.GetLineLayoutHeight(DisplayContext);
+					// Get the line for the current index.
+					CachedLine line = GetCachedLine(lineIndex);
 
-					// Check for starting line.
-					if (viewArea.Y >= height
-						&& viewArea.Y <= height + windowHeight)
+					// If the line is current below the view port, then update
+					// the two lines.
+					endLine = lineIndex;
+
+					if (height < viewArea.Y)
 					{
-						// The starting line is somewhere in this window.
-						startWindowIndex = window.WindowIndex;
-						startWindowHeight = height;
+						// We are below the line, so update it.
+						startLine = lineIndex;
 					}
 
-					// Check for ending line.
-					if (bottom >= height
-						&& bottom <= height + windowHeight)
-					{
-						// The starting line is somewhere in this window.
-						endWindowIndex = window.WindowIndex;
-						endWindowHeight = height;
-					}
-
-					// If we have both a start and end window, we're done with this
-					// loop and can process it.
-					if (startWindowIndex >= 0
-						&& endWindowIndex >= 0)
+					if (height > bottom)
 					{
 						break;
 					}
 
-					// Add to the current height.
-					height += windowHeight;
+					// Update the line height.
+					height += line.Height;
 				}
-
-				// Make sure we have a starting and ending line index. If we don't have
-				// a starting line, then just show the last one.
-				if (startWindowIndex == -1)
-				{
-					startLine = endLine = LineBuffer.LineCount - 1;
-					return;
-				}
-
-				// Determine what the start line is inside the starting cache.
-				var startWindowOffset = (int) (viewArea.Y - startWindowHeight);
-				startLine = windows[startWindowIndex].GetLineLayoutContaining(
-					DisplayContext, startWindowOffset);
-
-				// Get the ending line from the ending cache.
-				if (endWindowIndex == -1)
-				{
-					endLine = LineBuffer.LineCount - 1;
-					return;
-				}
-
-				var endWindowOffset = (int) (viewArea.Y + viewArea.Height - endWindowHeight);
-				endLine = windows[endWindowIndex].GetLineLayoutContaining(
-					DisplayContext, endWindowOffset);
 			}
 
 			// Process any queued changes.
@@ -276,18 +229,11 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			// anything else making changes.
 			LineBlockStyle style;
 
-			using (new WriteLock(access))
+			using (new ReadLock(access))
 			{
-				// Make sure we have all the windows allocated.
-				AllocateWindows();
+				CachedLine line = GetCachedLine(lineIndex);
 
-				// Go through the windows and find the starting one.
-				lineIndex = LineBuffer.NormalizeLineIndex(lineIndex);
-				int windowIndex = GetWindowIndex(lineIndex);
-				CachedWindow window = windows[windowIndex];
-
-				// Get the layout from the window.
-				style = window.GetLineStyle(DisplayContext, lineIndex);
+				style = line.Style;
 			}
 
 			// Process any queued changes.
@@ -302,18 +248,14 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		/// </summary>
 		public override void Reset()
 		{
-			// We need to get a write lock on the entire cache to avoid
-			// anything else making changes.
-			using (new WriteLock(access))
+			// We need to get a write lock on the entire cache to avoid anything
+			// else making changes.
+			using (new NestableWriteLock(access))
 			{
-				// Reset the line heights.
-				lineHeight = null;
-
-				// Reset each of the windows.
-				foreach (CachedWindow window in windows)
+				// Go through each of the lines in the buffer.
+				foreach (CachedLine line in lines)
 				{
-					window.Reset();
-					Clear(window);
+					line.Reset();
 				}
 			}
 
@@ -328,7 +270,8 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		public override void SetLineBuffer(LineBuffer value)
 		{
 			base.SetLineBuffer(value);
-			Reset();
+			Clear();
+			AllocateLines();
 		}
 
 		/// <summary>
@@ -363,22 +306,18 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 						lineIndex <= endLineIndex;
 						lineIndex++)
 					{
-						// Get the window for the line change and reset that window.
-						int cachedWindowIndex = GetWindowIndex(lineIndex);
-						CachedWindow cachedWindow = windows[cachedWindowIndex];
+						CachedLine line = lines[lineIndex];
 
-						cachedWindow.Reset(lineIndex - cachedWindow.WindowStartLine);
+						line.Reset();
 					}
 
 					for (int lineIndex = previousSelection.StartPosition.LineIndex;
 						lineIndex <= previousEndLineIndex;
 						lineIndex++)
 					{
-						// Get the window for the line change and reset that window.
-						int cachedWindowIndex = GetWindowIndex(lineIndex);
-						CachedWindow cachedWindow = windows[cachedWindowIndex];
+						CachedLine line = lines[lineIndex];
 
-						cachedWindow.Reset(lineIndex - cachedWindow.WindowStartLine);
+						line.Reset();
 					}
 				}
 
@@ -388,73 +327,6 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 
 			// Process any queued changes.
 			ProcessQueuedLineChanges();
-		}
-
-		/// <summary>
-		/// Gets a set of allocated cached lines, releasing any as needed.
-		/// </summary>
-		/// <returns></returns>
-		internal CachedLine[] GetAllocatedCachedLines()
-		{
-			// Get an array of lines from the list.
-			if (allocatedLines.Count == 0)
-			{
-				// We don't have any allocated lines, so free the last.
-				ClearLeastRecentlyUsedWindow();
-			}
-
-			// Return the first set of allocated lines in the array.
-			CachedLine[] first = allocatedLines[0];
-			allocatedLines.RemoveAt(0);
-			return first;
-		}
-
-		/// <summary>
-		/// Retrieves the heights of a given line range, without locking.
-		/// </summary>
-		/// <param name="startLineIndex">Start index of the line.</param>
-		/// <param name="endLineIndex">End index of the line.</param>
-		/// <returns></returns>
-		internal int InternalGetLineLayoutHeight(
-			int startLineIndex,
-			int endLineIndex)
-		{
-			// Normalize the end line so we don't go over our bounds.
-			endLineIndex = LineBuffer.NormalizeLineIndex(endLineIndex);
-
-			// Go through the windows and find the starting one.
-			int startingWindowIndex = GetWindowIndex(startLineIndex);
-			int endingWindowIndex = GetWindowIndex(endLineIndex);
-
-			CachedWindow startingWindow = windows[startingWindowIndex];
-			CachedWindow endingWindow = windows[endingWindowIndex];
-
-			// Make sure that both the starting and ending windows are populated.
-			// This handles if the windows are the same since Populate() checks
-			// the loaded status.
-			startingWindow.Populate(DisplayContext);
-			endingWindow.Populate(DisplayContext);
-
-			// Get the height of the lines inside the starting window.
-			int height = startingWindow.GetLineLayoutHeight(
-				DisplayContext, startLineIndex, endLineIndex);
-
-			// If the end window is different, get those line heights also.
-			if (startingWindowIndex != endingWindowIndex)
-			{
-				height += endingWindow.GetLineLayoutHeight(
-					DisplayContext, startLineIndex, endLineIndex);
-			}
-
-			// Retrieve all the cache windows between the two ranges.
-			for (int windowIndex = startingWindowIndex + 1;
-				windowIndex < endingWindowIndex;
-				windowIndex++)
-			{
-				CachedWindow window = windows[windowIndex];
-				height += window.GetLineLayoutHeight(DisplayContext);
-			}
-			return height;
 		}
 
 		/// <summary>
@@ -512,129 +384,12 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		}
 
 		/// <summary>
-		/// Goes through and makes sure all the windows are allocated for the
-		/// underlying buffer.
-		/// </summary>
-		private void AllocateWindows()
-		{
-			// If we have no lines, then we don't need any buffers.
-			int lineCount = LineBuffer.LineCount;
-
-			if (lineCount == 0)
-			{
-				Clear();
-			}
-
-			// We need a window for every windowSize lines.
-			int windowsNeeded = lineCount / windowSize;
-
-			if (lineCount % windowSize > 0)
-			{
-				windowsNeeded++;
-			}
-
-			// If we don't have enough, allocate more.
-			while (windows.Count < windowsNeeded)
-			{
-				windows.Add(new CachedWindow(this, windows.Count));
-			}
-
-			// If we have too many, then free them.
-			while (windows.Count > windowsNeeded)
-			{
-				CachedWindow window = windows.RemoveLast();
-				Clear(window);
-			}
-		}
-
-		/// <summary>
 		/// Clears out all the windows and returns the larger arrays back into
 		/// the allocation list.
 		/// </summary>
 		private void Clear()
 		{
-			// Go through all the windows and returned the allocated lines back
-			// to the list.
-			foreach (CachedWindow window in windows)
-			{
-				Clear(window);
-			}
-
-			// Clear out the array.
-			windows.Clear();
-		}
-
-		/// <summary>
-		/// Clears the specified window of allocations.
-		/// </summary>
-		/// <param name="window">The window.</param>
-		private void Clear(CachedWindow window)
-		{
-			if (window.Lines != null)
-			{
-				// Clear out the lines to make sure the garbage collection can
-				// release them as needed.
-				foreach (CachedLine line in window.Lines)
-				{
-					line.Reset();
-				}
-
-				// Move the lines list back into the allocation list.
-				allocatedLines.Add(window.Lines);
-				window.Lines = null;
-			}
-		}
-
-		/// <summary>
-		/// Clears the least recently used window that has lines.
-		/// </summary>
-		private void ClearLeastRecentlyUsedWindow()
-		{
-			// Go through the windows and find the cache window that has the
-			// oldest data.
-			int lruWindowIndex = -1;
-			DateTime lruWindowAccessed = DateTime.MaxValue;
-
-			for (int index = 0;
-				index < windows.Count;
-				index++)
-			{
-				// If the window doesn't have lines, we don't use it.
-				CachedWindow window = windows[index];
-
-				if (window.Lines == null)
-				{
-					continue;
-				}
-
-				// Check to see if this window is older than the current.
-				if (window.LastAccessed < lruWindowAccessed)
-				{
-					lruWindowAccessed = window.LastAccessed;
-					lruWindowIndex = index;
-				}
-			}
-
-			// The index will contains the last index.
-			if (lruWindowIndex == -1)
-			{
-				throw new Exception("Cannot find LRU cache window");
-			}
-
-			// Clear this window.
-			Clear(windows[lruWindowIndex]);
-		}
-
-		/// <summary>
-		/// Gets the index of the window for a given line.
-		/// </summary>
-		/// <param name="line">The line.</param>
-		/// <returns></returns>
-		private int GetWindowIndex(int line)
-		{
-			// Figure out the window based on the windowSize.
-			int window = line / windowSize;
-			return window;
+			lines.Clear();
 		}
 
 		/// <summary>
@@ -647,14 +402,10 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			object sender,
 			LineChangedArgs args)
 		{
-			// Make sure we allocated all the windows.
-			AllocateWindows();
+			// Get the line and reset it.
+			CachedLine line = lines[args.LineIndex];
 
-			// Get the window for the line change and reset that line.
-			int cachedWindowIndex = GetWindowIndex(args.LineIndex);
-			CachedWindow cachedWindow = windows[cachedWindowIndex];
-
-			cachedWindow.Reset(args.LineIndex - cachedWindow.WindowStartLine);
+			line.Reset();
 
 			// Call the base implementation to cascade the events up.
 			base.OnLineChanged(sender, args);
@@ -671,8 +422,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			LineRangeEventArgs args)
 		{
 			// Clear out everything and reallocate the windows.
-			Clear();
-			AllocateWindows();
+			Reset();
 
 			// Call the base implementation to cascade the events up.
 			base.OnLinesDeleted(sender, args);
@@ -688,9 +438,15 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			object sender,
 			LineRangeEventArgs args)
 		{
-			// Clear out everything and reallocate the windows.
-			Clear();
-			AllocateWindows();
+			// Create a short list of new cache items for the line.
+			int count = args.EndLineIndex - args.StartLineIndex;
+			var newLines = new CachedLine[count];
+
+			for(int index = 0;index < count; index++)
+				newLines[index] = new CachedLine();
+
+			// Insert the lines into the array.
+			lines.InsertRange(args.StartLineIndex, newLines);
 
 			// Call the base implementation to cascade the events up.
 			base.OnLinesInserted(sender, args);
@@ -708,7 +464,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			{
 				// Try to get a write lock on the access object. We choose not
 				// to wait any time since we'll try again after each lock.
-				if (access.TryEnterWriteLock(0))
+				if (!access.IsWriteLockHeld && access.TryEnterWriteLock(0))
 				{
 					try
 					{
@@ -763,56 +519,36 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="CachedTextRenderer"/> class.
+		/// Initializes a new instance of the <see cref="CachedTextRenderer" /> class.
 		/// </summary>
 		/// <param name="displayContext">The display context.</param>
 		/// <param name="editorViewRenderer">The text renderer.</param>
 		public CachedTextRenderer(
 			IDisplayContext displayContext,
 			EditorViewRenderer editorViewRenderer)
-			: this(displayContext, editorViewRenderer, 8, 16)
-		{
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="CachedTextRenderer"/> class.
-		/// </summary>
-		/// <param name="displayContext">The display context.</param>
-		/// <param name="editorViewRenderer">The text renderer.</param>
-		/// <param name="maximumLoadedWindows">The maximum loaded windows.</param>
-		/// <param name="windowSize">Size of the window.</param>
-		public CachedTextRenderer(
-			IDisplayContext displayContext,
-			EditorViewRenderer editorViewRenderer,
-			int maximumLoadedWindows,
-			int windowSize)
 			: base(displayContext, editorViewRenderer)
 		{
 			// Set the cache window properties.
 			access = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
 			queuedLineEvents = new List<Action>();
-			this.windowSize = windowSize;
 
-			// Create the collection of windows.
-			windows = new List<CachedWindow>();
+			// Create a collection of the initial buffer lines.
+			lines = new CachedLineList();
 
-			// Pre-create the window arrays.
-			allocatedLines = new List<CachedLine[]>();
+			AllocateLines();
+		}
 
-			for (int index = 0;
-				index < maximumLoadedWindows;
-				index++)
+		private void AllocateLines()
+		{
+			LineBuffer lineBuffer = LineBuffer;
+
+			if(lineBuffer != null)
 			{
-				// Create the array and add it to the allocated list.
-				var lines = new CachedLine[windowSize];
-
-				allocatedLines.Add(lines);
-
-				for (int line = 0;
-					line < windowSize;
-					line++)
+				for(int index = 0;
+					index < lineBuffer.LineCount;
+					index++)
 				{
-					lines[line] = new CachedLine();
+					lines.Add(new CachedLine());
 				}
 			}
 		}
@@ -835,17 +571,13 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		private readonly List<CachedLine[]> allocatedLines;
 
 		private int? lineHeight;
+
+		/// <summary>
+		/// Contains all the cached information about each line in the buffer.
+		/// </summary>
+		private readonly CachedLineList lines;
+
 		private readonly List<Action> queuedLineEvents;
-
-		/// <summary>
-		/// Contains the size of the individual windows.
-		/// </summary>
-		private readonly int windowSize;
-
-		/// <summary>
-		/// Contains all the windows in this cache.
-		/// </summary>
-		private readonly List<CachedWindow> windows;
 
 		#endregion
 	}

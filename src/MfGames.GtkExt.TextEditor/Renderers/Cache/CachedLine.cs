@@ -3,7 +3,10 @@
 // http://mfgames.com/mfgames-gtkext-cil/license
 
 using System;
+using MfGames.GtkExt.Extensions.Pango;
+using MfGames.GtkExt.TextEditor.Models.Buffers;
 using MfGames.GtkExt.TextEditor.Models.Styles;
+using MfGames.GtkExt.TextEditor.Renderers;
 using Pango;
 
 namespace MfGames.GtkExt.TextEditor.Buffers
@@ -37,6 +40,31 @@ namespace MfGames.GtkExt.TextEditor.Buffers
 		#endregion
 
 		#region Methods
+
+		/// <summary>
+		/// Caches information about a line into the cached line.
+		/// </summary>
+		/// <param name="view">The view.</param>
+		/// <param name="line">The line.</param>
+		public void Cache(
+			EditorViewRenderer view,
+			int line)
+		{
+			// If we already have a layout, we don't need to do anything.
+			if (Layout != null)
+			{
+				return;
+			}
+
+			// Cache various elements of the rendering. This is an expensive
+			// operation, so we want to minimize it.
+			Layout layout = view.GetLineLayout(line, LineContexts.None);
+			LineBlockStyle style = view.GetLineStyle(line, LineContexts.None);
+
+			Style = style;
+			Layout = layout;
+			Height = (int) (layout.GetPixelHeight() + style.Height);
+		}
 
 		/// <summary>
 		/// Resets the cached line.

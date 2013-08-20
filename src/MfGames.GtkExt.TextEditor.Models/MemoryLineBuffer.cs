@@ -106,7 +106,7 @@ namespace MfGames.GtkExt.TextEditor.Models
 			}
 
 			// Fire an insert line change.
-			RaiseLinesInserted(new LineRangeEventArgs(lineIndex, count));
+			RaiseLinesInserted(new LineRangeEventArgs(lineIndex, lineIndex + count));
 
 			// Return the appropriate results.
 			return

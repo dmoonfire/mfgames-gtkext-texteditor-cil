@@ -169,8 +169,8 @@
     <Compile Include="Editing\LineBufferCommandController.cs" />
     <Compile Include="Renderers\BufferPositionHelper.cs" />
     <Compile Include="Renderers\Cache\CachedLine.cs" />
+    <Compile Include="Renderers\Cache\CachedLineList.cs" />
     <Compile Include="Renderers\Cache\CachedTextRenderer.cs" />
-    <Compile Include="Renderers\Cache\CachedWindow.cs" />
     <Compile Include="Renderers\DrawingUtility.cs" />
     <Compile Include="Editing\ActionEntry.cs" />
     <Compile Include="Editing\Caret.cs" />
