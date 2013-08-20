@@ -151,22 +151,8 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// <returns></returns>
 		public virtual int GetLineLayoutHeight()
 		{
-			// Get a layout for the default text style.
-			var layout = new Layout(DisplayContext.PangoContext);
-
-			DisplayContext.SetLayout(
-				layout, DisplayContext.Theme.TextLineStyle, DisplayContext.TextWidth);
-
-			// Set the layout to a simple string.
-			layout.SetText("W");
-
-			// Get the height of the default line.
-			int height,
-				width;
-
-			layout.GetPixelSize(out width, out height);
-
-			return height;
+			// Arbitrary value in pixels.
+			return 50;
 		}
 
 		/// <summary>

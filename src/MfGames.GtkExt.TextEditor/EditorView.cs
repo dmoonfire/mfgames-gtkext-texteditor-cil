@@ -241,7 +241,9 @@ namespace MfGames.GtkExt.TextEditor
 				return;
 			}
 
-			// Request that the widget get updated.
+			// Request that the widget get updated. We need this because the
+			// cursor has moved and we don't have any other place to trigger
+			// the redraw.
 			RequestRedraw();
 
 			// Figure out if the caret is already in the visible area.

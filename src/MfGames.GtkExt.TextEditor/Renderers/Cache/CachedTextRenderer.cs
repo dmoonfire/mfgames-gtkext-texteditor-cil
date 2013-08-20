@@ -146,16 +146,6 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		}
 
 		/// <summary>
-		/// Gets the height of a single line of "normal" text.
-		/// </summary>
-		/// <returns></returns>
-		public override int GetLineLayoutHeight()
-		{
-			int results = GetLineLayoutHeight(0, LineBuffer.LineCount);
-			return results;
-		}
-
-		/// <summary>
 		/// Gets the lines that are visible in the given view area.
 		/// </summary>
 		/// <param name="viewArea">The view area.</param>
@@ -421,8 +411,11 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			object sender,
 			LineRangeEventArgs args)
 		{
-			// Clear out everything and reallocate the windows.
-			Reset();
+			// It is very important for performance and caching that we delete
+			// the line given instead of rebuilding the counts.
+			int count = args.EndLineIndex - args.StartLineIndex;
+
+			lines.RemoveRange(args.StartLineIndex, count);
 
 			// Call the base implementation to cascade the events up.
 			base.OnLinesDeleted(sender, args);
