@@ -97,6 +97,52 @@ namespace GtkExtDemo.TextEditor
 			return base.GetLineText(lineIndex, lineContexts);
 		}
 
+		public override LineBufferOperationResults DeleteLines(int lineIndex,int count)
+		{
+			// First start by removing all the styles of the lines we're deleting.
+			for(int index = lineIndex;
+				index < lineIndex + count;
+				index++)
+			{
+				styles.Remove(index);
+			}
+
+			// Now move all styles from the existing lines.
+			for (int index = lineIndex + count;
+				index < LineCount;
+				index++)
+			{
+				int newIndex = index - count;
+
+				if (styles.ContainsKey(index))
+				{
+					styles[newIndex] = styles[index];
+					styles.Remove(index);
+				}
+			}
+
+			// Call the base implementation to move everything else.
+				return base.DeleteLines(lineIndex,count);
+		}
+
+		public override LineBufferOperationResults InsertLines(int lineIndex,int count)
+		{
+			// We need to adjust the line indexes above this line.
+			for (int index = LineCount;
+				index >= lineIndex;
+				index--)
+			{
+				if (styles.ContainsKey(index))
+				{
+					styles[index + count] = styles[index];
+					styles.Remove(index);
+				}
+			}
+
+			// Call the base implementation to move everything else.
+			return base.InsertLines(lineIndex,count);
+		}
+
 		/// <summary>
 		/// Trims and removes duplicate spaces from the line.
 		/// </summary>
