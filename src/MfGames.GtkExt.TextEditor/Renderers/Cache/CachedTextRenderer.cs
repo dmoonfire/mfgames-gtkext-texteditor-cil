@@ -134,18 +134,6 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		}
 
 		/// <summary>
-		/// Gets the cached line and ensures it is populated.
-		/// </summary>
-		/// <param name="lineIndex">The line.</param>
-		/// <returns></returns>
-		private CachedLine GetCachedLine(int lineIndex)
-		{
-			CachedLine cachedLine = lines[lineIndex];
-			cachedLine.Cache(EditorViewRenderer,lineIndex);
-			return cachedLine;
-		}
-
-		/// <summary>
 		/// Gets the lines that are visible in the given view area.
 		/// </summary>
 		/// <param name="viewArea">The view area.</param>
@@ -373,6 +361,21 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			ProcessQueuedLineChanges();
 		}
 
+		private void AllocateLines()
+		{
+			LineBuffer lineBuffer = LineBuffer;
+
+			if (lineBuffer != null)
+			{
+				for (int index = 0;
+					index < lineBuffer.LineCount;
+					index++)
+				{
+					lines.Add(new CachedLine());
+				}
+			}
+		}
+
 		/// <summary>
 		/// Clears out all the windows and returns the larger arrays back into
 		/// the allocation list.
@@ -380,6 +383,18 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		private void Clear()
 		{
 			lines.Clear();
+		}
+
+		/// <summary>
+		/// Gets the cached line and ensures it is populated.
+		/// </summary>
+		/// <param name="lineIndex">The line.</param>
+		/// <returns></returns>
+		private CachedLine GetCachedLine(int lineIndex)
+		{
+			CachedLine cachedLine = lines[lineIndex];
+			cachedLine.Cache(EditorViewRenderer, lineIndex);
+			return cachedLine;
 		}
 
 		/// <summary>
@@ -435,8 +450,12 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			int count = args.EndLineIndex - args.StartLineIndex;
 			var newLines = new CachedLine[count];
 
-			for(int index = 0;index < count; index++)
+			for (int index = 0;
+				index < count;
+				index++)
+			{
 				newLines[index] = new CachedLine();
+			}
 
 			// Insert the lines into the array.
 			lines.InsertRange(args.StartLineIndex, newLines);
@@ -457,7 +476,8 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			{
 				// Try to get a write lock on the access object. We choose not
 				// to wait any time since we'll try again after each lock.
-				if (!access.IsWriteLockHeld && access.TryEnterWriteLock(0))
+				if (!access.IsWriteLockHeld
+					&& access.TryEnterWriteLock(0))
 				{
 					try
 					{
@@ -529,21 +549,6 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			lines = new CachedLineList();
 
 			AllocateLines();
-		}
-
-		private void AllocateLines()
-		{
-			LineBuffer lineBuffer = LineBuffer;
-
-			if(lineBuffer != null)
-			{
-				for(int index = 0;
-					index < lineBuffer.LineCount;
-					index++)
-				{
-					lines.Add(new CachedLine());
-				}
-			}
 		}
 
 		#endregion

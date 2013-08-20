@@ -10,7 +10,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 	/// <summary>
 	/// A specialized list of cached lines.
 	/// </summary>
-	internal class CachedLineList : List<CachedLine>
+	internal class CachedLineList: List<CachedLine>
 	{
 	}
 }
