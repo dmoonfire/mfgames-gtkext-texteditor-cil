@@ -427,8 +427,9 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			LineRangeEventArgs args)
 		{
 			// It is very important for performance and caching that we delete
-			// the line given instead of rebuilding the counts.
-			int count = args.EndLineIndex - args.StartLineIndex;
+			// the line given instead of rebuilding the counts. Since we are
+			// dealing with indexes, we need to get the count.
+			int count = args.EndLineIndex - args.StartLineIndex + 1;
 
 			lines.RemoveRange(args.StartLineIndex, count);
 
@@ -446,8 +447,9 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			object sender,
 			LineRangeEventArgs args)
 		{
-			// Create a short list of new cache items for the line.
-			int count = args.EndLineIndex - args.StartLineIndex;
+			// Create a short list of new cache items for the line. Since we are
+			// dealing with indexes, we need to get the count.
+			int count = args.EndLineIndex - args.StartLineIndex + 1;
 			var newLines = new CachedLine[count];
 
 			for (int index = 0;

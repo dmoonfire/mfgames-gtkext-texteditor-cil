@@ -45,7 +45,7 @@ namespace MfGames.GtkExt.TextEditor.Models
 			lines.RemoveRange(lineIndex, count);
 
 			// Fire an delete line change.
-			RaiseLinesDeleted(new LineRangeEventArgs(lineIndex, lineIndex + count));
+			RaiseLinesDeleted(new LineRangeEventArgs(lineIndex, lineIndex + count - 1));
 
 			// Return the appropriate results.
 			return new LineBufferOperationResults(new BufferPosition(lineIndex, 0));
@@ -106,7 +106,7 @@ namespace MfGames.GtkExt.TextEditor.Models
 			}
 
 			// Fire an insert line change.
-			RaiseLinesInserted(new LineRangeEventArgs(lineIndex, lineIndex + count));
+			RaiseLinesInserted(new LineRangeEventArgs(lineIndex, lineIndex + count - 1));
 
 			// Return the appropriate results.
 			return
