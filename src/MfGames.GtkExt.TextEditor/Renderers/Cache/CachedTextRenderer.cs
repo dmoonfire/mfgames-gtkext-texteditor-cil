@@ -247,9 +247,12 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		/// <param name="value">The value.</param>
 		public override void SetLineBuffer(LineBuffer value)
 		{
-			base.SetLineBuffer(value);
-			Clear();
-			AllocateLines();
+			using (new WriteLock(access))
+			{
+				base.SetLineBuffer(value);
+				Clear();
+				AllocateLines();
+			}
 		}
 
 		/// <summary>
