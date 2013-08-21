@@ -100,6 +100,9 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 				wrappedLine = layout.Lines[wrappedLineIndex];
 			}
 
+			// Adjust the X coordinate for the current line.
+			lineX -= GetLeftStylePaddingPango(controller, position.LineIndex);
+
 			// The wrapped line has the current wrapped line, so use the lineX
 			// to figure out which character to use.
 			int trailing;
@@ -125,6 +128,38 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 
 			// Draw the new location of the caret.
 			displayContext.ScrollToCaret(position);
+		}
+
+		/// <summary>
+		/// Gets the padding of the given line in layout units.
+		/// </summary>
+		/// <param name="controller">The controller.</param>
+		/// <param name="lineIndex">Index of the line.</param>
+		/// <returns></returns>
+		private static int GetLeftStylePaddingPango(EditorViewController controller,
+			int lineIndex)
+		{
+			int pixelPadding = GetLeftPaddingPixels(controller, lineIndex);
+			int pangoPadding = Units.FromPixels(pixelPadding);
+			return pangoPadding;
+		}
+
+		private static int GetLeftPaddingPixels(
+			EditorViewController controller,
+			int lineIndex)
+		{
+			// Get the style for the given line.
+			LineBlockStyle style =
+				controller.DisplayContext.Renderer.GetLineStyle(
+					lineIndex, LineContexts.CurrentLine);
+
+			if (style == null)
+			{
+				return 0;
+			}
+
+			var pixelPadding = (int) style.Padding.Left.GetValueOrDefault(0);
+			return pixelPadding;
 		}
 
 		/// <summary>
@@ -316,7 +351,11 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 
 			// Figure out the X coordinate of the line. If there is an action context,
 			// use that. Otherwise, calculate it from the character index of the position.
-			int lineX = Units.ToPixels(GetLineX(controller, wrappedLine, position));
+			int pixels = Units.ToPixels(GetLineX(controller, wrappedLine, position));
+			int lineX = pixels;
+
+			// Adjust the X coordinate for the current line.
+			lineX -= GetLeftPaddingPixels(controller,position.LineIndex);
 
 			// Move to the calculated point.
 			Point(
@@ -355,7 +394,11 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 
 			// Figure out the X coordinate of the line. If there is an action context,
 			// use that. Otherwise, calculate it from the character index of the position.
-			int lineX = Units.ToPixels(GetLineX(controller, wrappedLine, position));
+			int pixels = Units.ToPixels(GetLineX(controller, wrappedLine, position));
+			int lineX = pixels;
+
+			// Adjust the X coordinate for the current line.
+			lineX -= GetLeftPaddingPixels(controller,position.LineIndex);
 
 			// Move to the calculated point.
 			var newPoint = new PointD(lineX, bufferY - displayContext.BufferOffsetY);
@@ -706,6 +749,9 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 				wrappedLine = layout.Lines[wrappedLineIndex];
 			}
 
+			// Adjust the X coordinate for the current line.
+			lineX -= GetLeftStylePaddingPango(controller,position.LineIndex);
+
 			// The wrapped line has the current wrapped line, so use the lineX
 			// to figure out which character to use.
 			int trailing;
@@ -755,8 +801,8 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 				// is always to the left of the character unless we're at the
 				// end, and then it's considered trailing of the previous
 				// character.
-				string lineText =
-					controller.DisplayContext.LineBuffer.GetLineText(position.LineIndex);
+				LineBuffer lineBuffer = controller.DisplayContext.LineBuffer;
+				string lineText = lineBuffer.GetLineText(position.LineIndex);
 				int characterIndex = position.CharacterIndex;
 				bool trailing = false;
 
@@ -774,6 +820,13 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 				int unicodeIndex = PangoUtility.TranslateStringToPangoIndex(
 					lineText, characterIndex);
 				lineX = wrappedLine.IndexToX(unicodeIndex, trailing);
+
+				// We need the line's style since it may have left passing
+				// which will change our columns.
+				LineBlockStyle style = controller.DisplayContext.Renderer.GetLineStyle(
+					position.LineIndex,LineContexts.CurrentLine);
+
+				lineX += (int) style.Padding.Left.GetValueOrDefault(0);
 
 				// Save a new state into the states.
 				state = new VerticalMovementActionState(lineX);
