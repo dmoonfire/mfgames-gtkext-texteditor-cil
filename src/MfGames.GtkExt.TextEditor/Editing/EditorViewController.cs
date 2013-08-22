@@ -421,7 +421,7 @@ namespace MfGames.GtkExt.TextEditor.Editing
 
 					// Set the tail of the anchor to the current mouse position.
 					displayContext.Caret.Selection.TailPosition =
-						MoveActions.GetBufferPosition(textPoint, displayContext);
+						MoveActions.GetBufferPosition(textPoint, this);
 
 					// Update the display.
 					displayContext.Renderer.UpdateSelection(displayContext, previousSelection);
@@ -504,7 +504,7 @@ namespace MfGames.GtkExt.TextEditor.Editing
 								break;
 
 							default:
-								MoveActions.Point(displayContext, textPoint);
+								MoveActions.Point(this, textPoint);
 								break;
 						}
 					}

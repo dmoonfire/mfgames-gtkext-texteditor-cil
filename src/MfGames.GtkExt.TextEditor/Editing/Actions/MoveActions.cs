@@ -200,8 +200,9 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 		/// <returns></returns>
 		public static BufferPosition GetBufferPosition(
 			PointD widgetPoint,
-			IDisplayContext displayContext)
+			EditorViewController controller)
 		{
+			IDisplayContext displayContext = controller.DisplayContext;
 			double y = widgetPoint.Y + displayContext.BufferOffsetY;
 			int lineIndex = displayContext.Renderer.GetLineLayoutRange(y);
 			Layout layout = displayContext.Renderer.GetLineLayout(
@@ -223,7 +224,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			double layoutX = widgetPoint.X - style.Left;
 
 			// Determines where in the layout is the point.
-			int pangoLayoutX = Units.FromPixels((int) layoutX);
+			int pangoLayoutX = Units.FromPixels((int)layoutX);
 			int unicodeIndex;
 			int trailing;
 
@@ -351,15 +352,13 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 
 			// Figure out the X coordinate of the line. If there is an action context,
 			// use that. Otherwise, calculate it from the character index of the position.
-			int pixels = Units.ToPixels(GetLineX(controller, wrappedLine, position));
-			int lineX = pixels;
-
-			// Adjust the X coordinate for the current line.
-			lineX -= GetLeftPaddingPixels(controller,position.LineIndex);
+			int pangoLineX = GetLineX(controller, wrappedLine, position);
+			int lineX = Units.ToPixels(pangoLineX);
 
 			// Move to the calculated point.
-			Point(
-				displayContext, new PointD(lineX, bufferY - displayContext.BufferOffsetY));
+			var newPoint = new PointD(lineX, bufferY - displayContext.BufferOffsetY);
+
+			Point(controller, newPoint);
 		}
 
 		/// <summary>
@@ -397,28 +396,26 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			int pixels = Units.ToPixels(GetLineX(controller, wrappedLine, position));
 			int lineX = pixels;
 
-			// Adjust the X coordinate for the current line.
-			lineX -= GetLeftPaddingPixels(controller,position.LineIndex);
-
 			// Move to the calculated point.
 			var newPoint = new PointD(lineX, bufferY - displayContext.BufferOffsetY);
-			Point(displayContext, newPoint);
+
+			Point(controller,newPoint);
 		}
 
 		/// <summary>
 		/// Moves the caret to a specific widget-relative point on the screen.
 		/// </summary>
-		/// <param name="displayContext">The display context.</param>
+		/// <param name="controller">The controller.</param>
 		/// <param name="widgetPoint">The point in the widget.</param>
 		public static void Point(
-			IDisplayContext displayContext,
+			EditorViewController controller,
 			PointD widgetPoint)
 		{
 			// Move to and draw the caret.
 			BufferPosition bufferPosition = GetBufferPosition(
-				widgetPoint, displayContext);
+				widgetPoint, controller);
 
-			displayContext.ScrollToCaret(bufferPosition);
+			controller.DisplayContext.ScrollToCaret(bufferPosition);
 		}
 
 		/// <summary>
@@ -826,7 +823,8 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 				LineBlockStyle style = controller.DisplayContext.Renderer.GetLineStyle(
 					position.LineIndex,LineContexts.CurrentLine);
 
-				lineX += (int) style.Padding.Left.GetValueOrDefault(0);
+				var pixelPadding = (int) style.Padding.Left.GetValueOrDefault(0);
+				lineX += Units.FromPixels(pixelPadding);
 
 				// Save a new state into the states.
 				state = new VerticalMovementActionState(lineX);
