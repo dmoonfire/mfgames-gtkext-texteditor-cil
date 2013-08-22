@@ -152,7 +152,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		public virtual int GetLineLayoutHeight()
 		{
 			// Arbitrary value in pixels.
-			return 50;
+			return 30;
 		}
 
 		/// <summary>
