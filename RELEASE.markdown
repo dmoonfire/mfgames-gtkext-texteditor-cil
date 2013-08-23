@@ -15,6 +15,7 @@ Incremental release to improve performance and handling.
 - Up/Down key navigation now works with left padding of styles. +New
 - Added some locking around the cached renderer to allow it to handle getting events from other threads more gracefully, in specific the line changed events. +Changed
 - Added a background line cacher to speed up scrolling performance and line calculations. +New
+- If the popup menu callback removes all items, then the popup isn't shown. +Changed
 
 # Dependencies
 
