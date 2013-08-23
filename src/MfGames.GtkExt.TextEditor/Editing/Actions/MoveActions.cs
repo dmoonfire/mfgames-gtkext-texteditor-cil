@@ -131,38 +131,6 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 		}
 
 		/// <summary>
-		/// Gets the padding of the given line in layout units.
-		/// </summary>
-		/// <param name="controller">The controller.</param>
-		/// <param name="lineIndex">Index of the line.</param>
-		/// <returns></returns>
-		private static int GetLeftStylePaddingPango(EditorViewController controller,
-			int lineIndex)
-		{
-			int pixelPadding = GetLeftPaddingPixels(controller, lineIndex);
-			int pangoPadding = Units.FromPixels(pixelPadding);
-			return pangoPadding;
-		}
-
-		private static int GetLeftPaddingPixels(
-			EditorViewController controller,
-			int lineIndex)
-		{
-			// Get the style for the given line.
-			LineBlockStyle style =
-				controller.DisplayContext.Renderer.GetLineStyle(
-					lineIndex, LineContexts.CurrentLine);
-
-			if (style == null)
-			{
-				return 0;
-			}
-
-			var pixelPadding = (int) style.Padding.Left.GetValueOrDefault(0);
-			return pixelPadding;
-		}
-
-		/// <summary>
 		/// Moves the caret to the end of the buffer.
 		/// </summary>
 		/// <param name="controller">The action context.</param>
@@ -224,7 +192,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			double layoutX = widgetPoint.X - style.Left;
 
 			// Determines where in the layout is the point.
-			int pangoLayoutX = Units.FromPixels((int)layoutX);
+			int pangoLayoutX = Units.FromPixels((int) layoutX);
 			int unicodeIndex;
 			int trailing;
 
@@ -399,7 +367,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			// Move to the calculated point.
 			var newPoint = new PointD(lineX, bufferY - displayContext.BufferOffsetY);
 
-			Point(controller,newPoint);
+			Point(controller, newPoint);
 		}
 
 		/// <summary>
@@ -412,8 +380,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			PointD widgetPoint)
 		{
 			// Move to and draw the caret.
-			BufferPosition bufferPosition = GetBufferPosition(
-				widgetPoint, controller);
+			BufferPosition bufferPosition = GetBufferPosition(widgetPoint, controller);
 
 			controller.DisplayContext.ScrollToCaret(bufferPosition);
 		}
@@ -747,7 +714,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			}
 
 			// Adjust the X coordinate for the current line.
-			lineX -= GetLeftStylePaddingPango(controller,position.LineIndex);
+			lineX -= GetLeftStylePaddingPango(controller, position.LineIndex);
 
 			// The wrapped line has the current wrapped line, so use the lineX
 			// to figure out which character to use.
@@ -774,6 +741,39 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 
 			// Draw the new location of the caret.
 			displayContext.ScrollToCaret(position);
+		}
+
+		private static int GetLeftPaddingPixels(
+			EditorViewController controller,
+			int lineIndex)
+		{
+			// Get the style for the given line.
+			LineBlockStyle style =
+				controller.DisplayContext.Renderer.GetLineStyle(
+					lineIndex, LineContexts.CurrentLine);
+
+			if (style == null)
+			{
+				return 0;
+			}
+
+			var pixelPadding = (int) style.Padding.Left.GetValueOrDefault(0);
+			return pixelPadding;
+		}
+
+		/// <summary>
+		/// Gets the padding of the given line in layout units.
+		/// </summary>
+		/// <param name="controller">The controller.</param>
+		/// <param name="lineIndex">Index of the line.</param>
+		/// <returns></returns>
+		private static int GetLeftStylePaddingPango(
+			EditorViewController controller,
+			int lineIndex)
+		{
+			int pixelPadding = GetLeftPaddingPixels(controller, lineIndex);
+			int pangoPadding = Units.FromPixels(pixelPadding);
+			return pangoPadding;
 		}
 
 		/// <summary>
@@ -820,8 +820,9 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 
 				// We need the line's style since it may have left passing
 				// which will change our columns.
-				LineBlockStyle style = controller.DisplayContext.Renderer.GetLineStyle(
-					position.LineIndex,LineContexts.CurrentLine);
+				LineBlockStyle style =
+					controller.DisplayContext.Renderer.GetLineStyle(
+						position.LineIndex, LineContexts.CurrentLine);
 
 				var pixelPadding = (int) style.Padding.Left.GetValueOrDefault(0);
 				lineX += Units.FromPixels(pixelPadding);
