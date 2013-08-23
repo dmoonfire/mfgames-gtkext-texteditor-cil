@@ -241,12 +241,20 @@ namespace MfGames.GtkExt.TextEditor.Editing
 			if (PopulateContextMenu != null)
 			{
 				// Create the arguments for the event.
-				var args = new PopulateContextMenuArgs();
-				args.Menu = menu;
-				args.Controller = this;
+				var args = new PopulateContextMenuArgs
+				{
+					Menu = menu,
+					Controller = this
+				};
 
 				// Trigger the event.
 				PopulateContextMenu(this, args);
+			}
+
+			// If we have no items, then there is no menu.
+			if (menu.Children.Length == 0)
+			{
+				return null;
 			}
 
 			// Return the resulting menu.
