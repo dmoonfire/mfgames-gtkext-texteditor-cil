@@ -3,6 +3,7 @@
 // http://mfgames.com/mfgames-gtkext-cil/license
 
 using System;
+using System.Diagnostics;
 using MfGames.GtkExt.Extensions.Pango;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
 using MfGames.GtkExt.TextEditor.Models.Styles;
@@ -24,6 +25,14 @@ namespace MfGames.GtkExt.TextEditor.Buffers
 		/// </summary>
 		/// <value>The height.</value>
 		public int Height { get; set; }
+
+		/// <summary>
+		/// Determines if the line has been cached already.
+		/// </summary>
+		public bool IsCached
+		{
+			get { return Layout != null; }
+		}
 
 		/// <summary>
 		/// Gets or sets the Pango layout for the line.
@@ -54,6 +63,11 @@ namespace MfGames.GtkExt.TextEditor.Buffers
 			if (Layout != null)
 			{
 				return;
+			}
+
+			if (line % 1053 == 0)
+			{
+				Debug.WriteLine("CacheLine: Caching " + line);
 			}
 
 			// Cache various elements of the rendering. This is an expensive

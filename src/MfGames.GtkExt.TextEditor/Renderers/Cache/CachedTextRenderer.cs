@@ -252,6 +252,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 				base.SetLineBuffer(value);
 				Clear();
 				AllocateLines();
+				backgroundUpdater.Restart();
 			}
 		}
 
@@ -288,7 +289,6 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 						lineIndex++)
 					{
 						CachedLine line = lines[lineIndex];
-
 						line.Reset();
 					}
 
@@ -297,7 +297,6 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 						lineIndex++)
 					{
 						CachedLine line = lines[lineIndex];
-
 						line.Reset();
 					}
 				}
@@ -554,6 +553,11 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			lines = new CachedLineList();
 
 			AllocateLines();
+
+			// Create a background loader that will attempt to calculate the
+			// layout and heights of lines using the GUI's idle loop.
+			backgroundUpdater = new BackgroundCachedLineUpdater(this, lines);
+			backgroundUpdater.Restart();
 		}
 
 		#endregion
@@ -572,6 +576,8 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		/// and not freeing the memory until the class is freed.
 		/// </summary>
 		private readonly List<CachedLine[]> allocatedLines;
+
+		private readonly BackgroundCachedLineUpdater backgroundUpdater;
 
 		private int? lineHeight;
 

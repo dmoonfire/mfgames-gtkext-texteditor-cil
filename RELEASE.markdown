@@ -14,6 +14,7 @@ Incremental release to improve performance and handling.
 - Significantly improved performance with larger documents. +New
 - Up/Down key navigation now works with left padding of styles. +New
 - Added some locking around the cached renderer to allow it to handle getting events from other threads more gracefully, in specific the line changed events. +Changed
+- Added a background line cacher to speed up scrolling performance and line calculations. +New
 
 # Dependencies
 
