@@ -3,14 +3,12 @@
 // http://mfgames.com/mfgames-gtkext-cil/license
 
 using System;
-using System.Diagnostics;
 using MfGames.GtkExt.Extensions.Pango;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
 using MfGames.GtkExt.TextEditor.Models.Styles;
-using MfGames.GtkExt.TextEditor.Renderers;
 using Pango;
 
-namespace MfGames.GtkExt.TextEditor.Buffers
+namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 {
 	/// <summary>
 	/// Contains information about a single cached line in memory. This
@@ -63,11 +61,6 @@ namespace MfGames.GtkExt.TextEditor.Buffers
 			if (Layout != null)
 			{
 				return;
-			}
-
-			if (line % 1053 == 0)
-			{
-				Debug.WriteLine("CacheLine: Caching " + line);
 			}
 
 			// Cache various elements of the rendering. This is an expensive

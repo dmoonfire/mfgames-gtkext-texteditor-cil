@@ -4,7 +4,6 @@
 
 using System;
 using GLib;
-using MfGames.GtkExt.TextEditor.Buffers;
 
 namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 {

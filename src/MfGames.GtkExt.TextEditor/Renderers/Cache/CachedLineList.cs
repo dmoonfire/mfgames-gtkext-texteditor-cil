@@ -3,7 +3,6 @@
 // http://mfgames.com/mfgames-gtkext-cil/license
 
 using System.Collections.Generic;
-using MfGames.GtkExt.TextEditor.Buffers;
 
 namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 {

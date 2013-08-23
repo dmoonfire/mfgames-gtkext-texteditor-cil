@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-using MfGames.GtkExt.TextEditor.Buffers;
 using MfGames.GtkExt.TextEditor.Interfaces;
 using MfGames.GtkExt.TextEditor.Models;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
@@ -325,6 +324,10 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			// Attempt to resolve the updates. This will do nothing if a lock
 			// is currently acquired.
 			ProcessQueuedLineChanges();
+
+			// Start the background cacher to handle the lines that aren't
+			// visible on screen.
+			backgroundUpdater.Restart();
 		}
 
 		/// <summary>
