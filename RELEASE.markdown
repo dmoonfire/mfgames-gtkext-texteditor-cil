@@ -1,5 +1,9 @@
 Incremental release to improve performance and handling.
 
+# Signatures
+
+- Exposed the margin rendererer collection as a property. +Changed
+
 # Unicode
 
 - Additional work to handle Unicode characters with navigation and mouse clicking. +Changed
