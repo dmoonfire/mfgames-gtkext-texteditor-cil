@@ -6,12 +6,14 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using Gtk;
 using MfGames.GtkExt.TextEditor.Interfaces;
 using MfGames.GtkExt.TextEditor.Models;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
 using MfGames.GtkExt.TextEditor.Models.Styles;
 using MfGames.Locking;
-using Pango;
+using Action = System.Action;
+using Layout = Pango.Layout;
 using Rectangle = Cairo.Rectangle;
 
 namespace MfGames.GtkExt.TextEditor.Renderers.Cache
@@ -72,6 +74,9 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			int lineIndex,
 			LineContexts lineContexts)
 		{
+			// Make sure we're on the proper thread.
+			CheckGuiThread();
+
 			// If we have a context, never cache it.
 			if (lineContexts != LineContexts.None)
 			{
@@ -105,6 +110,9 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			int startLineIndex,
 			int endLineIndex)
 		{
+			// Make sure we're on the proper thread.
+			CheckGuiThread();
+
 			// We need to get a write lock on the entire cache to avoid
 			// anything else making changes.
 			int results = 0;
@@ -143,6 +151,9 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			out int startLine,
 			out int endLine)
 		{
+			// Make sure we're on the proper thread.
+			CheckGuiThread();
+
 			// We need to get a write lock on the entire cache to avoid
 			// anything else making changes.
 			using (new ReadLock(access))
@@ -196,6 +207,9 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			int lineIndex,
 			LineContexts lineContexts)
 		{
+			// Make sure we're on the proper thread.
+			CheckGuiThread();
+
 			// If we have a context, never cache it.
 			if (lineContexts != LineContexts.None)
 			{
@@ -246,6 +260,10 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		/// <param name="value">The value.</param>
 		public override void SetLineBuffer(LineBuffer value)
 		{
+			// Make sure we're on the proper thread.
+			CheckGuiThread();
+
+			// Make sure we're locked when we reset the buffer.
 			using (new WriteLock(access))
 			{
 				base.SetLineBuffer(value);
@@ -264,6 +282,9 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			IDisplayContext displayContext,
 			BufferSegment previousSelection)
 		{
+			// Make sure we're on the proper thread.
+			CheckGuiThread();
+
 			// We need to get a write lock on the entire cache to avoid
 			// anything else making changes.
 			using (new WriteLock(access))
@@ -323,7 +344,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 
 			// Attempt to resolve the updates. This will do nothing if a lock
 			// is currently acquired.
-			ProcessQueuedLineChanges();
+			Application.Invoke(ProcessQueuedLineChanges);
 
 			// Start the background cacher to handle the lines that aren't
 			// visible on screen.
@@ -345,7 +366,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 
 			// Attempt to resolve the updates. This will do nothing if a lock
 			// is currently acquired.
-			ProcessQueuedLineChanges();
+			Application.Invoke(ProcessQueuedLineChanges);
 		}
 
 		/// <summary>
@@ -363,7 +384,11 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 
 			// Attempt to resolve the updates. This will do nothing if a lock
 			// is currently acquired.
-			ProcessQueuedLineChanges();
+			Application.Invoke(ProcessQueuedLineChanges);
+
+			// Start the background cacher to handle the lines that aren't
+			// visible on screen.
+			backgroundUpdater.Restart();
 		}
 
 		private void AllocateLines()
@@ -378,6 +403,22 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 				{
 					lines.Add(new CachedLine());
 				}
+			}
+		}
+
+		/// <summary>
+		/// Checks the current thread to see if the operation is happening on
+		/// the GUI thread.
+		/// </summary>
+		private void CheckGuiThread()
+		{
+			// Check the current thread against the thread we've been created on.
+			Thread currentThread = Thread.CurrentThread;
+
+			if (currentThread != thread)
+			{
+				throw new InvalidOperationException(
+					"The requested operation was not called on the GUI thread.");
 			}
 		}
 
@@ -412,6 +453,9 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			object sender,
 			LineChangedArgs args)
 		{
+			// Make sure we're on the proper thread.
+			CheckGuiThread();
+
 			// Get the line and reset it.
 			CachedLine line = lines[args.LineIndex];
 
@@ -431,6 +475,9 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			object sender,
 			LineRangeEventArgs args)
 		{
+			// Make sure we're on the proper thread.
+			CheckGuiThread();
+
 			// It is very important for performance and caching that we delete
 			// the line given instead of rebuilding the counts. Since we are
 			// dealing with indexes, we need to get the count.
@@ -452,6 +499,9 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			object sender,
 			LineRangeEventArgs args)
 		{
+			// Make sure we're on the proper thread.
+			CheckGuiThread();
+
 			// Create a short list of new cache items for the line. Since we are
 			// dealing with indexes, we need to get the count.
 			int count = args.EndLineIndex - args.StartLineIndex + 1;
@@ -477,6 +527,9 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		/// </summary>
 		private void ProcessQueuedLineChanges()
 		{
+			// Make sure we're on the proper thread.
+			CheckGuiThread();
+
 			// We have to make sure we aren't making changes to the queue
 			// while we're processing these changes.
 			lock (queuedLineEvents)
@@ -504,6 +557,13 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 					}
 				}
 			}
+		}
+
+		private void ProcessQueuedLineChanges(
+			object sender,
+			EventArgs args)
+		{
+			ProcessQueuedLineChanges();
 		}
 
 		/// <summary>
@@ -548,6 +608,9 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			EditorViewRenderer editorViewRenderer)
 			: base(displayContext, editorViewRenderer)
 		{
+			// Keep track of the thread we've been created on.
+			thread = Thread.CurrentThread;
+
 			// Set the cache window properties.
 			access = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
 			queuedLineEvents = new List<Action>();
@@ -590,6 +653,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		private readonly CachedLineList lines;
 
 		private readonly List<Action> queuedLineEvents;
+		private readonly Thread thread;
 
 		#endregion
 	}
