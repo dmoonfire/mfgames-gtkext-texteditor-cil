@@ -283,7 +283,7 @@ namespace GtkExtDemo
 					case DemoLineStyleType.Heading:
 						lineStyle.FontDescription =
 							FontDescriptionCache.GetFontDescription("Sans Bold 18");
-						//lineStyle.Padding.Left = 25;
+						lineStyle.Padding.Left = 25;
 						break;
 
 					case DemoLineStyleType.Borders:
@@ -300,11 +300,11 @@ namespace GtkExtDemo
 						break;
 
 					case DemoLineStyleType.Default:
-						//lineStyle.Padding.Left = 50;
+						lineStyle.Padding.Left = 50;
 						break;
 
 					case DemoLineStyleType.Break:
-						//lineStyle.Padding.Left = 50;
+						lineStyle.Padding.Left = 50;
 						lineStyle.Alignment = Alignment.Center;
 						break;
 				}

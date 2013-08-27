@@ -98,6 +98,14 @@ namespace MfGames.GtkExt.TextEditor
 		}
 
 		/// <summary>
+		/// Contains the margins currently enabled for the view.
+		/// </summary>
+		public MarginRendererCollection Margins
+		{
+			get { return margins; }
+		}
+
+		/// <summary>
 		/// Gets or sets the line layout buffer.
 		/// </summary>
 		/// <value>The line layout buffer.</value>
@@ -241,7 +249,9 @@ namespace MfGames.GtkExt.TextEditor
 				return;
 			}
 
-			// Request that the widget get updated.
+			// Request that the widget get updated. We need this because the
+			// cursor has moved and we don't have any other place to trigger
+			// the redraw.
 			RequestRedraw();
 
 			// Figure out if the caret is already in the visible area.
@@ -786,7 +796,7 @@ namespace MfGames.GtkExt.TextEditor
 			object sender,
 			EventArgs e)
 		{
-			SetAdjustments();
+			Application.Invoke(delegate { SetAdjustments(); });
 		}
 
 		/// <summary>

@@ -95,9 +95,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\MfGames.Commands.TextEditing.0.0.3.0\lib\net45\MfGames.Commands.TextEditing.dll</HintPath>
     </Reference>
-    <Reference Include="MfGames.GtkExt, Version=0.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="MfGames.GtkExt, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\MfGames.GtkExt.0.0.4.0\lib\net45\MfGames.GtkExt.dll</HintPath>
+      <HintPath>..\packages\MfGames.GtkExt.0.2.0.0\lib\net45\MfGames.GtkExt.dll</HintPath>
     </Reference>
     <Reference Include="MfGames.Languages, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

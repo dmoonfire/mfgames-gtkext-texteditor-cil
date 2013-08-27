@@ -1,6 +1,24 @@
-Incremental release to handle bug fixed in the process of using Author Intrusion to write a novella.
+Incremental release to improve performance and handling.
+
+# Signatures
+
+- Exposed the margin rendererer collection as a property. +Changed
 
 # Unicode
 
-- Reworked how cursor movement and caret rendering took into account with how Pango works with Unicode characters. +Changed
-- Better handling of trailing glyph edges while navigating to reduce the jumping of a single character while moving. +Changed
+- Additional work to handle Unicode characters with navigation and mouse clicking. +Changed
+- Moved the UTF-8 processing into MfGames.GtkExt
+
+# Improvements
+
+- Significantly improved performance with larger documents. +New
+- Up/Down key navigation now works with left padding of styles. +New
+- Added some locking around the cached renderer to allow it to handle getting events from other threads more gracefully, in specific the line changed events. +Changed
+- Added a background line cacher to speed up scrolling performance and line calculations. +New
+- If the popup menu callback removes all items, then the popup isn't shown. +Changed
+- If there is a selection while typing, the selection is replaced with text. +New
+- Some additional work on ensuring that changes to the GUI are done on the proper thread. +New
+
+# Dependencies
+
+- MfGames.GtkExt 0.2.0

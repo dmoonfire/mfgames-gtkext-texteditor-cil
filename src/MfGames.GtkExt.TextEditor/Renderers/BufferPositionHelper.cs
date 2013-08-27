@@ -59,7 +59,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 				bufferPosition.LineIndex, LineContexts.Unformatted);
 
 			// Get the wrapped line associated with this character position.
-			int unicodeIndex = ToUnicodeCharacterIndex(
+			int unicodeIndex = PangoUtility.TranslateStringToPangoIndex(
 				text, bufferPosition.CharacterIndex);
 			int x;
 
@@ -321,55 +321,11 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			// convert it back to a C# string.
 			string lineText =
 				displayContext.LineBuffer.GetLineText(bufferPosition.LineIndex);
-			int characterIndex = ToCharacterIndex(lineText, unicodeIndex);
+			int characterIndex = PangoUtility.TranslatePangoToStringIndex(
+				lineText, unicodeIndex);
 
 			// Create a new buffer position from the elements and return it.
 			return new BufferPosition(bufferPosition.LineIndex, characterIndex);
-		}
-
-		/// <summary>
-		/// Converts a Unicode index into a C# character index.
-		/// </summary>
-		/// <param name="lineText">The line text.</param>
-		/// <param name="unicodeCharacter">The unicode character.</param>
-		/// <returns></returns>
-		public static int ToCharacterIndex(
-			string lineText,
-			int unicodeCharacter)
-		{
-			// Go through and figure out the appropriate index.
-			int characterIndex = 0;
-
-			foreach (int c in lineText)
-			{
-				if (c < 128)
-				{
-					unicodeCharacter -= 1;
-				}
-				else if (c < 2048)
-				{
-					unicodeCharacter -= 2;
-				}
-				else if (c < 65536)
-				{
-					unicodeCharacter -= 3;
-				}
-				else
-				{
-					unicodeCharacter -= 4;
-				}
-
-				// If we are zero or less, we're done.
-				if (unicodeCharacter < 0)
-				{
-					break;
-				}
-
-				// Increment the character index.
-				characterIndex++;
-			}
-
-			return characterIndex;
 		}
 
 		/// <summary>
@@ -456,7 +412,8 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			// convert it back to a C# string.
 			string lineText =
 				displayContext.LineBuffer.GetLineText(bufferPosition.LineIndex);
-			int characterIndex = ToCharacterIndex(lineText, unicodeIndex);
+			int characterIndex = PangoUtility.TranslatePangoToStringIndex(
+				lineText, unicodeIndex);
 
 			// Create a new buffer position from the elements and return it.
 			return new BufferPosition(bufferPosition.LineIndex, characterIndex);
@@ -501,7 +458,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			// value to calculate it. This actually uses UTF-8 encoding to
 			// calculate the indexes.
 			string lineText = displayContext.LineBuffer.GetLineText(lineIndex);
-			int unicodeCharacter = ToUnicodeCharacterIndex(
+			int unicodeCharacter = PangoUtility.TranslateStringToPangoIndex(
 				lineText, bufferPosition.CharacterIndex);
 
 			// We need to figure out the relative position. If the position equals
@@ -542,51 +499,6 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 
 			// Return the results.
 			return new PointD(Units.ToPixels(layoutX), y);
-		}
-
-		/// <summary>
-		/// Calculates the UTF-8-based character index from the C# text and
-		/// character index.
-		/// </summary>
-		/// <param name="lineText">The line text to parse for the index.</param>
-		/// <param name="character">The character index into the given string.</param>
-		/// <returns>The Unicode character index into the underlying C string.</returns>
-		public static int ToUnicodeCharacterIndex(
-			string lineText,
-			int character)
-		{
-			// Make sure we don't go beyond the string.
-			int stop = Math.Min(lineText.Length, character);
-
-			// Go through and calculate the UTF-8 index.
-			int unicodeCharacter = 0;
-
-			for (int index = 0;
-				index < stop;
-				index++)
-			{
-				// Get the character at this point
-				int c = lineText[index];
-
-				if (c < 128)
-				{
-					unicodeCharacter += 1;
-				}
-				else if (c < 2048)
-				{
-					unicodeCharacter += 2;
-				}
-				else if (c < 65536)
-				{
-					unicodeCharacter += 3;
-				}
-				else
-				{
-					unicodeCharacter += 4;
-				}
-			}
-
-			return unicodeCharacter;
 		}
 
 		#endregion

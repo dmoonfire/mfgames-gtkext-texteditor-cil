@@ -100,6 +100,9 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 				wrappedLine = layout.Lines[wrappedLineIndex];
 			}
 
+			// Adjust the X coordinate for the current line.
+			lineX -= GetLeftStylePaddingPango(controller, position.LineIndex);
+
 			// The wrapped line has the current wrapped line, so use the lineX
 			// to figure out which character to use.
 			int trailing;
@@ -111,12 +114,14 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			// characters because Pango uses that instead of C# strings.
 			string lineText =
 				controller.DisplayContext.LineBuffer.GetLineText(position.LineIndex);
-			int characterIndex = BufferPositionHelper.ToCharacterIndex(
+			unicodeIndex = NormalizeEmptyStrings(lineText, unicodeIndex);
+			int characterIndex = PangoUtility.TranslatePangoToStringIndex(
 				lineText, unicodeIndex);
 
 			position.CharacterIndex = characterIndex;
 
-			if (trailing > 0)
+			if (lineText.Length > 0
+				&& trailing > 0)
 			{
 				position.CharacterIndex++;
 			}
@@ -163,8 +168,9 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 		/// <returns></returns>
 		public static BufferPosition GetBufferPosition(
 			PointD widgetPoint,
-			IDisplayContext displayContext)
+			EditorViewController controller)
 		{
+			IDisplayContext displayContext = controller.DisplayContext;
 			double y = widgetPoint.Y + displayContext.BufferOffsetY;
 			int lineIndex = displayContext.Renderer.GetLineLayoutRange(y);
 			Layout layout = displayContext.Renderer.GetLineLayout(
@@ -195,8 +201,15 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			// When dealing with UTF-8 characters, we have to convert the
 			// Unicode index into a C# index.
 			string lineText = displayContext.LineBuffer.GetLineText(lineIndex);
-			int characterIndex = BufferPositionHelper.ToCharacterIndex(
+			unicodeIndex = NormalizeEmptyStrings(lineText, unicodeIndex);
+			int characterIndex = PangoUtility.TranslatePangoToStringIndex(
 				lineText, unicodeIndex);
+
+			// If the source text is empty, then we disable the trailing.
+			if (lineText.Length == 0)
+			{
+				trailing = 0;
+			}
 
 			// Return the buffer position.
 			return new BufferPosition(lineIndex, characterIndex + trailing);
@@ -307,11 +320,13 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 
 			// Figure out the X coordinate of the line. If there is an action context,
 			// use that. Otherwise, calculate it from the character index of the position.
-			int lineX = Units.ToPixels(GetLineX(controller, wrappedLine, position));
+			int pangoLineX = GetLineX(controller, wrappedLine, position);
+			int lineX = Units.ToPixels(pangoLineX);
 
 			// Move to the calculated point.
-			Point(
-				displayContext, new PointD(lineX, bufferY - displayContext.BufferOffsetY));
+			var newPoint = new PointD(lineX, bufferY - displayContext.BufferOffsetY);
+
+			Point(controller, newPoint);
 		}
 
 		/// <summary>
@@ -346,24 +361,28 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 
 			// Figure out the X coordinate of the line. If there is an action context,
 			// use that. Otherwise, calculate it from the character index of the position.
-			int lineX = Units.ToPixels(GetLineX(controller, wrappedLine, position));
+			int pixels = Units.ToPixels(GetLineX(controller, wrappedLine, position));
+			int lineX = pixels;
 
 			// Move to the calculated point.
-			Point(
-				displayContext, new PointD(lineX, bufferY - displayContext.BufferOffsetY));
+			var newPoint = new PointD(lineX, bufferY - displayContext.BufferOffsetY);
+
+			Point(controller, newPoint);
 		}
 
 		/// <summary>
 		/// Moves the caret to a specific widget-relative point on the screen.
 		/// </summary>
-		/// <param name="displayContext">The display context.</param>
+		/// <param name="controller">The controller.</param>
 		/// <param name="widgetPoint">The point in the widget.</param>
 		public static void Point(
-			IDisplayContext displayContext,
+			EditorViewController controller,
 			PointD widgetPoint)
 		{
 			// Move to and draw the caret.
-			displayContext.ScrollToCaret(GetBufferPosition(widgetPoint, displayContext));
+			BufferPosition bufferPosition = GetBufferPosition(widgetPoint, controller);
+
+			controller.DisplayContext.ScrollToCaret(bufferPosition);
 		}
 
 		/// <summary>
@@ -694,6 +713,9 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 				wrappedLine = layout.Lines[wrappedLineIndex];
 			}
 
+			// Adjust the X coordinate for the current line.
+			lineX -= GetLeftStylePaddingPango(controller, position.LineIndex);
+
 			// The wrapped line has the current wrapped line, so use the lineX
 			// to figure out which character to use.
 			int trailing;
@@ -705,18 +727,53 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			// characters because Pango uses that instead of C# strings.
 			string lineText =
 				controller.DisplayContext.LineBuffer.GetLineText(position.LineIndex);
-			int characterIndex = BufferPositionHelper.ToCharacterIndex(
+			unicodeIndex = NormalizeEmptyStrings(lineText, unicodeIndex);
+			int characterIndex = PangoUtility.TranslateStringToPangoIndex(
 				lineText, unicodeIndex);
 
 			position.CharacterIndex = characterIndex;
 
-			if (trailing > 0)
+			if (lineText.Length > 0
+				&& trailing > 0)
 			{
 				position.CharacterIndex++;
 			}
 
 			// Draw the new location of the caret.
 			displayContext.ScrollToCaret(position);
+		}
+
+		private static int GetLeftPaddingPixels(
+			EditorViewController controller,
+			int lineIndex)
+		{
+			// Get the style for the given line.
+			LineBlockStyle style =
+				controller.DisplayContext.Renderer.GetLineStyle(
+					lineIndex, LineContexts.CurrentLine);
+
+			if (style == null)
+			{
+				return 0;
+			}
+
+			var pixelPadding = (int) style.Padding.Left.GetValueOrDefault(0);
+			return pixelPadding;
+		}
+
+		/// <summary>
+		/// Gets the padding of the given line in layout units.
+		/// </summary>
+		/// <param name="controller">The controller.</param>
+		/// <param name="lineIndex">Index of the line.</param>
+		/// <returns></returns>
+		private static int GetLeftStylePaddingPango(
+			EditorViewController controller,
+			int lineIndex)
+		{
+			int pixelPadding = GetLeftPaddingPixels(controller, lineIndex);
+			int pangoPadding = Units.FromPixels(pixelPadding);
+			return pangoPadding;
 		}
 
 		/// <summary>
@@ -741,12 +798,13 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 				// is always to the left of the character unless we're at the
 				// end, and then it's considered trailing of the previous
 				// character.
-				string lineText =
-					controller.DisplayContext.LineBuffer.GetLineText(position.LineIndex);
+				LineBuffer lineBuffer = controller.DisplayContext.LineBuffer;
+				string lineText = lineBuffer.GetLineText(position.LineIndex);
 				int characterIndex = position.CharacterIndex;
 				bool trailing = false;
 
-				if (characterIndex == lineText.Length)
+				if (characterIndex == lineText.Length
+					&& lineText.Length > 0)
 				{
 					characterIndex--;
 					trailing = true;
@@ -755,9 +813,19 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 				// Because Pango works with UTF-8-based indexes, we need to
 				// convert the C# character index into that index to properly
 				// identify the character.
-				int unicodeIndex = BufferPositionHelper.ToUnicodeCharacterIndex(
+				characterIndex = NormalizeEmptyStrings(lineText, characterIndex);
+				int unicodeIndex = PangoUtility.TranslateStringToPangoIndex(
 					lineText, characterIndex);
 				lineX = wrappedLine.IndexToX(unicodeIndex, trailing);
+
+				// We need the line's style since it may have left passing
+				// which will change our columns.
+				LineBlockStyle style =
+					controller.DisplayContext.Renderer.GetLineStyle(
+						position.LineIndex, LineContexts.CurrentLine);
+
+				var pixelPadding = (int) style.Padding.Left.GetValueOrDefault(0);
+				lineX += Units.FromPixels(pixelPadding);
 
 				// Save a new state into the states.
 				state = new VerticalMovementActionState(lineX);
@@ -770,6 +838,25 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			}
 
 			return lineX;
+		}
+
+		/// <summary>
+		/// Normalizes indexes when the source text is empty instead of a
+		/// replacement value.
+		/// </summary>
+		/// <param name="text">The text.</param>
+		/// <param name="index">The index.</param>
+		/// <returns></returns>
+		private static int NormalizeEmptyStrings(
+			string text,
+			int index)
+		{
+			if (string.IsNullOrEmpty(text))
+			{
+				return 0;
+			}
+
+			return index;
 		}
 
 		/// <summary>
