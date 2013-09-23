@@ -26,9 +26,9 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 			// pull out a substring.
 			string sourceLine = state.LineBuffer.GetLineText(
 				SourceRange.LinePosition, LineContexts.Unformatted);
-			int sourceBegin = SourceRange.BeginCharacterPosition.NormalizeIndex(
+			int sourceBegin = SourceRange.BeginCharacterPosition.GetCharacterIndex(
 				sourceLine, SourceRange.EndCharacterPosition, WordSearchDirection.Left);
-			int sourceEnd = SourceRange.EndCharacterPosition.NormalizeIndex(
+			int sourceEnd = SourceRange.EndCharacterPosition.GetCharacterIndex(
 				sourceLine, SourceRange.BeginCharacterPosition, WordSearchDirection.Right);
 
 			// Grab the text from the source line. If the source begin is at the
@@ -44,7 +44,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 					DestinationPosition.LinePosition, LineContexts.Unformatted);
 			var buffer = new StringBuilder(destinationLine);
 			int characterIndex =
-				DestinationPosition.CharacterPosition.NormalizeIndex(destinationLine);
+				DestinationPosition.CharacterPosition.GetCharacterIndex(destinationLine);
 
 			buffer.Insert(characterIndex, sourceText);
 

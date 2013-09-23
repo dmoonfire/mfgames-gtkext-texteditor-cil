@@ -171,13 +171,13 @@ namespace MfGames.GtkExt.TextEditor.Models
 			DeleteTextOperation operation)
 		{
 			// Get the text from the buffer, insert the text, and put it back.
-			int lineIndex = operation.TextRange.LinePosition.NormalizeIndex(lines.Count);
+			int lineIndex = operation.TextRange.LinePosition.GetLineIndex(lines.Count);
 			string lineText = lines[lineIndex];
 			int startCharacterIndex =
-				operation.TextRange.BeginCharacterPosition.NormalizeIndex(
+				operation.TextRange.BeginCharacterPosition.GetCharacterIndex(
 					lineText, operation.TextRange.EndCharacterPosition, WordSearchDirection.Left);
 			int endCharacterIndex =
-				operation.TextRange.EndCharacterPosition.NormalizeIndex(
+				operation.TextRange.EndCharacterPosition.GetCharacterIndex(
 					lineText,
 					operation.TextRange.BeginCharacterPosition,
 					WordSearchDirection.Right);

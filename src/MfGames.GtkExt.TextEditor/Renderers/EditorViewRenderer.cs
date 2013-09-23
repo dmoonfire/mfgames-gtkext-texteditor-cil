@@ -7,6 +7,7 @@ using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.TextEditor.Interfaces;
 using MfGames.GtkExt.TextEditor.Models;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
+using MfGames.GtkExt.TextEditor.Models.Extensions;
 using MfGames.GtkExt.TextEditor.Models.Styles;
 using Pango;
 using Rectangle = Cairo.Rectangle;
@@ -248,6 +249,15 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 
 			// Retrieve the style.
 			return DisplayContext.Theme.LineStyles[styleName];
+		}
+
+		public LineBlockStyle GetLineStyle(
+			LinePosition linePosition,
+			LineContexts lineContexts = LineContexts.None)
+		{
+			int lineIndex = linePosition.GetLineIndex(this);
+			var results = GetLineStyle(lineIndex, lineContexts);
+			return results;
 		}
 
 		/// <summary>

@@ -97,7 +97,7 @@ namespace MfGames.GtkExt.TextEditor.Editing
 
 			// Shift the contents to compenstate for the margins.
 			LineBlockStyle style =
-				displayContext.Renderer.GetLineStyle(Position.LinePosition, LineContexts.None);
+				displayContext.Renderer.GetLineStyle(Position.LinePosition);
 
 			x += displayContext.TextX;
 			x += style.Left;

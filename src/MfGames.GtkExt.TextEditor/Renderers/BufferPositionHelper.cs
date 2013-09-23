@@ -436,7 +436,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			// Get the line index, which needs to be a number in range.
 			EditorViewRenderer buffer = displayContext.Renderer;
 			int lineIndex = Math.Min(
-				bufferPosition.LinePosition,
+				bufferPosition.LinePosition.Index,
 				displayContext.LineBuffer.LineCount - 1);
 
 			// Pull out some of the common things we'll be using in this method.

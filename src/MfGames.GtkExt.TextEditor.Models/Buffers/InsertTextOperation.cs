@@ -54,7 +54,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 			var buffer = new StringBuilder(lineText);
 
 			// Normalize the character ranges.
-			int characterIndex = TextPosition.CharacterPosition.NormalizeIndex(lineText);
+			int characterIndex = TextPosition.CharacterPosition.GetCharacterIndex(lineText);
 
 			buffer.Insert(characterIndex, Text);
 

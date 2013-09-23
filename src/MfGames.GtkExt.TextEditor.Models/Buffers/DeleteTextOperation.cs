@@ -42,16 +42,16 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 		public override void Do(OperationContext state)
 		{
 			// Grab the line from the line buffer.
-			int lineIndex = TextRange.LinePosition.NormalizeIndex(
+			int lineIndex = TextRange.LinePosition.GetLineIndex(
 				state.LineBuffer.LineCount);
 			string lineText = state.LineBuffer.GetLineText(
 				lineIndex, LineContexts.Unformatted);
 			var buffer = new StringBuilder(lineText);
 
 			// Normalize the character ranges.
-			startCharacterIndex = TextRange.BeginCharacterPosition.NormalizeIndex(
+			startCharacterIndex = TextRange.BeginCharacterPosition.GetCharacterIndex(
 				lineText, TextRange.EndCharacterPosition, WordSearchDirection.Left);
-			int endCharacterIndex = TextRange.EndCharacterPosition.NormalizeIndex(
+			int endCharacterIndex = TextRange.EndCharacterPosition.GetCharacterIndex(
 				lineText, TextRange.BeginCharacterPosition, WordSearchDirection.Right);
 			int length = endCharacterIndex - startCharacterIndex;
 
@@ -80,7 +80,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 		public override void Undo(OperationContext state)
 		{
 			// Grab the line from the line buffer.
-			int lineIndex = TextRange.LinePosition.NormalizeIndex(
+			int lineIndex = TextRange.LinePosition.GetLineIndex(
 				state.LineBuffer.LineCount);
 			string lineText = state.LineBuffer.GetLineText(
 				lineIndex, LineContexts.Unformatted);

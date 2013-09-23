@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
+using MfGames.GtkExt.TextEditor.Models.Extensions;
 
 namespace MfGames.GtkExt.TextEditor.Models
 {
@@ -122,6 +123,15 @@ namespace MfGames.GtkExt.TextEditor.Models
 		public abstract int GetLineLength(
 			int lineIndex,
 			LineContexts lineContexts);
+
+		public int GetLineLength(
+			LinePosition linePosition,
+			LineContexts lineContexts = LineContexts.None)
+		{
+			int lineIndex = linePosition.GetLineIndex(this);
+			int results = GetLineLength(lineIndex, lineContexts);
+			return results;
+		}
 
 		/// <summary>
 		/// Gets the Pango markup for a given line.
