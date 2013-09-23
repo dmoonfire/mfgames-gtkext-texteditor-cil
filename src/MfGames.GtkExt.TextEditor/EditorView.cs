@@ -7,6 +7,7 @@ using System.Diagnostics;
 using Cairo;
 using Gdk;
 using Gtk;
+using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.Extensions.Cairo;
 using MfGames.GtkExt.Extensions.Pango;
 using MfGames.GtkExt.TextEditor.Editing;
@@ -288,14 +289,14 @@ namespace MfGames.GtkExt.TextEditor
 		/// Scrolls the view to ensure the caret is visible.
 		/// </summary>
 		/// <param name="bufferPosition">The buffer position.</param>
-		public void ScrollToCaret(BufferPosition bufferPosition)
+		public void ScrollToCaret(TextPosition bufferPosition)
 		{
 			// Look to see if we are moving to a different position. If we are,
 			// we tell the line buffer that we have exited the previous line.
-			if (caret.Position.LineIndex != bufferPosition.LineIndex)
+			if (caret.Position.LinePosition != bufferPosition.LinePosition)
 			{
 				// Send an operation to the line buffer that we left the line.
-				LineBuffer.ExitLine(caret.Position.LineIndex);
+				LineBuffer.ExitLine(caret.Position.LinePosition);
 			}
 
 			// Call the base scrolling.
@@ -489,7 +490,7 @@ namespace MfGames.GtkExt.TextEditor
 					var lineContexts = LineContexts.None;
 					bool currentLine = false;
 
-					if (lineIndex == caret.Position.LineIndex)
+					if (lineIndex == caret.Position.LinePosition)
 					{
 						// Add the curent line to the context.
 						lineContexts |= LineContexts.CurrentLine;
@@ -732,7 +733,7 @@ namespace MfGames.GtkExt.TextEditor
 
 				// Readjust the scroll bars and scroll to the top.
 				SetAdjustments();
-				Caret.Position = new BufferPosition(0, 0);
+				Caret.Position = new TextPosition(0, 0);
 				ScrollToCaret();
 
 				// Reset the controller of any input states.

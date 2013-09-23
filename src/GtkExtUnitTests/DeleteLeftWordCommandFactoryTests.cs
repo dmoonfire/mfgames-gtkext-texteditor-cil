@@ -31,7 +31,7 @@ namespace UnitTests
 			var factory = new DeleteLeftWordCommandFactory();
 			var reference = new CommandFactoryReference(factory.FactoryKey);
 
-			caret.Position = new BufferPosition(2, 14);
+			caret.Position = new TextPosition(2, 14);
 
 			// Act
 			factory.Do(controller, reference, controller.CommandFactory);
@@ -61,7 +61,7 @@ namespace UnitTests
 			var undo = new UndoCommandFactory();
 			var reference = new CommandFactoryReference(factory.FactoryKey);
 
-			caret.Position = new BufferPosition(2, 14);
+			caret.Position = new TextPosition(2, 14);
 
 			factory.Do(controller, reference, controller.CommandFactory);
 

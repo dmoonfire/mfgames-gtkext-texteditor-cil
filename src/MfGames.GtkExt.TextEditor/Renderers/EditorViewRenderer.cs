@@ -3,6 +3,7 @@
 // http://mfgames.com/mfgames-gtkext-cil/license
 
 using System;
+using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.TextEditor.Interfaces;
 using MfGames.GtkExt.TextEditor.Models;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
@@ -272,7 +273,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			{
 				// Apply the markup to the line.
 				return SelectionRenderer.GetSelectionMarkup(
-					markup, new CharacterRange(startCharacterIndex, endCharacterIndex));
+					markup, new TextRange(startCharacterIndex, endCharacterIndex));
 			}
 
 			// Return the resulting markup.
@@ -366,7 +367,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// <param name="previousSelection">The previous selection.</param>
 		public virtual void UpdateSelection(
 			IDisplayContext displayContext,
-			BufferSegment previousSelection)
+			TextRange previousSelection)
 		{
 		}
 

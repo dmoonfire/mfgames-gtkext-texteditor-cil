@@ -25,7 +25,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 		/// Gets or sets the buffer position for the insert operation.
 		/// </summary>
 		/// <value>The buffer position.</value>
-		public TextPosition BufferPosition { get; private set; }
+		public TextPosition TextPosition { get; private set; }
 
 		/// <summary>
 		/// Gets the type of the operation representing this object.
@@ -50,11 +50,11 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 		{
 			// Grab the line from the line buffer.
 			string lineText = state.LineBuffer.GetLineText(
-				(int) BufferPosition.Line, LineContexts.Unformatted);
+				(int) TextPosition.LinePosition, LineContexts.Unformatted);
 			var buffer = new StringBuilder(lineText);
 
 			// Normalize the character ranges.
-			int characterIndex = BufferPosition.Character.NormalizeIndex(lineText);
+			int characterIndex = TextPosition.CharacterPosition.NormalizeIndex(lineText);
 
 			buffer.Insert(characterIndex, Text);
 
@@ -63,14 +63,14 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 
 			// Set the line in the buffer.
 			lineText = buffer.ToString();
-			state.LineBuffer.SetText((int) BufferPosition.Line, lineText);
+			state.LineBuffer.SetText((int) TextPosition.LinePosition, lineText);
 
 			// If we are updating the position, we need to do it here.
 			if (UpdateTextPosition.HasFlag(DoTypes.Do))
 			{
 				state.Results =
 					new LineBufferOperationResults(
-						new BufferPosition(BufferPosition.Line, characterIndex + Text.Length));
+						new TextPosition(TextPosition.LinePosition, characterIndex + Text.Length));
 			}
 		}
 
@@ -83,7 +83,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 		{
 			// Grab the line from the line buffer.
 			string lineText = state.LineBuffer.GetLineText(
-				(int) BufferPosition.Line, LineContexts.Unformatted);
+				(int) TextPosition.LinePosition, LineContexts.Unformatted);
 			var buffer = new StringBuilder(lineText);
 
 			// Normalize the character ranges.
@@ -91,14 +91,14 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 
 			// Set the line in the buffer.
 			lineText = buffer.ToString();
-			state.LineBuffer.SetText((int) BufferPosition.Line, lineText);
+			state.LineBuffer.SetText((int) TextPosition.LinePosition, lineText);
 
 			// If we are updating the position, we need to do it here.
 			if (UpdateTextPosition.HasFlag(DoTypes.Undo))
 			{
 				state.Results =
 					new LineBufferOperationResults(
-						new BufferPosition(originalPosition.Line, originalPosition.Character));
+						new TextPosition(originalPosition.LinePosition, originalPosition.CharacterPosition));
 			}
 		}
 
@@ -134,7 +134,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 				throw new ArgumentNullException("text");
 			}
 
-			BufferPosition = bufferPosition;
+			TextPosition = bufferPosition;
 			Text = text;
 		}
 

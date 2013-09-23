@@ -42,11 +42,11 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 			OperationContext operationContext,
 			EditorViewController controller,
 			IDisplayContext displayContext,
-			BufferPosition position)
+			TextPosition position)
 		{
 			// If we don't have a selection, this is a simple insert command.
 			var commands = new List<IUndoableCommand<OperationContext>>();
-			BufferPosition bufferPosition = displayContext.Caret.Position;
+			TextPosition bufferPosition = displayContext.Caret.Position;
 
 			if (!displayContext.Caret.Selection.IsEmpty)
 			{
@@ -63,7 +63,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 			string text = commandData.ToString();
 			IInsertTextCommand<OperationContext> insertCommand =
 				controller.CommandController.CreateInsertTextCommand(
-					new TextPosition(bufferPosition.LineIndex, bufferPosition.CharacterIndex),
+					new TextPosition(bufferPosition.LinePosition, bufferPosition.CharacterPosition),
 					text);
 			insertCommand.UpdateTextPosition = DoTypes.All;
 			commands.Add(insertCommand);
@@ -96,7 +96,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 			if (operationContext.Results.HasValue)
 			{
 				displayContext.Caret.SetAndScrollToPosition(
-					operationContext.Results.Value.BufferPosition);
+					operationContext.Results.Value.TextPosition);
 			}
 		}
 

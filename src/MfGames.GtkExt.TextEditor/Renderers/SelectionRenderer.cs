@@ -4,6 +4,7 @@
 
 using System;
 using System.Text;
+using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.TextEditor.Models;
 
 namespace MfGames.GtkExt.TextEditor.Renderers
@@ -24,7 +25,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// <returns>A Pango markup string with the selection applied.</returns>
 		public string GetSelectionMarkup(
 			string pangoMarkup,
-			CharacterRange characters)
+			TextRange characters)
 		{
 			return GetSelectionMarkup(
 				pangoMarkup, characters, "span", " background='#CCCCFF'");
@@ -43,7 +44,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// </returns>
 		public string GetSelectionMarkup(
 			string markup,
-			CharacterRange characters,
+			TextRange characters,
 			string selectionTag,
 			string selectionAttributes)
 		{
@@ -240,7 +241,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// point the selection ends.</param>
 		private static void GetMarkupIndexes(
 			string pangoMarkup,
-			CharacterRange characters,
+			TextRange characters,
 			out int startIndex,
 			out int endIndex,
 			out int leadingXmlDepth,

@@ -107,7 +107,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			InsertPatternIntoBuffer(3);
 			editor.Clipboard.Text = "Insert\nNew ";
-			editor.Caret.Position = new BufferPosition(1, 0);
+			editor.Caret.Position = new TextPosition(1, 0);
 
 			// Operation
 			TextActions.Paste(controller);
@@ -129,7 +129,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			InsertPatternIntoBuffer(3);
 			editor.Clipboard.Text = " Inserted\nNew";
-			editor.Caret.Position = new BufferPosition(1, 0).ToEndOfLine(renderer);
+			editor.Caret.Position = new TextPosition(1, 0).ToEndOfLine(renderer);
 
 			// Operation
 			TextActions.Paste(controller);
@@ -151,7 +151,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			InsertPatternIntoBuffer(3);
 			editor.Clipboard.Text = "Insert\nNew\n";
-			editor.Caret.Position = new BufferPosition(1, 0);
+			editor.Caret.Position = new TextPosition(1, 0);
 
 			// Operation
 			TextActions.Paste(controller);
@@ -174,7 +174,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			InsertPatternIntoBuffer(3);
 			editor.Clipboard.Text = " Inserted\nNew\n";
-			editor.Caret.Position = new BufferPosition(1, 0).ToEndOfLine(renderer);
+			editor.Caret.Position = new TextPosition(1, 0).ToEndOfLine(renderer);
 
 			// Operation
 			TextActions.Paste(controller);
@@ -197,7 +197,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			InsertPatternIntoBuffer(3);
 			editor.Clipboard.Text = "Insert\nNew\n";
-			editor.Caret.Position = new BufferPosition(1, 5);
+			editor.Caret.Position = new TextPosition(1, 5);
 
 			// Operation
 			TextActions.Paste(controller);
@@ -220,7 +220,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			InsertPatternIntoBuffer(3);
 			editor.Clipboard.Text = "Insert\nNew ";
-			editor.Caret.Position = new BufferPosition(1, 5);
+			editor.Caret.Position = new TextPosition(1, 5);
 
 			// Operation
 			TextActions.Paste(controller);
@@ -242,7 +242,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			InsertPatternIntoBuffer(3);
 			editor.Clipboard.Text = "Insert ";
-			editor.Caret.Position = new BufferPosition(1, 0);
+			editor.Caret.Position = new TextPosition(1, 0);
 
 			// Operation
 			TextActions.Paste(controller);
@@ -263,7 +263,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			InsertPatternIntoBuffer(3);
 			editor.Clipboard.Text = " Inserted";
-			editor.Caret.Position = new BufferPosition(1, 0).ToEndOfLine(renderer);
+			editor.Caret.Position = new TextPosition(1, 0).ToEndOfLine(renderer);
 
 			// Operation
 			TextActions.Paste(controller);
@@ -284,7 +284,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			InsertPatternIntoBuffer(3);
 			editor.Clipboard.Text = "Insert\n";
-			editor.Caret.Position = new BufferPosition(1, 0);
+			editor.Caret.Position = new TextPosition(1, 0);
 
 			// Operation
 			TextActions.Paste(controller);
@@ -306,7 +306,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			InsertPatternIntoBuffer(3);
 			editor.Clipboard.Text = " Inserted\n";
-			editor.Caret.Position = new BufferPosition(1, 0).ToEndOfLine(renderer);
+			editor.Caret.Position = new TextPosition(1, 0).ToEndOfLine(renderer);
 
 			// Operation
 			TextActions.Paste(controller);
@@ -328,7 +328,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			InsertPatternIntoBuffer(3);
 			editor.Clipboard.Text = "Insert\n";
-			editor.Caret.Position = new BufferPosition(1, 5);
+			editor.Caret.Position = new TextPosition(1, 5);
 
 			// Operation
 			TextActions.Paste(controller);
@@ -350,7 +350,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			InsertPatternIntoBuffer(3);
 			editor.Clipboard.Text = "Insert ";
-			editor.Caret.Position = new BufferPosition(1, 5);
+			editor.Caret.Position = new TextPosition(1, 5);
 
 			// Operation
 			TextActions.Paste(controller);
@@ -371,8 +371,8 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			InsertPatternIntoBuffer(3);
 			editor.Clipboard.Text = "Insert\nNew ";
-			editor.Caret.Selection.AnchorPosition = new BufferPosition(1, 0);
-			editor.Caret.Selection.TailPosition = new BufferPosition(1, 5);
+			editor.Caret.Selection.AnchorPosition = new TextPosition(1, 0);
+			editor.Caret.Selection.TailPosition = new TextPosition(1, 5);
 
 			// Operation
 			TextActions.Paste(controller);
@@ -394,8 +394,8 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			InsertPatternIntoBuffer(3);
 			editor.Clipboard.Text = " Inserted\nNew";
-			editor.Caret.Selection.AnchorPosition = new BufferPosition(1, 3);
-			editor.Caret.Selection.TailPosition = new BufferPosition(1, 6);
+			editor.Caret.Selection.AnchorPosition = new TextPosition(1, 3);
+			editor.Caret.Selection.TailPosition = new TextPosition(1, 6);
 
 			// Operation
 			TextActions.Paste(controller);
@@ -417,8 +417,8 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			InsertPatternIntoBuffer(3);
 			editor.Clipboard.Text = "Insert\nNew\n";
-			editor.Caret.Selection.AnchorPosition = new BufferPosition(1, 0);
-			editor.Caret.Selection.TailPosition = new BufferPosition(1, 5);
+			editor.Caret.Selection.AnchorPosition = new TextPosition(1, 0);
+			editor.Caret.Selection.TailPosition = new TextPosition(1, 5);
 
 			// Operation
 			TextActions.Paste(controller);
@@ -441,8 +441,8 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			InsertPatternIntoBuffer(3);
 			editor.Clipboard.Text = " Inserted\nNew\n";
-			editor.Caret.Selection.AnchorPosition = new BufferPosition(1, 3);
-			editor.Caret.Selection.TailPosition = new BufferPosition(1, 6);
+			editor.Caret.Selection.AnchorPosition = new TextPosition(1, 3);
+			editor.Caret.Selection.TailPosition = new TextPosition(1, 6);
 
 			// Operation
 			TextActions.Paste(controller);
@@ -465,8 +465,8 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			InsertPatternIntoBuffer(3);
 			editor.Clipboard.Text = "Insert\nNew\n";
-			editor.Caret.Selection.AnchorPosition = new BufferPosition(1, 3);
-			editor.Caret.Selection.TailPosition = new BufferPosition(1, 5);
+			editor.Caret.Selection.AnchorPosition = new TextPosition(1, 3);
+			editor.Caret.Selection.TailPosition = new TextPosition(1, 5);
 
 			// Operation
 			TextActions.Paste(controller);
@@ -489,8 +489,8 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			InsertPatternIntoBuffer(3);
 			editor.Clipboard.Text = "Insert\nNew ";
-			editor.Caret.Selection.AnchorPosition = new BufferPosition(1, 3);
-			editor.Caret.Selection.TailPosition = new BufferPosition(1, 5);
+			editor.Caret.Selection.AnchorPosition = new TextPosition(1, 3);
+			editor.Caret.Selection.TailPosition = new TextPosition(1, 5);
 
 			// Operation
 			TextActions.Paste(controller);
@@ -512,8 +512,8 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			InsertPatternIntoBuffer(3);
 			editor.Clipboard.Text = "Insert ";
-			editor.Caret.Selection.AnchorPosition = new BufferPosition(1, 0);
-			editor.Caret.Selection.TailPosition = new BufferPosition(1, 5);
+			editor.Caret.Selection.AnchorPosition = new TextPosition(1, 0);
+			editor.Caret.Selection.TailPosition = new TextPosition(1, 5);
 
 			// Operation
 			TextActions.Paste(controller);
@@ -534,8 +534,8 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			InsertPatternIntoBuffer(3);
 			editor.Clipboard.Text = " Inserted";
-			editor.Caret.Selection.AnchorPosition = new BufferPosition(1, 3);
-			editor.Caret.Selection.TailPosition = new BufferPosition(1, 6);
+			editor.Caret.Selection.AnchorPosition = new TextPosition(1, 3);
+			editor.Caret.Selection.TailPosition = new TextPosition(1, 6);
 
 			// Operation
 			TextActions.Paste(controller);
@@ -556,8 +556,8 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			InsertPatternIntoBuffer(3);
 			editor.Clipboard.Text = "Insert\n";
-			editor.Caret.Selection.AnchorPosition = new BufferPosition(1, 0);
-			editor.Caret.Selection.TailPosition = new BufferPosition(1, 5);
+			editor.Caret.Selection.AnchorPosition = new TextPosition(1, 0);
+			editor.Caret.Selection.TailPosition = new TextPosition(1, 5);
 
 			// Operation
 			TextActions.Paste(controller);
@@ -579,8 +579,8 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			InsertPatternIntoBuffer(3);
 			editor.Clipboard.Text = " Inserted\n";
-			editor.Caret.Selection.AnchorPosition = new BufferPosition(1, 3);
-			editor.Caret.Selection.TailPosition = new BufferPosition(1, 6);
+			editor.Caret.Selection.AnchorPosition = new TextPosition(1, 3);
+			editor.Caret.Selection.TailPosition = new TextPosition(1, 6);
 
 			// Operation
 			TextActions.Paste(controller);
@@ -602,8 +602,8 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			InsertPatternIntoBuffer(3);
 			editor.Clipboard.Text = "Insert\n";
-			editor.Caret.Selection.AnchorPosition = new BufferPosition(1, 3);
-			editor.Caret.Selection.TailPosition = new BufferPosition(1, 5);
+			editor.Caret.Selection.AnchorPosition = new TextPosition(1, 3);
+			editor.Caret.Selection.TailPosition = new TextPosition(1, 5);
 
 			// Operation
 			TextActions.Paste(controller);
@@ -625,8 +625,8 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			InsertPatternIntoBuffer(3);
 			editor.Clipboard.Text = "Insert ";
-			editor.Caret.Selection.AnchorPosition = new BufferPosition(1, 3);
-			editor.Caret.Selection.TailPosition = new BufferPosition(1, 5);
+			editor.Caret.Selection.AnchorPosition = new TextPosition(1, 3);
+			editor.Caret.Selection.TailPosition = new TextPosition(1, 5);
 
 			// Operation
 			TextActions.Paste(controller);
@@ -1148,7 +1148,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 		private void Undo(Action test)
 		{
 			// Setup
-			BufferPosition startingPosition = editor.Caret.Position;
+			TextPosition startingPosition = editor.Caret.Position;
 			test();
 
 			// Operation
@@ -1170,7 +1170,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 		private void UndoRedoUndo(Action test)
 		{
 			// Setup
-			BufferPosition startingPosition = editor.Caret.Position;
+			TextPosition startingPosition = editor.Caret.Position;
 			test();
 
 			// Operation

@@ -3,6 +3,7 @@
 // http://mfgames.com/mfgames-gtkext-cil/license
 
 using System.Collections.Generic;
+using MfGames.Commands.TextEditing;
 
 namespace MfGames.GtkExt.TextEditor.Models.Buffers
 {
@@ -18,7 +19,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 		/// Gets or sets the position at the end of the operations.
 		/// </summary>
 		/// <value>The end position.</value>
-		public BufferPosition EndPosition { get; set; }
+		public TextPosition EndPosition { get; set; }
 
 		/// <summary>
 		/// Gets the operations for the command.
@@ -29,7 +30,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 		/// Gets or sets the position for the start of the operations.
 		/// </summary>
 		/// <value>The operation position.</value>
-		public BufferPosition StartPosition { get; set; }
+		public TextPosition StartPosition { get; set; }
 
 		/// <summary>
 		/// Gets the undo operations for this command.
@@ -53,7 +54,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 		/// Initializes a new instance of the <see cref="Command"/> class.
 		/// </summary>
 		/// <param name="startPosition">The start position.</param>
-		public Command(BufferPosition startPosition)
+		public Command(TextPosition startPosition)
 			: this()
 		{
 			EndPosition = StartPosition = startPosition;

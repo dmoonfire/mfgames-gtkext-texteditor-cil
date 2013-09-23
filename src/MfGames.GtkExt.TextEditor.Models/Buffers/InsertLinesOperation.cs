@@ -53,7 +53,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 			if (UpdateTextPosition.HasFlag(DoTypes.Do))
 			{
 				state.Results =
-					new LineBufferOperationResults(new BufferPosition(LineIndex, 0));
+					new LineBufferOperationResults(new TextPosition.LinePositionIndex, 0));
 			}
 		}
 
@@ -73,7 +73,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 			{
 				state.Results =
 					new LineBufferOperationResults(
-						new BufferPosition(InitialPosition.Line, InitialPosition.Character));
+						new TextPosition(InitialPosition.LinePosition, InitialPosition.CharacterPosition));
 			}
 		}
 

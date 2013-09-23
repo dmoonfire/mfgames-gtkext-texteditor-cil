@@ -4,6 +4,7 @@
 
 using System;
 using Cairo;
+using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.TextEditor.Interfaces;
 using MfGames.GtkExt.TextEditor.Models;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
@@ -14,10 +15,10 @@ using Rectangle = Pango.Rectangle;
 namespace MfGames.GtkExt.TextEditor.Renderers
 {
 	/// <summary>
-	/// Contains various extensions to <see cref="BufferPosition"/> for working
+	/// Contains various extensions to <see cref="TextPosition"/> for working
 	/// with <see cref="IDisplayContext"/>.
 	/// </summary>
-	public static class BufferPositionHelper
+	public static class TextPositionHelper
 	{
 		#region Methods
 
@@ -28,7 +29,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// <param name="displayContext">The display context.</param>
 		/// <returns></returns>
 		public static LayoutLine GetWrappedLine(
-			this BufferPosition bufferPosition,
+			this TextPosition bufferPosition,
 			IDisplayContext displayContext)
 		{
 			Layout layout;
@@ -47,20 +48,20 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// <param name="wrappedLineIndex">Index of the wrapped line.</param>
 		/// <returns></returns>
 		public static LayoutLine GetWrappedLine(
-			this BufferPosition bufferPosition,
+			this TextPosition bufferPosition,
 			IDisplayContext displayContext,
 			out Layout layout,
 			out int wrappedLineIndex)
 		{
 			// Get the layout and text associated with the line.
-			string text = displayContext.LineBuffer.GetLineText(bufferPosition.LineIndex);
+			string text = displayContext.LineBuffer.GetLineText(bufferPosition.LinePosition);
 
 			layout = displayContext.Renderer.GetLineLayout(
-				bufferPosition.LineIndex, LineContexts.Unformatted);
+				bufferPosition.LinePosition, LineContexts.Unformatted);
 
 			// Get the wrapped line associated with this character position.
 			int unicodeIndex = PangoUtility.TranslateStringToPangoIndex(
-				text, bufferPosition.CharacterIndex);
+				text, bufferPosition.CharacterPosition);
 			int x;
 
 			layout.IndexToLineX(unicodeIndex, false, out wrappedLineIndex, out x);
@@ -78,10 +79,10 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		///   <c>true</c> if [is begining of wrapped line] [the specified display context]; otherwise, <c>false</c>.
 		/// </returns>
 		public static bool IsBeginingOfWrappedLine(
-			this BufferPosition bufferPosition,
+			this TextPosition bufferPosition,
 			IDisplayContext displayContext)
 		{
-			return bufferPosition.CharacterIndex
+			return bufferPosition.CharacterPosition
 				== bufferPosition.GetWrappedLine(displayContext).StartIndex;
 		}
 
@@ -94,10 +95,10 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		///   <c>true</c> if [is beginning of buffer] [the specified buffer]; otherwise, <c>false</c>.
 		/// </returns>
 		public static bool IsBeginningOfBuffer(
-			this BufferPosition bufferPosition,
+			this TextPosition bufferPosition,
 			EditorViewRenderer buffer)
 		{
-			return bufferPosition.LineIndex == 0 && bufferPosition.CharacterIndex == 0;
+			return bufferPosition.LinePosition == 0 && bufferPosition.CharacterPosition == 0;
 		}
 
 		/// <summary>
@@ -108,7 +109,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// 	<c>true</c> if [is beginning of buffer] [the specified buffer]; otherwise, <c>false</c>.
 		/// </returns>
 		public static bool IsBeginningOfBuffer(
-			this BufferPosition bufferPosition,
+			this TextPosition bufferPosition,
 			IDisplayContext displayContext)
 		{
 			return bufferPosition.IsBeginningOfBuffer(displayContext.Renderer);
@@ -122,10 +123,10 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// 	<c>true</c> if [is beginning of line] [the specified buffer]; otherwise, <c>false</c>.
 		/// </returns>
 		public static bool IsBeginningOfLine(
-			this BufferPosition bufferPosition,
+			this TextPosition bufferPosition,
 			EditorViewRenderer buffer)
 		{
-			return bufferPosition.CharacterIndex == 0;
+			return bufferPosition.CharacterPosition == 0;
 		}
 
 		/// <summary>
@@ -136,7 +137,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// 	<c>true</c> if [is beginning of line] [the specified buffer]; otherwise, <c>false</c>.
 		/// </returns>
 		public static bool IsBeginningOfLine(
-			this BufferPosition bufferPosition,
+			this TextPosition bufferPosition,
 			IDisplayContext displayContext)
 		{
 			return bufferPosition.IsBeginningOfLine(displayContext.Renderer);
@@ -150,10 +151,10 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// 	<c>true</c> if [is end of buffer] [the specified buffer]; otherwise, <c>false</c>.
 		/// </returns>
 		public static bool IsEndOfBuffer(
-			this BufferPosition bufferPosition,
+			this TextPosition bufferPosition,
 			EditorViewRenderer buffer)
 		{
-			return bufferPosition.LineIndex == buffer.LineBuffer.LineCount - 1
+			return bufferPosition.LinePosition == buffer.LineBuffer.LineCount - 1
 				&& bufferPosition.IsEndOfLine(buffer);
 		}
 
@@ -165,7 +166,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// 	<c>true</c> if [is end of buffer] [the specified buffer]; otherwise, <c>false</c>.
 		/// </returns>
 		public static bool IsEndOfBuffer(
-			this BufferPosition bufferPosition,
+			this TextPosition bufferPosition,
 			IDisplayContext displayContext)
 		{
 			return bufferPosition.IsEndOfBuffer(displayContext.Renderer);
@@ -179,12 +180,12 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// 	<c>true</c> if [is end of line] [the specified buffer]; otherwise, <c>false</c>.
 		/// </returns>
 		public static bool IsEndOfLine(
-			this BufferPosition bufferPosition,
+			this TextPosition bufferPosition,
 			EditorViewRenderer buffer)
 		{
-			return bufferPosition.CharacterIndex
+			return bufferPosition.CharacterPosition
 				== buffer.LineBuffer.GetLineLength(
-					bufferPosition.LineIndex, LineContexts.Unformatted);
+					bufferPosition.LinePosition, LineContexts.Unformatted);
 		}
 
 		/// <summary>
@@ -195,7 +196,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// 	<c>true</c> if [is end of line] [the specified buffer]; otherwise, <c>false</c>.
 		/// </returns>
 		public static bool IsEndOfLine(
-			this BufferPosition bufferPosition,
+			this TextPosition bufferPosition,
 			IDisplayContext displayContext)
 		{
 			return bufferPosition.IsEndOfLine(displayContext.Renderer);
@@ -209,7 +210,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// 	<c>true</c> if [is end of wrapped line] [the specified display context]; otherwise, <c>false</c>.
 		/// </returns>
 		public static bool IsEndOfWrappedLine(
-			this BufferPosition bufferPosition,
+			this TextPosition bufferPosition,
 			IDisplayContext displayContext)
 		{
 			// Get the wrapped line and layout.
@@ -228,7 +229,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			}
 
 			// Return if these are equal.
-			return bufferPosition.CharacterIndex == wrappedCharacterIndex;
+			return bufferPosition.CharacterPosition == wrappedCharacterIndex;
 		}
 
 		/// <summary>
@@ -239,10 +240,10 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// 	<c>true</c> if [is last line in buffer] [the specified line layout buffer]; otherwise, <c>false</c>.
 		/// </returns>
 		public static bool IsLastLineInBuffer(
-			this BufferPosition bufferPosition,
+			this TextPosition bufferPosition,
 			EditorViewRenderer lineLayoutBuffer)
 		{
-			return bufferPosition.LineIndex == lineLayoutBuffer.LineBuffer.LineCount - 1;
+			return bufferPosition.LinePosition == lineLayoutBuffer.LineBuffer.LineCount - 1;
 		}
 
 		/// <summary>
@@ -253,7 +254,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// 	<c>true</c> if [is last line in buffer] [the specified line layout buffer]; otherwise, <c>false</c>.
 		/// </returns>
 		public static bool IsLastLineInBuffer(
-			this BufferPosition bufferPosition,
+			this TextPosition bufferPosition,
 			IDisplayContext displayContext)
 		{
 			return bufferPosition.IsLastLineInBuffer(displayContext.Renderer);
@@ -263,19 +264,19 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// Moves the position to end beginning of buffer.
 		/// </summary>
 		/// <param name="buffer">The buffer.</param>
-		public static BufferPosition ToBeginningOfBuffer(
-			this BufferPosition bufferPosition,
+		public static TextPosition ToBeginningOfBuffer(
+			this TextPosition bufferPosition,
 			EditorViewRenderer buffer)
 		{
-			return new BufferPosition(0, 0);
+			return new TextPosition(0, 0);
 		}
 
 		/// <summary>
 		/// Moves the position to end beginning of buffer.
 		/// </summary>
 		/// <param name="displayContext">The display context.</param>
-		public static BufferPosition ToBeginningOfBuffer(
-			this BufferPosition bufferPosition,
+		public static TextPosition ToBeginningOfBuffer(
+			this TextPosition bufferPosition,
 			IDisplayContext displayContext)
 		{
 			return bufferPosition.ToBeginningOfBuffer(displayContext.Renderer);
@@ -285,19 +286,19 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// Moves the position to the beginning of line.
 		/// </summary>
 		/// <param name="buffer">The buffer.</param>
-		public static BufferPosition ToBeginningOfLine(
-			this BufferPosition bufferPosition,
+		public static TextPosition ToBeginningOfLine(
+			this TextPosition bufferPosition,
 			EditorViewRenderer buffer)
 		{
-			return new BufferPosition(bufferPosition.LineIndex, 0);
+			return new TextPosition(bufferPosition.LinePosition, 0);
 		}
 
 		/// <summary>
 		/// Moves the position to the beginning of line.
 		/// </summary>
 		/// <param name="displayContext">The display context.</param>
-		public static BufferPosition ToBeginningOfLine(
-			this BufferPosition bufferPosition,
+		public static TextPosition ToBeginningOfLine(
+			this TextPosition bufferPosition,
 			IDisplayContext displayContext)
 		{
 			return bufferPosition.ToBeginningOfLine(displayContext.Renderer);
@@ -307,8 +308,8 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// Moves the position to the beginning of wrapped line.
 		/// </summary>
 		/// <param name="displayContext">The display context.</param>
-		public static BufferPosition ToBeginningOfWrappedLine(
-			this BufferPosition bufferPosition,
+		public static TextPosition ToBeginningOfWrappedLine(
+			this TextPosition bufferPosition,
 			IDisplayContext displayContext)
 		{
 			// Wrapped lines (via Pango) work with UTF-8 encoding, not the
@@ -320,25 +321,25 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			// Because the wrappedLine works with UTF-8 encoding, we need to
 			// convert it back to a C# string.
 			string lineText =
-				displayContext.LineBuffer.GetLineText(bufferPosition.LineIndex);
+				displayContext.LineBuffer.GetLineText(bufferPosition.LinePosition);
 			int characterIndex = PangoUtility.TranslatePangoToStringIndex(
 				lineText, unicodeIndex);
 
 			// Create a new buffer position from the elements and return it.
-			return new BufferPosition(bufferPosition.LineIndex, characterIndex);
+			return new TextPosition(bufferPosition.LinePosition, characterIndex);
 		}
 
 		/// <summary>
 		/// Moves the position to the end of buffer.
 		/// </summary>
 		/// <param name="buffer">The buffer.</param>
-		public static BufferPosition ToEndOfBuffer(
-			this BufferPosition bufferPosition,
+		public static TextPosition ToEndOfBuffer(
+			this TextPosition bufferPosition,
 			EditorViewRenderer buffer)
 		{
 			int endLineIndex = buffer.LineBuffer.LineCount - 1;
 
-			return new BufferPosition(
+			return new TextPosition(
 				endLineIndex,
 				buffer.LineBuffer.GetLineLength(endLineIndex, LineContexts.Unformatted));
 		}
@@ -349,8 +350,8 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// <param name="bufferPosition">The buffer position.</param>
 		/// <param name="displayContext">The display context.</param>
 		/// <returns></returns>
-		public static BufferPosition ToEndOfBuffer(
-			this BufferPosition bufferPosition,
+		public static TextPosition ToEndOfBuffer(
+			this TextPosition bufferPosition,
 			IDisplayContext displayContext)
 		{
 			return bufferPosition.ToEndOfBuffer(displayContext.Renderer);
@@ -362,14 +363,14 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// <param name="bufferPosition">The buffer position.</param>
 		/// <param name="buffer">The buffer.</param>
 		/// <returns></returns>
-		public static BufferPosition ToEndOfLine(
-			this BufferPosition bufferPosition,
+		public static TextPosition ToEndOfLine(
+			this TextPosition bufferPosition,
 			EditorViewRenderer buffer)
 		{
-			return new BufferPosition(
-				bufferPosition.LineIndex,
+			return new TextPosition(
+				bufferPosition.LinePosition,
 				buffer.LineBuffer.GetLineLength(
-					bufferPosition.LineIndex, LineContexts.Unformatted));
+					bufferPosition.LinePosition, LineContexts.Unformatted));
 		}
 
 		/// <summary>
@@ -378,8 +379,8 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// <param name="bufferPosition">The buffer position.</param>
 		/// <param name="displayContext">The display context.</param>
 		/// <returns></returns>
-		public static BufferPosition ToEndOfLine(
-			this BufferPosition bufferPosition,
+		public static TextPosition ToEndOfLine(
+			this TextPosition bufferPosition,
 			IDisplayContext displayContext)
 		{
 			return bufferPosition.ToEndOfLine(displayContext.Renderer);
@@ -389,8 +390,8 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// Moves the position to the end of wrapped line.
 		/// </summary>
 		/// <param name="displayContext">The display context.</param>
-		public static BufferPosition ToEndOfWrappedLine(
-			this BufferPosition bufferPosition,
+		public static TextPosition ToEndOfWrappedLine(
+			this TextPosition bufferPosition,
 			IDisplayContext displayContext)
 		{
 			// Get the wrapped line and layout.
@@ -411,12 +412,12 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			// Because the wrappedLine works with UTF-8 encoding, we need to
 			// convert it back to a C# string.
 			string lineText =
-				displayContext.LineBuffer.GetLineText(bufferPosition.LineIndex);
+				displayContext.LineBuffer.GetLineText(bufferPosition.LinePosition);
 			int characterIndex = PangoUtility.TranslatePangoToStringIndex(
 				lineText, unicodeIndex);
 
 			// Create a new buffer position from the elements and return it.
-			return new BufferPosition(bufferPosition.LineIndex, characterIndex);
+			return new TextPosition(bufferPosition.LinePosition, characterIndex);
 		}
 
 		/// <summary>
@@ -428,14 +429,17 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// <param name="lineHeight">Will contains the height of the current line.</param>
 		/// <returns></returns>
 		public static PointD ToScreenCoordinates(
-			this BufferPosition bufferPosition,
+			this TextPosition bufferPosition,
 			IDisplayContext displayContext,
 			out int lineHeight)
 		{
-			// Pull out some of the common things we'll be using in this method.
+			// Get the line index, which needs to be a number in range.
 			EditorViewRenderer buffer = displayContext.Renderer;
 			int lineIndex = Math.Min(
-				bufferPosition.LineIndex, displayContext.LineBuffer.LineCount);
+				bufferPosition.LinePosition,
+				displayContext.LineBuffer.LineCount - 1);
+
+			// Pull out some of the common things we'll be using in this method.
 			int bufferLineIndex = buffer.LineBuffer.NormalizeLineIndex(lineIndex);
 			Layout layout = buffer.GetLineLayout(
 				bufferLineIndex, LineContexts.Unformatted);
@@ -459,7 +463,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			// calculate the indexes.
 			string lineText = displayContext.LineBuffer.GetLineText(lineIndex);
 			int unicodeCharacter = PangoUtility.TranslateStringToPangoIndex(
-				lineText, bufferPosition.CharacterIndex);
+				lineText, bufferPosition.CharacterPosition);
 
 			// We need to figure out the relative position. If the position equals
 			// the length of the string, we want to put the caret at the end of the

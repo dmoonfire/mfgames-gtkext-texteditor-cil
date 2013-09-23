@@ -41,16 +41,16 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 			// Grab the selection and determine if we are a single line or
 			// multiple line selection.
 			IUndoableCommand<OperationContext> command;
-			BufferSegment selection = displayContext.Caret.Selection;
+			TextRange selection = displayContext.Caret.Selection;
 
 			if (selection.IsSameLine)
 			{
 				IDeleteTextCommand<OperationContext> deleteCommand =
 					controller.CommandController.CreateDeleteTextCommand(
 						new SingleLineTextRange(
-							selection.StartPosition.LineIndex,
-							selection.StartPosition.CharacterIndex,
-							selection.EndPosition.CharacterIndex));
+							selection.BeginTextPosition.LinePosition,
+							selection.BeginTextPosition.CharacterPosition,
+							selection.EndTextPosition.CharacterPosition));
 				deleteCommand.UpdateTextPosition = DoTypes.All;
 				command = deleteCommand;
 			}
@@ -64,8 +64,8 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 				IDeleteTextCommand<OperationContext> firstLineCommand =
 					controller.CommandController.CreateDeleteTextCommand(
 						new SingleLineTextRange(
-							selection.StartPosition.LineIndex,
-							selection.StartPosition.CharacterIndex,
+							selection.BeginTextPosition.LinePosition,
+							selection.BeginTextPosition.CharacterPosition,
 							CharacterPosition.End));
 				firstLineCommand.UpdateTextPosition = DoTypes.All;
 
@@ -74,18 +74,17 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 				// Insert the text from the last into into the first.
 				IInsertTextFromTextRangeCommand<OperationContext> secondLineCommand =
 					controller.CommandController.CreateInsertTextFromTextRangeCommand(
-						new TextPosition(
-							selection.StartPosition.LineIndex, selection.StartPosition.CharacterIndex),
+						selection.BeginTextPosition,
 						new SingleLineTextRange(
-							selection.EndPosition.LineIndex,
-							selection.EndPosition.CharacterIndex,
+							selection.EndTextPosition.LinePosition,
+							selection.EndTextPosition.CharacterPosition,
 							CharacterPosition.End));
 
 				compositeCommand.Commands.Add(secondLineCommand);
 
 				// Delete all the lines between the two.
-				for (int line = selection.StartPosition.LineIndex + 1;
-					line <= selection.EndPosition.LineIndex;
+				for (int line = selection.StartPosition.LinePosition + 1;
+					line <= selection.EndPosition.LinePosition;
 					line++)
 				{
 					IDeleteLineCommand<OperationContext> deleteLineCommand =
@@ -114,7 +113,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 			OperationContext operationContext,
 			EditorViewController controller,
 			IDisplayContext displayContext,
-			BufferPosition position)
+			TextPosition position)
 		{
 			// Create the delete selection command.
 			ICommand<OperationContext> command = CreateCommand(
@@ -127,7 +126,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 			if (operationContext.Results.HasValue)
 			{
 				displayContext.Caret.Position =
-					operationContext.Results.Value.BufferPosition;
+					operationContext.Results.Value.TextPosition;
 			}
 		}
 

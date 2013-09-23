@@ -3,6 +3,7 @@
 // http://mfgames.com/mfgames-gtkext-cil/license
 
 using Gtk;
+using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.TextEditor.Editing;
 using MfGames.GtkExt.TextEditor.Models;
 using MfGames.GtkExt.TextEditor.Models.Styles;
@@ -125,7 +126,7 @@ namespace MfGames.GtkExt.TextEditor.Interfaces
 		/// Scrolls the display to the caret.
 		/// </summary>
 		/// <param name="bufferPosition">The buffer position.</param>
-		void ScrollToCaret(BufferPosition bufferPosition);
+		void ScrollToCaret(TextPosition bufferPosition);
 
 		/// <summary>
 		/// Sets the layout according to the given layout and style.

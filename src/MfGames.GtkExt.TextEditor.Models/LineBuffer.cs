@@ -62,45 +62,14 @@ namespace MfGames.GtkExt.TextEditor.Models
 			int count);
 
 		/// <summary>
-		/// Deletes the text from the buffer using a <see cref="DeleteTextOperation"/>.
+		/// Deletes the text from the buffer using a <see cref="DeleteTextOperation" />.
 		/// </summary>
-		/// <param name="lineIndex">Index of the line.</param>
-		/// <param name="startCharacterIndex">Start index of the character.</param>
-		/// <param name="endCharacterIndex">End index of the character.</param>
-		/// <returns></returns>
-		public LineBufferOperationResults DeleteText(
-			int lineIndex,
-			int startCharacterIndex,
-			int endCharacterIndex)
-		{
-			return DeleteText(
-				lineIndex, new CharacterRange(startCharacterIndex, endCharacterIndex));
-		}
-
-		/// <summary>
-		/// Deletes the text from the buffer using a <see cref="DeleteTextOperation"/>.
-		/// </summary>
-		/// <param name="bufferPosition">The buffer position.</param>
-		/// <param name="length">The length.</param>
-		/// <returns></returns>
-		public LineBufferOperationResults DeleteText(
-			BufferPosition bufferPosition,
-			int length)
-		{
-			return Do(new DeleteTextOperation(bufferPosition, length));
-		}
-
-		/// <summary>
-		/// Deletes the text from the buffer using a <see cref="DeleteTextOperation"/>.
-		/// </summary>
-		/// <param name="lineIndex">Index of the line.</param>
 		/// <param name="characterRange">The character range.</param>
 		/// <returns></returns>
 		public LineBufferOperationResults DeleteText(
-			int lineIndex,
-			CharacterRange characterRange)
+			SingleLineTextRange characterRange)
 		{
-			return Do(new DeleteTextOperation(lineIndex, characterRange));
+			return Do(new DeleteTextOperation(characterRange));
 		}
 
 		/// <summary>
@@ -254,13 +223,10 @@ namespace MfGames.GtkExt.TextEditor.Models
 		/// <param name="bufferPosition">The buffer position.</param>
 		/// <param name="text">The text.</param>
 		public LineBufferOperationResults InsertText(
-			BufferPosition bufferPosition,
+			TextPosition bufferPosition,
 			string text)
 		{
-			return
-				Do(
-					new InsertTextOperation(
-						bufferPosition.LineIndex, bufferPosition.CharacterIndex, text));
+			return Do(new InsertTextOperation(bufferPosition, text));
 		}
 
 		/// <summary>

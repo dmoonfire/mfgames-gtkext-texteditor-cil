@@ -3,6 +3,7 @@
 // http://mfgames.com/mfgames-gtkext-cil/license
 
 using MfGames.Commands;
+using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.TextEditor.Interfaces;
 using MfGames.GtkExt.TextEditor.Models;
 using MfGames.GtkExt.TextEditor.Renderers;
@@ -45,7 +46,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 			OperationContext operationContext,
 			EditorViewController controller,
 			IDisplayContext displayContext,
-			BufferPosition position)
+			TextPosition position)
 		{
 			// Figure out which command we'll be passing the operation to.
 			HierarchicalPath key;

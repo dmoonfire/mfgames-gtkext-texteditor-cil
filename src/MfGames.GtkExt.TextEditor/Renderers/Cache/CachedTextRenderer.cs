@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using Gtk;
+using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.TextEditor.Interfaces;
 using MfGames.GtkExt.TextEditor.Models;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
@@ -280,7 +281,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		/// <param name="previousSelection">The previous selection.</param>
 		public override void UpdateSelection(
 			IDisplayContext displayContext,
-			BufferSegment previousSelection)
+			TextRange previousSelection)
 		{
 			// Make sure we're on the proper thread.
 			CheckGuiThread();
@@ -291,7 +292,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			{
 				// Only update the caches if one of the current or previous
 				// selections was actually selecting something.
-				BufferSegment currentSelection = displayContext.Caret.Selection;
+				TextRange currentSelection = displayContext.Caret.Selection;
 
 				if (!previousSelection.IsEmpty
 					|| !currentSelection.IsEmpty)
@@ -299,12 +300,12 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 					// Clear out the cache for all the lines in the new and old selections.
 					int endLineIndex =
 						displayContext.LineBuffer.NormalizeLineIndex(
-							currentSelection.EndPosition.LineIndex);
+							currentSelection.EndPosition.LinePosition);
 					int previousEndLineIndex =
 						displayContext.LineBuffer.NormalizeLineIndex(
-							previousSelection.EndPosition.LineIndex);
+							previousSelection.EndPosition.LinePosition);
 
-					for (int lineIndex = currentSelection.StartPosition.LineIndex;
+					for (int lineIndex = currentSelection.StartPosition.LinePosition;
 						lineIndex <= endLineIndex;
 						lineIndex++)
 					{
@@ -312,7 +313,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 						line.Reset();
 					}
 
-					for (int lineIndex = previousSelection.StartPosition.LineIndex;
+					for (int lineIndex = previousSelection.StartPosition.LinePosition;
 						lineIndex <= previousEndLineIndex;
 						lineIndex++)
 					{

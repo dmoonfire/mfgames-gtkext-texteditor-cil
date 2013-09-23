@@ -3,6 +3,7 @@
 // http://mfgames.com/mfgames-gtkext-cil/license
 
 using MfGames.Commands;
+using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.TextEditor.Interfaces;
 using MfGames.GtkExt.TextEditor.Models;
 using MfGames.GtkExt.TextEditor.Renderers;
@@ -44,7 +45,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 			OperationContext operationContext,
 			EditorViewController controller,
 			IDisplayContext displayContext,
-			BufferPosition position)
+			TextPosition position)
 		{
 			// Figure out which command we'll be passing the operation to.
 			HierarchicalPath key;
@@ -59,7 +60,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 				// If we are the beginning of the buffer, then we can't delete anything.
 				return;
 			}
-			else if (position.CharacterIndex == 0)
+			else if (position.CharacterPosition == 0)
 			{
 				// If we are at the beginning of the line, then we are combining paragraphs.
 				key = JoinPreviousParagraphCommandFactory.Key;

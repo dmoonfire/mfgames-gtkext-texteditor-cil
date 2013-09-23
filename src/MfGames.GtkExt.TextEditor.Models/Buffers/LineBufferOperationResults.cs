@@ -2,6 +2,8 @@
 // Released under the MIT license
 // http://mfgames.com/mfgames-gtkext-cil/license
 
+using MfGames.Commands.TextEditing;
+
 namespace MfGames.GtkExt.TextEditor.Models.Buffers
 {
 	/// <summary>
@@ -16,7 +18,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 		/// Gets or sets the buffer position after the operation.
 		/// </summary>
 		/// <value>The position.</value>
-		public BufferPosition BufferPosition
+		public TextPosition TextPosition
 		{
 			get { return bufferPosition; }
 			set { bufferPosition = value; }
@@ -30,7 +32,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 		/// Initializes a new instance of the <see cref="LineBufferOperationResults"/> struct.
 		/// </summary>
 		/// <param name="bufferPosition">The buffer position.</param>
-		public LineBufferOperationResults(BufferPosition bufferPosition)
+		public LineBufferOperationResults(TextPosition bufferPosition)
 		{
 			this.bufferPosition = bufferPosition;
 		}
@@ -39,7 +41,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 
 		#region Fields
 
-		private BufferPosition bufferPosition;
+		private TextPosition bufferPosition;
 
 		#endregion
 	}

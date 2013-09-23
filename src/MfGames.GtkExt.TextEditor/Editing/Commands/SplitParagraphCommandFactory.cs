@@ -42,12 +42,12 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 			OperationContext operationContext,
 			EditorViewController controller,
 			IDisplayContext displayContext,
-			BufferPosition position)
+			TextPosition position)
 		{
 			// Create the command and execute it.
 			var textPosition = new TextPosition(
-				displayContext.Caret.Position.LineIndex,
-				displayContext.Caret.Position.CharacterIndex);
+				displayContext.Caret.Position.LinePosition,
+				displayContext.Caret.Position.CharacterPosition);
 			var splitCommand =
 				new SplitParagraphCommand<OperationContext>(
 					controller.CommandController, textPosition);
@@ -58,7 +58,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 			if (operationContext.Results.HasValue)
 			{
 				displayContext.Caret.SetAndScrollToPosition(
-					operationContext.Results.Value.BufferPosition);
+					operationContext.Results.Value.TextPosition);
 			}
 		}
 

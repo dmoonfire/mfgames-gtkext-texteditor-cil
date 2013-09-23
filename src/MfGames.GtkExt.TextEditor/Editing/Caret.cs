@@ -4,6 +4,7 @@
 
 using System.Diagnostics;
 using Cairo;
+using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.Extensions.Cairo;
 using MfGames.GtkExt.TextEditor.Interfaces;
 using MfGames.GtkExt.TextEditor.Models;
@@ -24,15 +25,15 @@ namespace MfGames.GtkExt.TextEditor.Editing
 		/// Gets or sets the buffer position of the caret.
 		/// </summary>
 		/// <value>The buffer position.</value>
-		public BufferPosition Position
+		public TextPosition Position
 		{
-			[DebuggerStepThrough] get { return Selection.TailPosition; }
+			[DebuggerStepThrough] get { return Selection.LastTextPosition; }
 
 			[DebuggerStepThrough]
 			set
 			{
-				Selection.TailPosition = value;
-				Selection.AnchorPosition = value;
+				Selection.LastTextPosition = value;
+				Selection.FirstTextPosition = value;
 			}
 		}
 
@@ -96,7 +97,7 @@ namespace MfGames.GtkExt.TextEditor.Editing
 
 			// Shift the contents to compenstate for the margins.
 			LineBlockStyle style =
-				displayContext.Renderer.GetLineStyle(Position.LineIndex, LineContexts.None);
+				displayContext.Renderer.GetLineStyle(Position.LinePosition, LineContexts.None);
 
 			x += displayContext.TextX;
 			x += style.Left;
@@ -109,7 +110,7 @@ namespace MfGames.GtkExt.TextEditor.Editing
 		/// Sets the position and scroll to the new location.
 		/// </summary>
 		/// <param name="position">The position.</param>
-		public void SetAndScrollToPosition(BufferPosition position)
+		public void SetAndScrollToPosition(TextPosition position)
 		{
 			Position = position;
 			displayContext.ScrollToCaret(displayContext.Caret.Position);
@@ -136,7 +137,7 @@ namespace MfGames.GtkExt.TextEditor.Editing
 		/// <summary>
 		/// Contains the selection of the caret.
 		/// </summary>
-		public BufferSegment Selection;
+		public TextRange Selection;
 
 		private readonly IDisplayContext displayContext;
 

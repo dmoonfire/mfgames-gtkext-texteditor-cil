@@ -121,8 +121,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BufferPosition.cs" />
-    <Compile Include="BufferSegment.cs" />
     <Compile Include="Buffers\Command.cs" />
     <Compile Include="Buffers\CommandCollection.cs" />
     <Compile Include="Buffers\CommandManager.cs" />
@@ -143,7 +141,6 @@
     <Compile Include="Buffers\MultiplexedOperationLineBuffer.cs" />
     <Compile Include="Buffers\SetTextOperation.cs" />
     <Compile Include="Buffers\TextEditingOperation.cs" />
-    <Compile Include="CharacterRange.cs" />
     <Compile Include="LineBuffer.cs" />
     <Compile Include="LineRange.cs" />
     <Compile Include="MemoryLineBuffer.cs" />
