@@ -127,6 +127,7 @@ namespace MfGames.GtkExt.TextEditor.Editing
 		public Caret(IDisplayContext displayContext)
 		{
 			this.displayContext = displayContext;
+			this.selection = TextRange.Empty;
 		}
 
 		#endregion
@@ -136,9 +137,14 @@ namespace MfGames.GtkExt.TextEditor.Editing
 		/// <summary>
 		/// Contains the selection of the caret.
 		/// </summary>
-		public TextRange Selection;
+		public TextRange Selection
+		{
+			get { return selection; }
+			set { selection = value ?? TextRange.Empty; }
+		}
 
 		private readonly IDisplayContext displayContext;
+		private TextRange selection;
 
 		#endregion
 	}

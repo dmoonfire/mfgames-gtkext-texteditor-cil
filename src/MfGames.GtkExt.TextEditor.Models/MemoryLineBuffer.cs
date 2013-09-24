@@ -198,12 +198,13 @@ namespace MfGames.GtkExt.TextEditor.Models
 			lines[operation.LineIndex] = operation.Text;
 
 			// Fire a line changed operation.
-			RaiseLineChanged(new LineChangedArgs(operation.LineIndex));
+			var lineChangedArgs = new LineChangedArgs(operation.LineIndex);
+			RaiseLineChanged(lineChangedArgs);
 
 			// Return the appropriate results.
-			return
-				new LineBufferOperationResults(
-					new TextPosition(operation.LineIndex, lines[operation.LineIndex].Length));
+			var bufferPosition = new TextPosition(operation.LineIndex, CharacterPosition.End);
+			var results = new LineBufferOperationResults(bufferPosition);
+			return results;
 		}
 
 		/// <summary>
