@@ -3,6 +3,7 @@
 // http://mfgames.com/mfgames-gtkext-cil/license
 
 using System;
+using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.TextEditor.Models;
 using MfGames.GtkExt.TextEditor.Renderers;
 using NUnit.Framework;
@@ -26,7 +27,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			string markup = string.Empty;
 			var selectionRenderer = new SelectionRenderer();
-			var characters = new CharacterRange(1, 2);
+			var characters = new SingleLineTextRange(0, 1, 2);
 
 			// Operation
 			string output = selectionRenderer.GetSelectionMarkup(markup, characters);
@@ -44,7 +45,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			const string markup = null;
 			var selectionRenderer = new SelectionRenderer();
-			var characters = new CharacterRange(1, 2);
+			var characters = new SingleLineTextRange(0, 1, 2);
 
 			// Operation
 			string output = selectionRenderer.GetSelectionMarkup(markup, characters);
@@ -59,7 +60,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			const string markup = "this i<span>s</span> a string";
 			var selectionRenderer = new SelectionRenderer();
-			var characters = new CharacterRange(5, 9);
+			var characters = new SingleLineTextRange(0, 5, 9);
 
 			// Operation
 			string output = selectionRenderer.GetSelectionMarkup(markup, characters);
@@ -75,7 +76,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			const string markup = "this <span>is a</span> string";
 			var selectionRenderer = new SelectionRenderer();
-			var characters = new CharacterRange(5, 9);
+			var characters = new SingleLineTextRange(0, 5, 9);
 
 			// Operation
 			string output = selectionRenderer.GetSelectionMarkup(markup, characters);
@@ -91,7 +92,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			const string markup = "thi<span>s is</span> a string";
 			var selectionRenderer = new SelectionRenderer();
-			var characters = new CharacterRange(5, 9);
+			var characters = new SingleLineTextRange(0, 5, 9);
 
 			// Operation
 			string output = selectionRenderer.GetSelectionMarkup(markup, characters);
@@ -108,7 +109,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			const string markup = "thi<span>s is a str</span>ing";
 			var selectionRenderer = new SelectionRenderer();
-			var characters = new CharacterRange(5, 9);
+			var characters = new SingleLineTextRange(0, 5, 9);
 
 			// Operation
 			string output = selectionRenderer.GetSelectionMarkup(markup, characters);
@@ -125,7 +126,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			const string markup = "this i<span>s a str</span>ing";
 			var selectionRenderer = new SelectionRenderer();
-			var characters = new CharacterRange(5, 9);
+			var characters = new SingleLineTextRange(0, 5, 9);
 
 			// Operation
 			string output = selectionRenderer.GetSelectionMarkup(markup, characters);
@@ -142,7 +143,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			const string markup = "this is a string";
 			var selectionRenderer = new SelectionRenderer();
-			var characters = new CharacterRange(0, 9);
+			var characters = new SingleLineTextRange(0, 0, 9);
 
 			// Operation
 			string output = selectionRenderer.GetSelectionMarkup(markup, characters);
@@ -157,7 +158,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			const string markup = "this is a string";
 			var selectionRenderer = new SelectionRenderer();
-			var characters = new CharacterRange(1, 9);
+			var characters = new SingleLineTextRange(0, 1, 9);
 
 			// Operation
 			string output = selectionRenderer.GetSelectionMarkup(markup, characters);
@@ -175,7 +176,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			const string markup = "this";
 			var selectionRenderer = new SelectionRenderer();
-			var characters = new CharacterRange(5, Int32.MaxValue);
+			var characters = new SingleLineTextRange(0, 5, Int32.MaxValue);
 
 			// Operation
 			string output = selectionRenderer.GetSelectionMarkup(markup, characters);
@@ -190,7 +191,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			const string markup = "this is a string";
 			var selectionRenderer = new SelectionRenderer();
-			var characters = new CharacterRange(5, markup.Length);
+			var characters = new SingleLineTextRange(0, 5, markup.Length);
 
 			// Operation
 			string output = selectionRenderer.GetSelectionMarkup(markup, characters);
@@ -205,7 +206,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			const string markup = "this &#0069;s a string";
 			var selectionRenderer = new SelectionRenderer();
-			var characters = new CharacterRange(5, 9);
+			var characters = new SingleLineTextRange(0, 5, 9);
 
 			// Operation
 			string output = selectionRenderer.GetSelectionMarkup(markup, characters);
@@ -221,7 +222,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			const string markup = "this is &#0061; string";
 			var selectionRenderer = new SelectionRenderer();
-			var characters = new CharacterRange(5, 9);
+			var characters = new SingleLineTextRange(0, 5, 9);
 
 			// Operation
 			string output = selectionRenderer.GetSelectionMarkup(markup, characters);
@@ -237,7 +238,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			const string markup = "this i&#0073; a string";
 			var selectionRenderer = new SelectionRenderer();
-			var characters = new CharacterRange(5, 9);
+			var characters = new SingleLineTextRange(0, 5, 9);
 
 			// Operation
 			string output = selectionRenderer.GetSelectionMarkup(markup, characters);
@@ -253,7 +254,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			const string markup = "this i&amp; a string";
 			var selectionRenderer = new SelectionRenderer();
-			var characters = new CharacterRange(5, 9);
+			var characters = new SingleLineTextRange(0, 5, 9);
 
 			// Operation
 			string output = selectionRenderer.GetSelectionMarkup(markup, characters);
@@ -269,7 +270,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			const string markup = "this is a string";
 			var selectionRenderer = new SelectionRenderer();
-			var characters = new CharacterRange(5, 9);
+			var characters = new SingleLineTextRange(0, 5, 9);
 
 			// Operation
 			string output = selectionRenderer.GetSelectionMarkup(markup, characters);

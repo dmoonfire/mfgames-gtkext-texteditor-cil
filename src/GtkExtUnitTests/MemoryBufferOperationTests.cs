@@ -3,6 +3,7 @@
 // http://mfgames.com/mfgames-gtkext-cil/license
 
 using System;
+using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
 using NUnit.Framework;
 
@@ -43,8 +44,8 @@ namespace MfGames.GtkExt.TextEditor.Models.Tests
 			Assert.AreEqual("two three", buffer.GetLineText(0, LineContexts.None));
 			Assert.AreEqual(
 				"two three".Length, buffer.GetLineLength(0, LineContexts.None));
-			Assert.AreEqual(0, results.TextPosition.Line);
-			Assert.AreEqual(0, results.TextPosition.Character);
+			Assert.AreEqual(0, results.TextPosition.LinePosition);
+			Assert.AreEqual(0, results.TextPosition.CharacterPosition);
 		}
 
 		/// <summary>
@@ -64,8 +65,8 @@ namespace MfGames.GtkExt.TextEditor.Models.Tests
 			// Verification
 			Assert.AreEqual("one two", buffer.GetLineText(0, LineContexts.None));
 			Assert.AreEqual("one two".Length, buffer.GetLineLength(0, LineContexts.None));
-			Assert.AreEqual(0, results.TextPosition.Line);
-			Assert.AreEqual(7, results.TextPosition.Character);
+			Assert.AreEqual(0, results.TextPosition.LinePosition);
+			Assert.AreEqual(7, results.TextPosition.CharacterPosition);
 		}
 
 		/// <summary>
@@ -85,8 +86,8 @@ namespace MfGames.GtkExt.TextEditor.Models.Tests
 			// Verification
 			Assert.AreEqual("one two", buffer.GetLineText(0, LineContexts.None));
 			Assert.AreEqual("one two".Length, buffer.GetLineLength(0, LineContexts.None));
-			Assert.AreEqual(0, results.TextPosition.Line);
-			Assert.AreEqual(7, results.TextPosition.Character);
+			Assert.AreEqual(0, results.TextPosition.LinePosition);
+			Assert.AreEqual(7, results.TextPosition.CharacterPosition);
 		}
 
 		/// <summary>
@@ -107,8 +108,8 @@ namespace MfGames.GtkExt.TextEditor.Models.Tests
 			Assert.AreEqual("one three", buffer.GetLineText(0, LineContexts.None));
 			Assert.AreEqual(
 				"one three".Length, buffer.GetLineLength(0, LineContexts.None));
-			Assert.AreEqual(0, results.TextPosition.Line);
-			Assert.AreEqual(4, results.TextPosition.Character);
+			Assert.AreEqual(0, results.TextPosition.LinePosition);
+			Assert.AreEqual(4, results.TextPosition.CharacterPosition);
 		}
 
 		/// <summary>
@@ -124,8 +125,8 @@ namespace MfGames.GtkExt.TextEditor.Models.Tests
 
 			// Validation
 			Assert.AreEqual(2, buffer.LineCount);
-			Assert.AreEqual(1, results.TextPosition.Line);
-			Assert.AreEqual(0, results.TextPosition.Character);
+			Assert.AreEqual(1, results.TextPosition.LinePosition);
+			Assert.AreEqual(0, results.TextPosition.CharacterPosition);
 		}
 
 		/// <summary>
@@ -147,8 +148,8 @@ namespace MfGames.GtkExt.TextEditor.Models.Tests
 			Assert.AreEqual("Test Original", buffer.GetLineText(0, LineContexts.None));
 			Assert.AreEqual(
 				"Test Original".Length, buffer.GetLineLength(0, LineContexts.None));
-			Assert.AreEqual(0, results.TextPosition.Line);
-			Assert.AreEqual(input.Length, results.TextPosition.Character);
+			Assert.AreEqual(0, results.TextPosition.LinePosition);
+			Assert.AreEqual(input.Length, results.TextPosition.CharacterPosition);
 		}
 
 		/// <summary>
@@ -167,8 +168,8 @@ namespace MfGames.GtkExt.TextEditor.Models.Tests
 			// Verification
 			Assert.AreEqual(input, buffer.GetLineText(0, LineContexts.None));
 			Assert.AreEqual(input.Length, buffer.GetLineLength(0, LineContexts.None));
-			Assert.AreEqual(0, results.TextPosition.Line);
-			Assert.AreEqual(input.Length, results.TextPosition.Character);
+			Assert.AreEqual(0, results.TextPosition.LinePosition);
+			Assert.AreEqual(input.Length, results.TextPosition.CharacterPosition);
 		}
 
 		/// <summary>
@@ -190,9 +191,9 @@ namespace MfGames.GtkExt.TextEditor.Models.Tests
 			Assert.AreEqual("Original Test", buffer.GetLineText(0, LineContexts.None));
 			Assert.AreEqual(
 				"Original Test".Length, buffer.GetLineLength(0, LineContexts.None));
-			Assert.AreEqual(0, results.TextPosition.Line);
+			Assert.AreEqual(0, results.TextPosition.LinePosition);
 			Assert.AreEqual(
-				"Original Test".Length, results.TextPosition.Character);
+				"Original Test".Length, results.TextPosition.CharacterPosition);
 		}
 
 		/// <summary>
@@ -214,9 +215,9 @@ namespace MfGames.GtkExt.TextEditor.Models.Tests
 			Assert.AreEqual("Original Test", buffer.GetLineText(0, LineContexts.None));
 			Assert.AreEqual(
 				"Original Test".Length, buffer.GetLineLength(0, LineContexts.None));
-			Assert.AreEqual(0, results.TextPosition.Line);
+			Assert.AreEqual(0, results.TextPosition.LinePosition);
 			Assert.AreEqual(
-				"Original Test".Length, results.TextPosition.Character);
+				"Original Test".Length, results.TextPosition.CharacterPosition);
 		}
 
 		/// <summary>
@@ -238,8 +239,8 @@ namespace MfGames.GtkExt.TextEditor.Models.Tests
 			Assert.AreEqual("one two three", buffer.GetLineText(0, LineContexts.None));
 			Assert.AreEqual(
 				"one two three".Length, buffer.GetLineLength(0, LineContexts.None));
-			Assert.AreEqual(0, results.TextPosition.Line);
-			Assert.AreEqual(4 + input.Length, results.TextPosition.Character);
+			Assert.AreEqual(0, results.TextPosition.LinePosition);
+			Assert.AreEqual(4 + input.Length, results.TextPosition.CharacterPosition);
 		}
 
 		/// <summary>
@@ -257,8 +258,8 @@ namespace MfGames.GtkExt.TextEditor.Models.Tests
 			// Verification
 			Assert.AreEqual(input, buffer.GetLineText(0, LineContexts.None));
 			Assert.AreEqual(input.Length, buffer.GetLineLength(0, LineContexts.None));
-			Assert.AreEqual(0, results.TextPosition.Line);
-			Assert.AreEqual(input.Length, results.TextPosition.Character);
+			Assert.AreEqual(0, results.TextPosition.LinePosition);
+			Assert.AreEqual(input.Length, results.TextPosition.CharacterPosition);
 		}
 
 		/// <summary>

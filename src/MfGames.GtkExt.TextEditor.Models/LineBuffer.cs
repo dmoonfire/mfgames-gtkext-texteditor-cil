@@ -73,6 +73,18 @@ namespace MfGames.GtkExt.TextEditor.Models
 			return Do(new DeleteTextOperation(characterRange));
 		}
 
+		public LineBufferOperationResults DeleteText(
+			int lineIndex,
+			int beginCharacterIndex,
+			int endCharacterIndex)
+		{
+			var range = new SingleLineTextRange(
+				new LinePosition(lineIndex),
+				new CharacterPosition(beginCharacterIndex),
+				new CharacterPosition(endCharacterIndex));
+			return DeleteText(range);
+		}
+
 		/// <summary>
 		/// Performs the given operation on the line buffer. This will raise any
 		/// events that were appropriate for the operation.
