@@ -44,6 +44,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 			IDisplayContext displayContext,
 			TextPosition position)
 		{
+#if REMOVED
 			// If we don't have a selection, this is a simple insert command.
 			var commands = new List<IUndoableCommand<OperationContext>>();
 			TextPosition bufferPosition = displayContext.Caret.Position;
@@ -98,6 +99,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 				displayContext.Caret.SetAndScrollToPosition(
 					operationContext.Results.Value.TextPosition);
 			}
+#endif
 		}
 
 		#endregion

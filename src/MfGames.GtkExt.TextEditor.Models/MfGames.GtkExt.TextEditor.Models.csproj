@@ -145,6 +145,7 @@
     <Compile Include="Buffers\TextEditingOperation.cs" />
     <Compile Include="Extensions\TextPositionExtensions.cs" />
     <Compile Include="Extensions\LinePositionExtensions.cs" />
+    <Compile Include="Extensions\TextRangeExtensions.cs" />
     <Compile Include="LineBuffer.cs" />
     <Compile Include="LineRange.cs" />
     <Compile Include="MemoryLineBuffer.cs" />

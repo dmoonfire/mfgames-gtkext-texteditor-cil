@@ -255,7 +255,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			LinePosition linePosition,
 			LineContexts lineContexts = LineContexts.None)
 		{
-			int lineIndex = linePosition.GetLineIndex(this);
+			int lineIndex = linePosition.GetLineIndex(LineBuffer);
 			var results = GetLineStyle(lineIndex, lineContexts);
 			return results;
 		}
@@ -274,16 +274,19 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			string markup = LineBuffer.GetLineMarkup(lineIndex, lineContexts);
 
 			// Check to see if we are in the selection.
-			int startCharacterIndex,
-				endCharacterIndex;
-			bool containsLine = DisplayContext.Caret.Selection.ContainsLine(
-				lineIndex, out startCharacterIndex, out endCharacterIndex);
+			CharacterPosition beginCharacterPosition;
+			CharacterPosition endCharacterPosition;
+			bool containsLine =
+				DisplayContext.Caret.Selection.ContainsLine(
+					LineBuffer, lineIndex, out beginCharacterPosition, out endCharacterPosition);
 
 			if (containsLine)
 			{
 				// Apply the markup to the line.
 				return SelectionRenderer.GetSelectionMarkup(
-					markup, new TextRange(startCharacterIndex, endCharacterIndex));
+					markup,
+					new SingleLineTextRange(
+						new LinePosition(lineIndex), beginCharacterPosition, endCharacterPosition));
 			}
 
 			// Return the resulting markup.

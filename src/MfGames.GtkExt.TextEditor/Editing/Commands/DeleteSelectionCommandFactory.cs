@@ -83,8 +83,9 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 				compositeCommand.Commands.Add(secondLineCommand);
 
 				// Delete all the lines between the two.
-				for (int line = selection.StartPosition.LinePosition + 1;
-					line <= selection.EndPosition.LinePosition;
+				// TODO FIx this
+				for (int line = selection.BeginLinePosition.Index + 1;
+					line <= selection.EndLinePosition;
 					line++)
 				{
 					IDeleteLineCommand<OperationContext> deleteLineCommand =

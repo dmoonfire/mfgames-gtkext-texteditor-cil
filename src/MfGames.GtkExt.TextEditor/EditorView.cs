@@ -15,6 +15,7 @@ using MfGames.GtkExt.TextEditor.Interfaces;
 using MfGames.GtkExt.TextEditor.Margins;
 using MfGames.GtkExt.TextEditor.Models;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
+using MfGames.GtkExt.TextEditor.Models.Extensions;
 using MfGames.GtkExt.TextEditor.Models.Styles;
 using MfGames.GtkExt.TextEditor.Renderers;
 using MfGames.GtkExt.TextEditor.Renderers.Cache;
@@ -293,10 +294,13 @@ namespace MfGames.GtkExt.TextEditor
 		{
 			// Look to see if we are moving to a different position. If we are,
 			// we tell the line buffer that we have exited the previous line.
-			if (caret.Position.LinePosition != bufferPosition.LinePosition)
+			LinePosition linePosition = caret.Position.LinePosition;
+			int lineIndex = linePosition.GetLineIndex(Controller.DisplayContext.LineBuffer);
+
+			if (linePosition != bufferPosition.LinePosition)
 			{
 				// Send an operation to the line buffer that we left the line.
-				LineBuffer.ExitLine(caret.Position.LinePosition);
+				LineBuffer.ExitLine(lineIndex);
 			}
 
 			// Call the base scrolling.

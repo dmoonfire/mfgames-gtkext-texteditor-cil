@@ -47,7 +47,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 				controller.CommandController.CreateDeleteTextCommand(
 					new SingleLineTextRange(
 						displayContext.Caret.Position.LinePosition,
-						(displayContext.Caret.Position.CharacterPosition - 1),
+						(displayContext.Caret.Position.CharacterPosition.Index - 1),
 						displayContext.Caret.Position.CharacterPosition));
 			deleteCommand.UpdateTextPosition = DoTypes.All;
 

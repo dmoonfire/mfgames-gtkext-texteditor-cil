@@ -25,7 +25,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// <returns>A Pango markup string with the selection applied.</returns>
 		public string GetSelectionMarkup(
 			string pangoMarkup,
-			TextRange characters)
+			SingleLineTextRange characters)
 		{
 			return GetSelectionMarkup(
 				pangoMarkup, characters, "span", " background='#CCCCFF'");
@@ -44,7 +44,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// </returns>
 		public string GetSelectionMarkup(
 			string markup,
-			TextRange characters,
+			SingleLineTextRange characters,
 			string selectionTag,
 			string selectionAttributes)
 		{
@@ -55,20 +55,9 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 				return markup;
 			}
 
-			// If the selection covers the entire string, we have an optimized
-			// case and we can just return a selection that covers the entire
-			// string.
-			if (characters.StartIndex == 0
-				&& characters.EndIndex == markup.Length)
-			{
-				return string.Format(
-					"<{0}{1}>{2}</{3}>",
-					selectionTag,
-					selectionAttributes,
-					markup,
-					selectionTag);
-			}
+			return markup;
 
+#if REMOVED
 			// The primary concern for applying the selection is that we already
 			// have Pango markup in the string and we have to maintain that
 			// markup while adjusting it. Pango doesn't allow for non-XML rules
@@ -216,8 +205,10 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			string selectionMarkup = buffer.ToString();
 
 			return selectionMarkup;
+#endif
 		}
 
+#if REMOVED
 		/// <summary>
 		/// Gets the indexes in the markup string for the given character range. This
 		/// handles mapping attributes and entities as zero and one-length characters
@@ -393,6 +384,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			// end as the last character in the string.
 			endIndex = pangoMarkup.Length;
 		}
+#endif
 
 		/// <summary>
 		/// Scans through the markup from the start to end index and gathers all the

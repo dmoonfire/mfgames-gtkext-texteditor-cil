@@ -283,6 +283,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			IDisplayContext displayContext,
 			TextRange previousSelection)
 		{
+#if REMOVED
 			// Make sure we're on the proper thread.
 			CheckGuiThread();
 
@@ -328,6 +329,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 
 			// Process any queued changes.
 			ProcessQueuedLineChanges();
+#endif
 		}
 
 		/// <summary>

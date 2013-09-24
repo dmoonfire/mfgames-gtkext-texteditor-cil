@@ -32,8 +32,7 @@ namespace MfGames.GtkExt.TextEditor.Editing
 			[DebuggerStepThrough]
 			set
 			{
-				Selection.LastTextPosition = value;
-				Selection.FirstTextPosition = value;
+				Selection = new TextRange(value, value);
 			}
 		}
 

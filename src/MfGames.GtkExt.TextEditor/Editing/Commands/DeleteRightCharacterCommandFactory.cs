@@ -48,7 +48,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 					new SingleLineTextRange(
 						displayContext.Caret.Position.LinePosition,
 						(displayContext.Caret.Position.CharacterPosition),
-						(displayContext.Caret.Position.CharacterPosition + 1)));
+						(displayContext.Caret.Position.CharacterPosition.Index + 1)));
 			deleteCommand.UpdateTextPosition = DoTypes.All;
 
 			// Execute the command.

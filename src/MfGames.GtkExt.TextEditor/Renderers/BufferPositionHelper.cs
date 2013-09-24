@@ -8,7 +8,9 @@ using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.TextEditor.Interfaces;
 using MfGames.GtkExt.TextEditor.Models;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
+using MfGames.GtkExt.TextEditor.Models.Extensions;
 using MfGames.GtkExt.TextEditor.Models.Styles;
+using MfGames.GtkExt.TextEditor.Models.Extensions;
 using Pango;
 using Rectangle = Pango.Rectangle;
 
@@ -54,14 +56,17 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			out int wrappedLineIndex)
 		{
 			// Get the layout and text associated with the line.
-			string text = displayContext.LineBuffer.GetLineText(bufferPosition.LinePosition);
+			LineBuffer lineBuffer = displayContext.LineBuffer;
+			int lineIndex = bufferPosition.LinePosition.GetLineIndex(lineBuffer);
+			string text = lineBuffer.GetLineText(lineIndex);
 
 			layout = displayContext.Renderer.GetLineLayout(
-				bufferPosition.LinePosition, LineContexts.Unformatted);
+				lineIndex, LineContexts.Unformatted);
 
 			// Get the wrapped line associated with this character position.
+			int characterIndex = bufferPosition.GetCharacterIndex(lineBuffer);
 			int unicodeIndex = PangoUtility.TranslateStringToPangoIndex(
-				text, bufferPosition.CharacterPosition);
+				text, characterIndex);
 			int x;
 
 			layout.IndexToLineX(unicodeIndex, false, out wrappedLineIndex, out x);
@@ -462,8 +467,9 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			// value to calculate it. This actually uses UTF-8 encoding to
 			// calculate the indexes.
 			string lineText = displayContext.LineBuffer.GetLineText(lineIndex);
+			int characterIndex = bufferPosition.GetCharacterIndex(displayContext.LineBuffer);
 			int unicodeCharacter = PangoUtility.TranslateStringToPangoIndex(
-				lineText, bufferPosition.CharacterPosition);
+				lineText, characterIndex);
 
 			// We need to figure out the relative position. If the position equals
 			// the length of the string, we want to put the caret at the end of the

@@ -41,6 +41,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 				return;
 			}
 
+#if REMOVED
 			// Go through the selection and figure out if we have a single-line
 			// copy.
 			LineBuffer lineBuffer = displayContext.LineBuffer;
@@ -88,6 +89,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 
 			// Set the clipboard value.
 			displayContext.Clipboard.Text = buffer.ToString();
+#endif
 		}
 
 		/// <summary>
