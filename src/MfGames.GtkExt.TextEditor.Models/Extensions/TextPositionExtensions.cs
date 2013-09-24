@@ -10,7 +10,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Extensions
 	{
 		#region Methods
 
-		public static CharacterPosition GetCharacterIndex(
+		public static int GetCharacterIndex(
 			this TextPosition textPosition,
 			LineBuffer lineBuffer)
 		{

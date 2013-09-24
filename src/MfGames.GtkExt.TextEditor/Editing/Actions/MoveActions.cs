@@ -12,6 +12,8 @@ using MfGames.GtkExt.TextEditor.Models;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
 using MfGames.GtkExt.TextEditor.Models.Styles;
 using MfGames.GtkExt.TextEditor.Renderers;
+using MfGames.Commands.TextEditing;
+using MfGames.GtkExt.TextEditor.Models.Extensions;
 using Pango;
 
 namespace MfGames.GtkExt.TextEditor.Editing.Actions
@@ -82,7 +84,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 
 			// Figure out which wrapped line we'll be moving the caret to.
 			int lineIndex =
-				position.LinePosition.GetLineIndex(buffer.LineBuffer.LineCount);
+				position.LinePosition.GetLineIndex(buffer.LineBuffer);
 
 			if(wrappedLine.IsLastLineInLayout())
 			{
@@ -265,32 +267,35 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 		{
 			// Pull out some useful variables.
 			IDisplayContext displayContext = controller.DisplayContext;
+			LineBuffer buffer = displayContext.LineBuffer;
 			TextPosition position = displayContext.Caret.Position;
 
-			// Pull out the line and chracter positions.
-			LinePosition linePosition = position.LinePosition;
+			// Pull out the line and chracter positions from where we're starting.
+			int lineIndex = position.LinePosition.GetLineIndex(buffer);
+			string lineText = buffer.GetLineText(lineIndex);
+			CharacterPosition wordPosition = CharacterPosition.Word;
 			CharacterPosition characterPosition = position.CharacterPosition;
-			string lineText = displayContext.LineBuffer.GetLineText(linePosition,LineContexts.None);
-			int leftBoundary = characterPosition.GetCharacterIndex(
+			int leftCharacterIndex = wordPosition.GetCharacterIndex(
 				lineText, characterPosition, WordSearchDirection.Left);
 
 			// If there is no left boundary, we move up a line.
-			if (leftBoundary == -1)
+			if (leftCharacterIndex == -1)
 			{
 				// Check to see if we are at the top of the line or not.
-				if (linePosition > 0)
+				if (lineIndex > 0)
 				{
-					linePosition = new LinePosition(linePosition.Index - 1);
+					lineIndex--;
 					characterPosition = CharacterPosition.End;
 				}
 			}
 			else
 			{
-				characterPosition = new CharacterPosition(leftBoundary);
+				characterPosition = new CharacterPosition(leftCharacterIndex);
 			}
 
 			// Cause the text editor to redraw itself.
-			var caretPosition = new TextPosition(linePosition,characterPosition);
+			var caretPosition = new TextPosition(
+				new LinePosition(lineIndex), characterPosition);
 			displayContext.ScrollToCaret(caretPosition);
 		}
 
@@ -402,32 +407,33 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 		[KeyBinding(Key.Right)]
 		public static void Right(EditorViewController controller)
 		{
-			// Move the character position.
+			// Pull out some useful variables.
 			IDisplayContext displayContext = controller.DisplayContext;
 			LineBuffer lineBuffer = displayContext.LineBuffer;
-
 			TextPosition position = displayContext.Caret.Position;
 			LinePosition linePosition = position.LinePosition;
 			CharacterPosition characterPosition = position.CharacterPosition;
+			int lineIndex = linePosition.GetLineIndex(lineBuffer);
+			string lineText = lineBuffer.GetLineText(lineIndex);
+			int characterIndex = characterPosition.GetCharacterIndex(lineText);
 
-			int lineLength = lineBuffer.GetLineLength(linePosition, LineContexts.None);
-
-			if (position.CharacterPosition
-				== lineLength)
+			// Figure out the indexes.
+			if (characterIndex == lineText.Length)
 			{
 				if (position.LinePosition < lineBuffer.LineCount - 1)
 				{
-					position.LinePosition++;
-					position.CharacterPosition = 0;
+					lineIndex++;
+					characterPosition = CharacterPosition.Begin;
 				}
 			}
 			else
 			{
-				position.CharacterPosition++;
+				characterPosition = new CharacterPosition(characterIndex++);
 			}
 
 			// Cause the text editor to redraw itself.
-			var caretPosition = new TextPosition(linePosition,characterPosition);
+			var caretPosition = new TextPosition(
+				new LinePosition(lineIndex),characterPosition);
 			displayContext.ScrollToCaret(caretPosition);
 		}
 
@@ -440,35 +446,38 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 		[KeyBinding(Key.Right, ModifierType.ControlMask)]
 		public static void RightWord(EditorViewController controller)
 		{
-			// Get the text and line for the position in question.
+			// Pull out some useful variables.
 			IDisplayContext displayContext = controller.DisplayContext;
+			LineBuffer buffer = displayContext.LineBuffer;
 			TextPosition position = displayContext.Caret.Position;
-			string text = displayContext.LineBuffer.GetLineText(
-				position.LinePosition, LineContexts.Unformatted);
 
-			// If there is no right boundary, we move down a line.
-			int rightBoundary = displayContext.WordTokenizer.GetNextWordBoundary(
-				text, position.CharacterPosition);
+			// Pull out the line and chracter positions from where we're starting.
+			int lineIndex = position.LinePosition.GetLineIndex(buffer);
+			string lineText = buffer.GetLineText(lineIndex);
+			CharacterPosition wordPosition = CharacterPosition.Word;
+			CharacterPosition characterPosition = position.CharacterPosition;
+			int rightCharacterIndex = wordPosition.GetCharacterIndex(
+				lineText,characterPosition,WordSearchDirection.Right);
 
-			if (rightBoundary == Int32.MaxValue)
+			// If there is no left boundary, we move up a line.
+			if(rightCharacterIndex == -1)
 			{
-				// Check to see if we are at the bottom of the buffer.
-				if (position.LinePosition + 1 >= displayContext.LineBuffer.LineCount)
+				// Check to see if we are at the top of the line or not.
+				if(lineIndex < buffer.LineCount - 1)
 				{
-					return;
+					lineIndex++;
+					characterPosition = CharacterPosition.Begin;
 				}
-
-				// Advance the position to the next line.
-				position.LinePosition++;
-				position.CharacterPosition = 0;
 			}
 			else
 			{
-				position.CharacterPosition = rightBoundary;
+				characterPosition = new CharacterPosition(rightCharacterIndex);
 			}
 
 			// Cause the text editor to redraw itself.
-			displayContext.ScrollToCaret(position);
+			var caretPosition = new TextPosition(
+				new LinePosition(lineIndex),characterPosition);
+			displayContext.ScrollToCaret(caretPosition);
 		}
 
 		/// <summary>
@@ -658,25 +667,26 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 		{
 			// Pull out information about the current context.
 			IDisplayContext displayContext = controller.DisplayContext;
+			LineBuffer buffer = displayContext.LineBuffer;
 			TextPosition position = displayContext.Caret.Position;
-			string lineText = displayContext.LineBuffer.GetLineText(
-				position.LinePosition, LineContexts.Unformatted);
+			int lineIndex = position.LinePosition.GetLineIndex(buffer);
+			string lineText = buffer.GetLineText(lineIndex);
+			int characterIndex = position.GetCharacterIndex(buffer);
 
 			// Find the boundaries for the current word.
 			int startIndex = Math.Max(
 				0,
 				displayContext.WordTokenizer.GetPreviousWordBoundary(
-					lineText, position.CharacterPosition));
+					lineText, characterIndex));
 			int endIndex = Math.Min(
 				lineText.Length,
 				displayContext.WordTokenizer.GetNextWordBoundary(
-					lineText, position.CharacterPosition));
+					lineText,characterIndex));
 
 			// Set the selection to the boundaries.
-			displayContext.Caret.Selection.FirstTextPosition =
-				new TextPosition(position.LinePosition, startIndex);
-			displayContext.Caret.Selection.LastTextPosition =
-				new TextPosition(position.LinePosition, endIndex);
+			displayContext.Caret.Selection = new TextRange(
+				new TextPosition(position.LinePosition, startIndex),
+				new TextPosition(position.LinePosition, endIndex));
 		}
 
 		/// <summary>
@@ -705,17 +715,20 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			int lineX = GetLineX(controller, wrappedLine, position);
 
 			// Figure out which wrapped line we'll be moving the caret to.
+			LinePosition linePosition = position.LinePosition;
+			int lineIndex = linePosition.GetLineIndex(buffer.LineBuffer);
+
 			if (wrappedLineIndex == 0)
 			{
 				// If we are the last line in the buffer, just do nothing.
-				if (position.LinePosition == 0)
+				if (linePosition == 0)
 				{
 					return;
 				}
 
 				// Move to the next line.
-				position.LinePosition--;
-				layout = buffer.GetLineLayout(position.LinePosition, LineContexts.None);
+				lineIndex--;
+				layout = buffer.GetLineLayout(lineIndex, LineContexts.None);
 				wrappedLineIndex = layout.LineCount - 1;
 				wrappedLine = layout.Lines[wrappedLineIndex];
 			}
@@ -727,7 +740,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			}
 
 			// Adjust the X coordinate for the current line.
-			lineX -= GetLeftStylePaddingPango(controller, position.LinePosition);
+			lineX -= GetLeftStylePaddingPango(controller, lineIndex);
 
 			// The wrapped line has the current wrapped line, so use the lineX
 			// to figure out which character to use.
@@ -739,7 +752,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			// Calculate the character position, but we have to map UTF-8
 			// characters because Pango uses that instead of C# strings.
 			string lineText =
-				controller.DisplayContext.LineBuffer.GetLineText(position.LinePosition);
+				controller.DisplayContext.LineBuffer.GetLineText(linePosition);
 			unicodeIndex = NormalizeEmptyStrings(lineText, unicodeIndex);
 			int characterIndex = PangoUtility.TranslateStringToPangoIndex(
 				lineText, unicodeIndex);
@@ -751,7 +764,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			}
 
 			// Draw the new location of the caret.
-			var caretPosition = new TextPosition(position.LinePosition, characterIndex);
+			var caretPosition = new TextPosition(lineIndex, characterIndex);
 			displayContext.ScrollToCaret(caretPosition);
 		}
 
