@@ -76,16 +76,6 @@ namespace MfGames.GtkExt.TextEditor.Models
 			return (lineIndex + 1).ToString("N0");
 		}
 
-		/// <summary>
-		/// Gets the line without any manipulations.
-		/// </summary>
-		/// <param name="lineIndex">Index of the line.</param>
-		/// <returns></returns>
-		public string GetLineText(int lineIndex)
-		{
-			return lines[lineIndex];
-		}
-
 		public override string GetLineText(
 			int lineIndex,
 			LineContexts lineContexts)
