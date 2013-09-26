@@ -10,10 +10,9 @@ using MfGames.GtkExt.Extensions.Pango;
 using MfGames.GtkExt.TextEditor.Interfaces;
 using MfGames.GtkExt.TextEditor.Models;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
+using MfGames.GtkExt.TextEditor.Models.Extensions;
 using MfGames.GtkExt.TextEditor.Models.Styles;
 using MfGames.GtkExt.TextEditor.Renderers;
-using MfGames.Commands.TextEditing;
-using MfGames.GtkExt.TextEditor.Models.Extensions;
 using Pango;
 
 namespace MfGames.GtkExt.TextEditor.Editing.Actions
@@ -83,10 +82,9 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			int lineX = GetLineX(controller, wrappedLine, position);
 
 			// Figure out which wrapped line we'll be moving the caret to.
-			int lineIndex =
-				position.LinePosition.GetLineIndex(buffer.LineBuffer);
+			int lineIndex = position.LinePosition.GetLineIndex(buffer.LineBuffer);
 
-			if(wrappedLine.IsLastLineInLayout())
+			if (wrappedLine.IsLastLineInLayout())
 			{
 				// If we are the last line in the buffer, just do nothing.
 				if (position.IsLastLineInBuffer(buffer))
@@ -96,7 +94,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 
 				// Move to the next line.
 				lineIndex++;
-				layout = buffer.GetLineLayout(lineIndex,LineContexts.None);
+				layout = buffer.GetLineLayout(lineIndex, LineContexts.None);
 				wrappedLine = layout.Lines[0];
 			}
 			else
@@ -471,10 +469,10 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 
 			// If we are at the beginning of the line, we need to move to the
 			// previous line.
-			if(characterIndex == lineText.Length)
+			if (characterIndex == lineText.Length)
 			{
 				// If we are at the last line, we don't do anything.
-				if(lineIndex == lineBuffer.LineCount - 1)
+				if (lineIndex == lineBuffer.LineCount - 1)
 				{
 					return;
 				}
@@ -487,12 +485,12 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			{
 				// Move to the previous left word.
 				int rightCharacterIndex = wordPosition.GetCharacterIndex(
-					lineText,characterPosition,WordSearchDirection.Right);
+					lineText, characterPosition, WordSearchDirection.Right);
 				characterPosition = new CharacterPosition(rightCharacterIndex);
 			}
 
 			// Cause the text editor to redraw itself.
-			var caretPosition = new TextPosition(linePosition,characterPosition);
+			var caretPosition = new TextPosition(linePosition, characterPosition);
 			displayContext.ScrollToCaret(caretPosition);
 		}
 
@@ -696,13 +694,13 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 					lineText, characterIndex));
 			int endIndex = Math.Min(
 				lineText.Length,
-				displayContext.WordTokenizer.GetNextWordBoundary(
-					lineText,characterIndex));
+				displayContext.WordTokenizer.GetNextWordBoundary(lineText, characterIndex));
 
 			// Set the selection to the boundaries.
-			displayContext.Caret.Selection = new TextRange(
-				new TextPosition(position.LinePosition, startIndex),
-				new TextPosition(position.LinePosition, endIndex));
+			displayContext.Caret.Selection =
+				new TextRange(
+					new TextPosition(position.LinePosition, startIndex),
+					new TextPosition(position.LinePosition, endIndex));
 		}
 
 		/// <summary>
@@ -920,7 +918,8 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			action(controller);
 
 			// Restore the anchor position which will merge the selections together.
-			caret.Selection = new TextRange(beginPosition, caret.Selection.EndTextPosition);
+			caret.Selection = new TextRange(
+				beginPosition, caret.Selection.EndTextPosition);
 		}
 
 		#endregion

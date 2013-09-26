@@ -22,12 +22,6 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 		#region Properties
 
 		/// <summary>
-		/// Gets or sets the buffer position for the insert operation.
-		/// </summary>
-		/// <value>The buffer position.</value>
-		public TextPosition TextPosition { get; private set; }
-
-		/// <summary>
 		/// Gets the type of the operation representing this object.
 		/// </summary>
 		/// <value>The type of the operation.</value>
@@ -42,6 +36,12 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 		/// <value>The text.</value>
 		public string Text { get; set; }
 
+		/// <summary>
+		/// Gets or sets the buffer position for the insert operation.
+		/// </summary>
+		/// <value>The buffer position.</value>
+		public TextPosition TextPosition { get; private set; }
+
 		#endregion
 
 		#region Methods
@@ -49,12 +49,14 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 		public override void Do(OperationContext state)
 		{
 			// Grab the line from the line buffer.
-			string lineText = state.LineBuffer.GetLineText(
-				(int) TextPosition.LinePosition, LineContexts.Unformatted);
+			string lineText =
+				state.LineBuffer.GetLineText(
+					(int) TextPosition.LinePosition, LineContexts.Unformatted);
 			var buffer = new StringBuilder(lineText);
 
 			// Normalize the character ranges.
-			int characterIndex = TextPosition.CharacterPosition.GetCharacterIndex(lineText);
+			int characterIndex =
+				TextPosition.CharacterPosition.GetCharacterIndex(lineText);
 
 			buffer.Insert(characterIndex, Text);
 
@@ -82,8 +84,9 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 		public override void Undo(OperationContext state)
 		{
 			// Grab the line from the line buffer.
-			string lineText = state.LineBuffer.GetLineText(
-				(int) TextPosition.LinePosition, LineContexts.Unformatted);
+			string lineText =
+				state.LineBuffer.GetLineText(
+					(int) TextPosition.LinePosition, LineContexts.Unformatted);
 			var buffer = new StringBuilder(lineText);
 
 			// Normalize the character ranges.
@@ -98,7 +101,8 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 			{
 				state.Results =
 					new LineBufferOperationResults(
-						new TextPosition(originalPosition.LinePosition, originalPosition.CharacterPosition));
+						new TextPosition(
+							originalPosition.LinePosition, originalPosition.CharacterPosition));
 			}
 		}
 

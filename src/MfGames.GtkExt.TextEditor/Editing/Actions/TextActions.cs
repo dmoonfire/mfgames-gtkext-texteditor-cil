@@ -51,17 +51,15 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			string firstLine = lineBuffer.GetLineText(
 				selection.FirstLinePosition, LineContexts.Unformatted);
 
-			if(endLineIndex == startLineIndex)
+			if (endLineIndex == startLineIndex)
 			{
 				// Single-line copy is much easier since we just need a substring.
 				int startCharacterIndex =
 					selection.FirstTextPosition.GetCharacterIndex(lineBuffer);
 				int endCharacterIndex =
 					selection.FirstTextPosition.GetCharacterIndex(lineBuffer);
-				string singleLineText =
-					firstLine.Substring(
-						startCharacterIndex,
-						endCharacterIndex - startCharacterIndex);
+				string singleLineText = firstLine.Substring(
+					startCharacterIndex, endCharacterIndex - startCharacterIndex);
 
 				// Set the clipboard's text and return.
 				displayContext.Clipboard.Text = singleLineText;
@@ -78,7 +76,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 
 			// Loop through the second to just shy of the last line, adding
 			// each one as a full line.
-			for(int lineIndex = startLineIndex + 1;
+			for (int lineIndex = startLineIndex + 1;
 				lineIndex < endLineIndex;
 				lineIndex++)
 			{
@@ -88,7 +86,8 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 
 			// Add the last line, which is a substring, but we don't add a
 			// newline to the end of this one.
-			string lastLineText = lineBuffer.GetLineText(endLineIndex, LineContexts.Unformatted);
+			string lastLineText = lineBuffer.GetLineText(
+				endLineIndex, LineContexts.Unformatted);
 			int lastCharacterIndex =
 				selection.EndCharacterPosition.GetCharacterIndex(lastLineText);
 			buffer.Append(lastLineText.Substring(0, lastCharacterIndex));

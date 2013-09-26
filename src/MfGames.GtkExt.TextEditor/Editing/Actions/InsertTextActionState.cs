@@ -5,7 +5,6 @@
 using MfGames.Commands.TextEditing;
 using MfGames.Extensions.System.Collections.Generic;
 using MfGames.GtkExt.TextEditor.Interfaces;
-using MfGames.GtkExt.TextEditor.Models;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
 
 namespace MfGames.GtkExt.TextEditor.Editing.Actions

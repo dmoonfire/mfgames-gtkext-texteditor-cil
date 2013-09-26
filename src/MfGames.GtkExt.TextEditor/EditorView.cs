@@ -295,7 +295,8 @@ namespace MfGames.GtkExt.TextEditor
 			// Look to see if we are moving to a different position. If we are,
 			// we tell the line buffer that we have exited the previous line.
 			LinePosition linePosition = caret.Position.LinePosition;
-			int lineIndex = linePosition.GetLineIndex(Controller.DisplayContext.LineBuffer);
+			int lineIndex =
+				linePosition.GetLineIndex(Controller.DisplayContext.LineBuffer);
 
 			if (linePosition != bufferPosition.LinePosition)
 			{

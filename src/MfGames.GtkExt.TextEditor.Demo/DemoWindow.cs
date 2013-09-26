@@ -179,13 +179,18 @@ namespace GtkExtDemo
 			if (caret.Selection.IsEmpty
 				|| caret.Selection.IsSameLine)
 			{
-				int lineIndex = caret.Position.LinePosition.GetLineIndex(editorView.LineBuffer);
+				int lineIndex =
+					caret.Position.LinePosition.GetLineIndex(editorView.LineBuffer);
 				ReverseLine(command, lineIndex);
 			}
 			else
 			{
-				int startLineIndex = caret.Selection.FirstTextPosition.LinePosition.GetLineIndex(editorView.LineBuffer);
-				int endLineIndex = caret.Selection.LastTextPosition.LinePosition.GetLineIndex(editorView.LineBuffer);
+				int startLineIndex =
+					caret.Selection.FirstTextPosition.LinePosition.GetLineIndex(
+						editorView.LineBuffer);
+				int endLineIndex =
+					caret.Selection.LastTextPosition.LinePosition.GetLineIndex(
+						editorView.LineBuffer);
 				for (int lineIndex = startLineIndex;
 					lineIndex <= endLineIndex;
 					lineIndex++)

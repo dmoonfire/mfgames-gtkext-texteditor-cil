@@ -428,9 +428,10 @@ namespace MfGames.GtkExt.TextEditor.Editing
 					TextRange previousSelection = displayContext.Caret.Selection;
 
 					// Set the tail of the anchor to the current mouse position.
-					displayContext.Caret.Selection = new TextRange(
-						displayContext.Caret.Selection.FirstTextPosition,
-						MoveActions.GetTextPosition(textPoint, this));
+					displayContext.Caret.Selection =
+						new TextRange(
+							displayContext.Caret.Selection.FirstTextPosition,
+							MoveActions.GetTextPosition(textPoint, this));
 
 					// Update the display.
 					displayContext.Renderer.UpdateSelection(displayContext, previousSelection);
@@ -527,9 +528,10 @@ namespace MfGames.GtkExt.TextEditor.Editing
 					if ((modifier & ModifierType.ShiftMask) == ModifierType.ShiftMask)
 					{
 						// Restore the anchor position which will extend the selection back.
-						displayContext.Caret.Selection = new TextRange(
-							previousSelection.FirstTextPosition,
-							displayContext.Caret.Selection.LastTextPosition);
+						displayContext.Caret.Selection =
+							new TextRange(
+								previousSelection.FirstTextPosition,
+								displayContext.Caret.Selection.LastTextPosition);
 
 						// Check to see if the selection changed.
 						if (previousSelection != displayContext.Caret.Selection)

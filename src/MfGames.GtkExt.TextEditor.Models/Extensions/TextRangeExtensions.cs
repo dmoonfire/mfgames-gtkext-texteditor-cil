@@ -8,6 +8,8 @@ namespace MfGames.GtkExt.TextEditor.Models.Extensions
 {
 	public static class TextRangeExtensions
 	{
+		#region Methods
+
 		public static bool ContainsLine(
 			this TextRange textRange,
 			LineBuffer lineBuffer,
@@ -48,7 +50,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Extensions
 			}
 
 			// If we are on the last line, then it is everything before the index.
-			if(lastLineIndex == lineIndex)
+			if (lastLineIndex == lineIndex)
 			{
 				beginCharacterPosition = CharacterPosition.Begin;
 				endCharacterPosition = textRange.LastTextPosition.CharacterPosition;
@@ -60,5 +62,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Extensions
 			endCharacterPosition = CharacterPosition.End;
 			return true;
 		}
+
+		#endregion
 	}
 }

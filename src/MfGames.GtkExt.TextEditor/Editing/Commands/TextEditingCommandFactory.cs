@@ -32,9 +32,10 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 			TextPosition position = displayContext.Caret.Position;
 
 			// Set up the operation context for this request.
-			var textPosition = new TextPosition(
-				displayContext.Caret.Position.LinePosition,
-				displayContext.Caret.Position.CharacterPosition);
+			var textPosition =
+				new TextPosition(
+					displayContext.Caret.Position.LinePosition,
+					displayContext.Caret.Position.CharacterPosition);
 			var operationContext = new OperationContext(
 				displayContext.LineBuffer, textPosition);
 

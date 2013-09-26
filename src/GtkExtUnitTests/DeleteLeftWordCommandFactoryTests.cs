@@ -73,7 +73,9 @@ namespace UnitTests
 			Assert.AreEqual(
 				2, caret.Position.LinePosition, "Caret was on an unexpected line.");
 			Assert.AreEqual(
-				14, caret.Position.CharacterPosition, "Caret was on an unexpected character.");
+				14,
+				caret.Position.CharacterPosition,
+				"Caret was on an unexpected character.");
 
 			Assert.AreEqual(3, lineBuffer.LineCount);
 			Assert.AreEqual(DefaultLine, lineBuffer.GetLineText(0));

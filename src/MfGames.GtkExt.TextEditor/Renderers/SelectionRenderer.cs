@@ -5,7 +5,6 @@
 using System;
 using System.Text;
 using MfGames.Commands.TextEditing;
-using MfGames.GtkExt.TextEditor.Models;
 
 namespace MfGames.GtkExt.TextEditor.Renderers
 {
@@ -242,7 +241,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 				characters.FirstCharacterPosition.GetCharacterIndex(plainText);
 			int lastCharacterIndex =
 				characters.LastCharacterPosition.GetCharacterIndex(plainText);
-			
+
 			// Because of how the loop works, we have to set the startIndex to
 			// a sane default and only check to see if we found the endIndex.
 			startIndex = -1;
@@ -389,48 +388,6 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			endIndex = pangoMarkup.Length;
 		}
 
-		private static string GetText(string pangoMarkup)
-		{
-			// If we don't have markup, just return it.
-			if (!pangoMarkup.Contains("<"))
-			{
-				return pangoMarkup;
-			}
-
-			// Build up the string of the code without a markup.
-			var buffer = new StringBuilder();
-			bool inTag = false;
-
-			for (int i = 0;
-				i < pangoMarkup.Length;
-				i++)
-			{
-				char c = pangoMarkup[i];
-
-				if (c == '<')
-				{
-					inTag = true;
-					continue;
-				}
-
-				if (inTag)
-				{
-					if (c == '>')
-					{
-						inTag = false;
-					}
-
-					continue;
-				}
-
-				buffer.Append(c);
-			}
-
-			// Return the resulting string.
-			string results = buffer.ToString();
-			return results;
-		}
-
 		/// <summary>
 		/// Scans through the markup from the start to end index and gathers all the
 		/// open tags at the point of the <paramref name="endIndex"/>.
@@ -522,6 +479,48 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 				tags[depth] = tag;
 				depth++;
 			}
+		}
+
+		private static string GetText(string pangoMarkup)
+		{
+			// If we don't have markup, just return it.
+			if (!pangoMarkup.Contains("<"))
+			{
+				return pangoMarkup;
+			}
+
+			// Build up the string of the code without a markup.
+			var buffer = new StringBuilder();
+			bool inTag = false;
+
+			for (int i = 0;
+				i < pangoMarkup.Length;
+				i++)
+			{
+				char c = pangoMarkup[i];
+
+				if (c == '<')
+				{
+					inTag = true;
+					continue;
+				}
+
+				if (inTag)
+				{
+					if (c == '>')
+					{
+						inTag = false;
+					}
+
+					continue;
+				}
+
+				buffer.Append(c);
+			}
+
+			// Return the resulting string.
+			string results = buffer.ToString();
+			return results;
 		}
 
 		#endregion

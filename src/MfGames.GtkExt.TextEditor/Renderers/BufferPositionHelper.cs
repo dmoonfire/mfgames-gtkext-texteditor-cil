@@ -10,7 +10,6 @@ using MfGames.GtkExt.TextEditor.Models;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
 using MfGames.GtkExt.TextEditor.Models.Extensions;
 using MfGames.GtkExt.TextEditor.Models.Styles;
-using MfGames.GtkExt.TextEditor.Models.Extensions;
 using Pango;
 using Rectangle = Pango.Rectangle;
 
@@ -103,7 +102,8 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			this TextPosition bufferPosition,
 			EditorViewRenderer buffer)
 		{
-			return bufferPosition.LinePosition == 0 && bufferPosition.CharacterPosition == 0;
+			return bufferPosition.LinePosition == 0
+				&& bufferPosition.CharacterPosition == 0;
 		}
 
 		/// <summary>
@@ -248,7 +248,8 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			this TextPosition bufferPosition,
 			EditorViewRenderer lineLayoutBuffer)
 		{
-			return bufferPosition.LinePosition == lineLayoutBuffer.LineBuffer.LineCount - 1;
+			return bufferPosition.LinePosition
+				== lineLayoutBuffer.LineBuffer.LineCount - 1;
 		}
 
 		/// <summary>
@@ -441,8 +442,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			// Get the line index, which needs to be a number in range.
 			EditorViewRenderer buffer = displayContext.Renderer;
 			int lineIndex = Math.Min(
-				bufferPosition.LinePosition.Index,
-				displayContext.LineBuffer.LineCount - 1);
+				bufferPosition.LinePosition.Index, displayContext.LineBuffer.LineCount - 1);
 
 			// Pull out some of the common things we'll be using in this method.
 			int bufferLineIndex = buffer.LineBuffer.NormalizeLineIndex(lineIndex);
@@ -467,7 +467,8 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			// value to calculate it. This actually uses UTF-8 encoding to
 			// calculate the indexes.
 			string lineText = displayContext.LineBuffer.GetLineText(lineIndex);
-			int characterIndex = bufferPosition.GetCharacterIndex(displayContext.LineBuffer);
+			int characterIndex =
+				bufferPosition.GetCharacterIndex(displayContext.LineBuffer);
 			int unicodeCharacter = PangoUtility.TranslateStringToPangoIndex(
 				lineText, characterIndex);
 

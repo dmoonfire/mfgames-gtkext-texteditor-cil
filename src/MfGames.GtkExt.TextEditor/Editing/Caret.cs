@@ -7,8 +7,6 @@ using Cairo;
 using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.Extensions.Cairo;
 using MfGames.GtkExt.TextEditor.Interfaces;
-using MfGames.GtkExt.TextEditor.Models;
-using MfGames.GtkExt.TextEditor.Models.Buffers;
 using MfGames.GtkExt.TextEditor.Models.Styles;
 using MfGames.GtkExt.TextEditor.Renderers;
 
@@ -29,11 +27,16 @@ namespace MfGames.GtkExt.TextEditor.Editing
 		{
 			[DebuggerStepThrough] get { return Selection.LastTextPosition; }
 
-			[DebuggerStepThrough]
-			set
-			{
-				Selection = new TextRange(value, value);
-			}
+			[DebuggerStepThrough] set { Selection = new TextRange(value, value); }
+		}
+
+		/// <summary>
+		/// Contains the selection of the caret.
+		/// </summary>
+		public TextRange Selection
+		{
+			get { return selection; }
+			set { selection = value ?? TextRange.Empty; }
 		}
 
 		#endregion
@@ -127,21 +130,12 @@ namespace MfGames.GtkExt.TextEditor.Editing
 		public Caret(IDisplayContext displayContext)
 		{
 			this.displayContext = displayContext;
-			this.selection = TextRange.Empty;
+			selection = TextRange.Empty;
 		}
 
 		#endregion
 
 		#region Fields
-
-		/// <summary>
-		/// Contains the selection of the caret.
-		/// </summary>
-		public TextRange Selection
-		{
-			get { return selection; }
-			set { selection = value ?? TextRange.Empty; }
-		}
 
 		private readonly IDisplayContext displayContext;
 		private TextRange selection;

@@ -7,7 +7,6 @@ using MfGames.Commands;
 using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.TextEditor.Interfaces;
 using MfGames.GtkExt.TextEditor.Models;
-using MfGames.GtkExt.TextEditor.Models.Extensions;
 using MfGames.HierarchicalPaths;
 
 namespace MfGames.GtkExt.TextEditor.Editing.Commands
@@ -64,7 +63,8 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 			string text = commandData.ToString();
 			IInsertTextCommand<OperationContext> insertCommand =
 				controller.CommandController.CreateInsertTextCommand(
-					new TextPosition(bufferPosition.LinePosition, bufferPosition.CharacterPosition),
+					new TextPosition(
+						bufferPosition.LinePosition, bufferPosition.CharacterPosition),
 					text);
 			insertCommand.UpdateTextPosition = DoTypes.All;
 			commands.Add(insertCommand);

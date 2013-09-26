@@ -100,8 +100,7 @@ namespace MfGames.GtkExt.TextEditor.Models
 			RaiseLinesInserted(new LineRangeEventArgs(lineIndex, lineIndex + count - 1));
 
 			// Return the appropriate results.
-			return
-				new LineBufferOperationResults(new TextPosition(lineIndex + count, 0));
+			return new LineBufferOperationResults(new TextPosition(lineIndex + count, 0));
 		}
 
 		public override LineBufferOperationResults InsertText(
@@ -165,7 +164,9 @@ namespace MfGames.GtkExt.TextEditor.Models
 			string lineText = lines[lineIndex];
 			int startCharacterIndex =
 				operation.TextRange.BeginCharacterPosition.GetCharacterIndex(
-					lineText, operation.TextRange.EndCharacterPosition, WordSearchDirection.Left);
+					lineText,
+					operation.TextRange.EndCharacterPosition,
+					WordSearchDirection.Left);
 			int endCharacterIndex =
 				operation.TextRange.EndCharacterPosition.GetCharacterIndex(
 					lineText,
@@ -181,8 +182,7 @@ namespace MfGames.GtkExt.TextEditor.Models
 			RaiseLineChanged(new LineChangedArgs(lineIndex));
 
 			// Return the appropriate results.
-			return
-				new LineBufferOperationResults(operation.TextRange.BeginTextPosition);
+			return new LineBufferOperationResults(operation.TextRange.BeginTextPosition);
 		}
 
 		/// <summary>
@@ -202,7 +202,8 @@ namespace MfGames.GtkExt.TextEditor.Models
 			RaiseLineChanged(lineChangedArgs);
 
 			// Return the appropriate results.
-			var bufferPosition = new TextPosition(operation.LineIndex, CharacterPosition.End);
+			var bufferPosition = new TextPosition(
+				operation.LineIndex, CharacterPosition.End);
 			var results = new LineBufferOperationResults(bufferPosition);
 			return results;
 		}

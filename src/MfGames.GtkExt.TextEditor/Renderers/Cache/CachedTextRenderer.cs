@@ -312,22 +312,6 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			ProcessQueuedLineChanges();
 		}
 
-		private void ClearCacheLines(TextRange selection)
-		{
-			LinePosition firstLinePosition = selection.FirstLinePosition;
-			int firstLineIndex = firstLinePosition.GetLineIndex(LineBuffer);
-			LinePosition lastLinePosition = selection.LastLinePosition;
-			int lastLineIndex = lastLinePosition.GetLineIndex(LineBuffer);
-
-			for (int lineIndex = firstLineIndex;
-				lineIndex <= lastLineIndex;
-				lineIndex++)
-			{
-				CachedLine line = lines[lineIndex];
-				line.Reset();
-			}
-		}
-
 		/// <summary>
 		/// Called when a line is changed.
 		/// </summary>
@@ -428,6 +412,22 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		private void Clear()
 		{
 			lines.Clear();
+		}
+
+		private void ClearCacheLines(TextRange selection)
+		{
+			LinePosition firstLinePosition = selection.FirstLinePosition;
+			int firstLineIndex = firstLinePosition.GetLineIndex(LineBuffer);
+			LinePosition lastLinePosition = selection.LastLinePosition;
+			int lastLineIndex = lastLinePosition.GetLineIndex(LineBuffer);
+
+			for (int lineIndex = firstLineIndex;
+				lineIndex <= lastLineIndex;
+				lineIndex++)
+			{
+				CachedLine line = lines[lineIndex];
+				line.Reset();
+			}
 		}
 
 		/// <summary>

@@ -126,8 +126,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 			// If we have a text position, we need to set it.
 			if (operationContext.Results.HasValue)
 			{
-				displayContext.Caret.Position =
-					operationContext.Results.Value.TextPosition;
+				displayContext.Caret.Position = operationContext.Results.Value.TextPosition;
 			}
 		}
 

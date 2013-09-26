@@ -74,7 +74,8 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 			{
 				state.Results =
 					new LineBufferOperationResults(
-						new TextPosition(InitialPosition.LinePosition, InitialPosition.CharacterPosition));
+						new TextPosition(
+							InitialPosition.LinePosition, InitialPosition.CharacterPosition));
 			}
 		}
 

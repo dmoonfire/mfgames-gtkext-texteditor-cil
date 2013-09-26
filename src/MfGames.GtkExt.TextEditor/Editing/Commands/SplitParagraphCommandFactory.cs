@@ -45,9 +45,10 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 			TextPosition position)
 		{
 			// Create the command and execute it.
-			var textPosition = new TextPosition(
-				displayContext.Caret.Position.LinePosition,
-				displayContext.Caret.Position.CharacterPosition);
+			var textPosition =
+				new TextPosition(
+					displayContext.Caret.Position.LinePosition,
+					displayContext.Caret.Position.CharacterPosition);
 			var splitCommand =
 				new SplitParagraphCommand<OperationContext>(
 					controller.CommandController, textPosition);

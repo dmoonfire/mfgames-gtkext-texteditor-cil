@@ -8,6 +8,8 @@ namespace MfGames.GtkExt.TextEditor.Models.Extensions
 {
 	public static class LinePositionExtensions
 	{
+		#region Methods
+
 		public static int GetLineIndex(
 			this LinePosition linePosition,
 			LineBuffer lineBuffer)
@@ -15,5 +17,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Extensions
 			int lineIndex = linePosition.GetLineIndex(lineBuffer.LineCount);
 			return lineIndex;
 		}
+
+		#endregion
 	}
 }

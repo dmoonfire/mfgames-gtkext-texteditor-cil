@@ -2,9 +2,7 @@
 // Released under the MIT license
 // http://mfgames.com/mfgames-gtkext-cil/license
 
-using System;
 using MfGames.Commands.TextEditing;
-using MfGames.GtkExt.TextEditor.Models;
 using MfGames.GtkExt.TextEditor.Renderers;
 using NUnit.Framework;
 

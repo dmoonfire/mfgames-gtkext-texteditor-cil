@@ -256,7 +256,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			LineContexts lineContexts = LineContexts.None)
 		{
 			int lineIndex = linePosition.GetLineIndex(LineBuffer);
-			var results = GetLineStyle(lineIndex, lineContexts);
+			LineBlockStyle results = GetLineStyle(lineIndex, lineContexts);
 			return results;
 		}
 
@@ -276,9 +276,8 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			// Check to see if we are in the selection.
 			CharacterPosition beginCharacterPosition;
 			CharacterPosition endCharacterPosition;
-			bool containsLine =
-				DisplayContext.Caret.Selection.ContainsLine(
-					LineBuffer, lineIndex, out beginCharacterPosition, out endCharacterPosition);
+			bool containsLine = DisplayContext.Caret.Selection.ContainsLine(
+				LineBuffer, lineIndex, out beginCharacterPosition, out endCharacterPosition);
 
 			if (containsLine)
 			{

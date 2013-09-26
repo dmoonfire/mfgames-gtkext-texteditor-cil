@@ -198,7 +198,8 @@ namespace GtkExtDemo.TextEditor
 		{
 			LineBufferOperationResults results = base.Do(operation);
 
-			return CheckForStyleChanged((int) operation.TextPosition.LinePosition, results);
+			return CheckForStyleChanged(
+				(int) operation.TextPosition.LinePosition, results);
 		}
 
 		/// <summary>
@@ -214,7 +215,7 @@ namespace GtkExtDemo.TextEditor
 			LineBufferOperationResults results = base.Do(operation);
 
 			int lineIndex = operation.TextRange.FirstLinePosition.GetLineIndex(LineCount);
-			return CheckForStyleChanged(lineIndex,results);
+			return CheckForStyleChanged(lineIndex, results);
 		}
 
 		/// <summary>
@@ -338,8 +339,7 @@ namespace GtkExtDemo.TextEditor
 			int characterIndex =
 				results.TextPosition.CharacterPosition.GetCharacterIndex(newLine);
 			results.TextPosition = new TextPosition(
-				results.TextPosition.LinePosition,
-				Math.Max(0, characterIndex - difference));
+				results.TextPosition.LinePosition, Math.Max(0, characterIndex - difference));
 
 			return results;
 		}

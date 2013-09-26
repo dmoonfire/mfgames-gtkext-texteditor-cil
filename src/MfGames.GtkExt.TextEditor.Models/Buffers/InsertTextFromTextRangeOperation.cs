@@ -26,8 +26,9 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 			// pull out a substring.
 			string sourceLine = state.LineBuffer.GetLineText(
 				SourceRange.LinePosition, LineContexts.Unformatted);
-			int sourceBegin = SourceRange.BeginCharacterPosition.GetCharacterIndex(
-				sourceLine, SourceRange.EndCharacterPosition, WordSearchDirection.Left);
+			int sourceBegin =
+				SourceRange.BeginCharacterPosition.GetCharacterIndex(
+					sourceLine, SourceRange.EndCharacterPosition, WordSearchDirection.Left);
 			int sourceEnd = SourceRange.EndCharacterPosition.GetCharacterIndex(
 				sourceLine, SourceRange.BeginCharacterPosition, WordSearchDirection.Right);
 
@@ -64,8 +65,9 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 		public override void Undo(OperationContext state)
 		{
 			// Grab the line from the line buffer.
-			string lineText = state.LineBuffer.GetLineText(
-				DestinationPosition.LinePosition, LineContexts.Unformatted);
+			string lineText =
+				state.LineBuffer.GetLineText(
+					DestinationPosition.LinePosition, LineContexts.Unformatted);
 			var buffer = new StringBuilder(lineText);
 
 			// Normalize the character ranges.
