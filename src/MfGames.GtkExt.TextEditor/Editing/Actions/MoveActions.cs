@@ -232,9 +232,10 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 		{
 			// Pull out some useful variables.
 			IDisplayContext displayContext = controller.DisplayContext;
-			TextPosition position = displayContext.Caret.Position;
+			LineBuffer lineBuffer = displayContext.LineBuffer;
 
-			// Move the character position.
+			// Move the character position based on line context.
+			TextPosition position = displayContext.Caret.Position;
 			LinePosition linePosition = position.LinePosition;
 			CharacterPosition characterPosition = position.CharacterPosition;
 
@@ -248,7 +249,10 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			}
 			else
 			{
-				characterPosition = new CharacterPosition(characterPosition.Index - 1);
+				// We have to resolve the character index before we calculate
+				// the position since it may be symbolic.
+				int characterIndex = position.GetCharacterIndex(lineBuffer);
+				characterPosition = new CharacterPosition(characterIndex - 1);
 			}
 
 			// Cause the text editor to redraw itself.
@@ -268,34 +272,39 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			// Pull out some useful variables.
 			IDisplayContext displayContext = controller.DisplayContext;
 			LineBuffer buffer = displayContext.LineBuffer;
-			TextPosition position = displayContext.Caret.Position;
 
 			// Pull out the line and chracter positions from where we're starting.
-			int lineIndex = position.LinePosition.GetLineIndex(buffer);
+			TextPosition position = displayContext.Caret.Position;
+			LinePosition linePosition = position.LinePosition;
+			int lineIndex = linePosition.GetLineIndex(buffer);
 			string lineText = buffer.GetLineText(lineIndex);
 			CharacterPosition wordPosition = CharacterPosition.Word;
 			CharacterPosition characterPosition = position.CharacterPosition;
-			int leftCharacterIndex = wordPosition.GetCharacterIndex(
-				lineText, characterPosition, WordSearchDirection.Left);
 
-			// If there is no left boundary, we move up a line.
-			if (leftCharacterIndex == -1)
+			// If we are at the beginning of the line, we need to move to the
+			// previous line.
+			if (characterPosition == CharacterPosition.Begin)
 			{
-				// Check to see if we are at the top of the line or not.
-				if (lineIndex > 0)
+				// If we are at the first line, we don't do anything.
+				if (lineIndex == 0)
 				{
-					lineIndex--;
-					characterPosition = CharacterPosition.End;
+					return;
 				}
+
+				// Move to the end of the previous line.
+				linePosition = new LinePosition(lineIndex - 1);
+				characterPosition = CharacterPosition.End;
 			}
 			else
 			{
+				// Move to the previous left word.
+				int leftCharacterIndex = wordPosition.GetCharacterIndex(
+					lineText, characterPosition, WordSearchDirection.Left);
 				characterPosition = new CharacterPosition(leftCharacterIndex);
 			}
 
 			// Cause the text editor to redraw itself.
-			var caretPosition = new TextPosition(
-				new LinePosition(lineIndex), characterPosition);
+			var caretPosition = new TextPosition(linePosition, characterPosition);
 			displayContext.ScrollToCaret(caretPosition);
 		}
 
@@ -410,30 +419,30 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			// Pull out some useful variables.
 			IDisplayContext displayContext = controller.DisplayContext;
 			LineBuffer lineBuffer = displayContext.LineBuffer;
+
+			// Move the character position based on line context.
 			TextPosition position = displayContext.Caret.Position;
 			LinePosition linePosition = position.LinePosition;
-			CharacterPosition characterPosition = position.CharacterPosition;
 			int lineIndex = linePosition.GetLineIndex(lineBuffer);
-			string lineText = lineBuffer.GetLineText(lineIndex);
-			int characterIndex = characterPosition.GetCharacterIndex(lineText);
+			int lineLength = lineBuffer.GetLineLength(lineIndex);
+			CharacterPosition characterPosition = position.CharacterPosition;
+			int characterIndex = position.GetCharacterIndex(lineBuffer);
 
-			// Figure out the indexes.
-			if (characterIndex == lineText.Length)
+			if (characterIndex == lineLength)
 			{
-				if (position.LinePosition < lineBuffer.LineCount - 1)
+				if (lineIndex < lineBuffer.LineCount - 1)
 				{
-					lineIndex++;
+					linePosition = new LinePosition(lineIndex + 1);
 					characterPosition = CharacterPosition.Begin;
 				}
 			}
 			else
 			{
-				characterPosition = new CharacterPosition(characterIndex++);
+				characterPosition = new CharacterPosition(characterIndex + 1);
 			}
 
 			// Cause the text editor to redraw itself.
-			var caretPosition = new TextPosition(
-				new LinePosition(lineIndex),characterPosition);
+			var caretPosition = new TextPosition(linePosition, characterPosition);
 			displayContext.ScrollToCaret(caretPosition);
 		}
 
@@ -449,34 +458,41 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			// Pull out some useful variables.
 			IDisplayContext displayContext = controller.DisplayContext;
 			LineBuffer buffer = displayContext.LineBuffer;
-			TextPosition position = displayContext.Caret.Position;
+			LineBuffer lineBuffer = displayContext.LineBuffer;
 
 			// Pull out the line and chracter positions from where we're starting.
-			int lineIndex = position.LinePosition.GetLineIndex(buffer);
+			TextPosition position = displayContext.Caret.Position;
+			LinePosition linePosition = position.LinePosition;
+			int lineIndex = linePosition.GetLineIndex(buffer);
 			string lineText = buffer.GetLineText(lineIndex);
 			CharacterPosition wordPosition = CharacterPosition.Word;
 			CharacterPosition characterPosition = position.CharacterPosition;
-			int rightCharacterIndex = wordPosition.GetCharacterIndex(
-				lineText,characterPosition,WordSearchDirection.Right);
+			int characterIndex = characterPosition.GetCharacterIndex(lineText);
 
-			// If there is no left boundary, we move up a line.
-			if(rightCharacterIndex == -1)
+			// If we are at the beginning of the line, we need to move to the
+			// previous line.
+			if(characterIndex == lineText.Length)
 			{
-				// Check to see if we are at the top of the line or not.
-				if(lineIndex < buffer.LineCount - 1)
+				// If we are at the last line, we don't do anything.
+				if(lineIndex == lineBuffer.LineCount - 1)
 				{
-					lineIndex++;
-					characterPosition = CharacterPosition.Begin;
+					return;
 				}
+
+				// Move to the end of the previous line.
+				linePosition = new LinePosition(lineIndex + 1);
+				characterPosition = CharacterPosition.Begin;
 			}
 			else
 			{
+				// Move to the previous left word.
+				int rightCharacterIndex = wordPosition.GetCharacterIndex(
+					lineText,characterPosition,WordSearchDirection.Right);
 				characterPosition = new CharacterPosition(rightCharacterIndex);
 			}
 
 			// Cause the text editor to redraw itself.
-			var caretPosition = new TextPosition(
-				new LinePosition(lineIndex),characterPosition);
+			var caretPosition = new TextPosition(linePosition,characterPosition);
 			displayContext.ScrollToCaret(caretPosition);
 		}
 

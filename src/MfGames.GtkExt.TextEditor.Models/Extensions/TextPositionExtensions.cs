@@ -20,6 +20,15 @@ namespace MfGames.GtkExt.TextEditor.Models.Extensions
 			return characterPosition;
 		}
 
+		public static int GetLineIndex(
+			this TextPosition textPosition,
+			LineBuffer lineBuffer)
+		{
+			LinePosition linePosition = textPosition.LinePosition;
+			int results = linePosition.GetLineIndex(lineBuffer.LineCount);
+			return results;
+		}
+
 		#endregion
 	}
 }
