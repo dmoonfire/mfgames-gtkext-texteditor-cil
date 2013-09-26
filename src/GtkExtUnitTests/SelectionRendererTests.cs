@@ -176,7 +176,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 			// Setup
 			const string markup = "this";
 			var selectionRenderer = new SelectionRenderer();
-			var characters = new SingleLineTextRange(0, 5, Int32.MaxValue);
+			var characters = new SingleLineTextRange(0, 5, CharacterPosition.End);
 
 			// Operation
 			string output = selectionRenderer.GetSelectionMarkup(markup, characters);

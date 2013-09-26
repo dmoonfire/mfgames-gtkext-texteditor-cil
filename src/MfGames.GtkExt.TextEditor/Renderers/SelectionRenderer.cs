@@ -55,9 +55,6 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 				return markup;
 			}
 
-			return markup;
-
-#if REMOVED
 			// The primary concern for applying the selection is that we already
 			// have Pango markup in the string and we have to maintain that
 			// markup while adjusting it. Pango doesn't allow for non-XML rules
@@ -205,10 +202,8 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			string selectionMarkup = buffer.ToString();
 
 			return selectionMarkup;
-#endif
 		}
 
-#if REMOVED
 		/// <summary>
 		/// Gets the indexes in the markup string for the given character range. This
 		/// handles mapping attributes and entities as zero and one-length characters
@@ -232,13 +227,22 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// point the selection ends.</param>
 		private static void GetMarkupIndexes(
 			string pangoMarkup,
-			TextRange characters,
+			SingleLineTextRange characters,
 			out int startIndex,
 			out int endIndex,
 			out int leadingXmlDepth,
 			out int leadingXmlIndex,
 			out int trailingXmlDepth)
 		{
+			// Strip off the Pango formatting so we can calculate lengths. We
+			// add in an extra " " so GetCharacterIndex can handle end of file
+			// lengths.
+			string plainText = GetText(pangoMarkup) + " ";
+			int firstCharacterIndex =
+				characters.FirstCharacterPosition.GetCharacterIndex(plainText);
+			int lastCharacterIndex =
+				characters.LastCharacterPosition.GetCharacterIndex(plainText);
+			
 			// Because of how the loop works, we have to set the startIndex to
 			// a sane default and only check to see if we found the endIndex.
 			startIndex = -1;
@@ -247,7 +251,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			leadingXmlIndex = -1;
 
 			// Check for the selection starting at the beginning.
-			if (characters.StartIndex == 0)
+			if (characters.FirstCharacterPosition == CharacterPosition.Begin)
 			{
 				startIndex = 0;
 			}
@@ -319,7 +323,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 								// We need to first check to see if we are at
 								// the selection point. If we are, then we want
 								// to start before we open a new tag.
-								if (characterIndex == characters.StartIndex)
+								if (characterIndex == firstCharacterIndex)
 								{
 									// Save the start index for the selection.
 									startIndex = markupIndexAnchor;
@@ -337,7 +341,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 									}
 								}
 							}
-							else if (characterIndex == characters.EndIndex)
+							else if (characterIndex == lastCharacterIndex)
 							{
 								// This is right before the selection ends.
 								// Since this is an opening tag, we want to
@@ -364,13 +368,13 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 
 				// Check to see if we have the start index.
 				if (startIndex == -1
-					&& characterIndex == characters.StartIndex)
+					&& characterIndex == firstCharacterIndex)
 				{
 					startIndex = markupIndexAnchor;
 				}
 
 				// Check to see if we are done processing.
-				if (characterIndex == characters.EndIndex)
+				if (characterIndex == lastCharacterIndex)
 				{
 					endIndex = markupIndexAnchor;
 					return;
@@ -384,7 +388,48 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			// end as the last character in the string.
 			endIndex = pangoMarkup.Length;
 		}
-#endif
+
+		private static string GetText(string pangoMarkup)
+		{
+			// If we don't have markup, just return it.
+			if (!pangoMarkup.Contains("<"))
+			{
+				return pangoMarkup;
+			}
+
+			// Build up the string of the code without a markup.
+			var buffer = new StringBuilder();
+			bool inTag = false;
+
+			for (int i = 0;
+				i < pangoMarkup.Length;
+				i++)
+			{
+				char c = pangoMarkup[i];
+
+				if (c == '<')
+				{
+					inTag = true;
+					continue;
+				}
+
+				if (inTag)
+				{
+					if (c == '>')
+					{
+						inTag = false;
+					}
+
+					continue;
+				}
+
+				buffer.Append(c);
+			}
+
+			// Return the resulting string.
+			string results = buffer.ToString();
+			return results;
+		}
 
 		/// <summary>
 		/// Scans through the markup from the start to end index and gathers all the
