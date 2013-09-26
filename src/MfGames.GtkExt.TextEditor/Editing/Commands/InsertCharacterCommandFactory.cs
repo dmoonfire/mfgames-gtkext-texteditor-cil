@@ -7,6 +7,7 @@ using MfGames.Commands;
 using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.TextEditor.Interfaces;
 using MfGames.GtkExt.TextEditor.Models;
+using MfGames.GtkExt.TextEditor.Models.Extensions;
 using MfGames.HierarchicalPaths;
 
 namespace MfGames.GtkExt.TextEditor.Editing.Commands
@@ -44,7 +45,6 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 			IDisplayContext displayContext,
 			TextPosition position)
 		{
-#if REMOVED
 			// If we don't have a selection, this is a simple insert command.
 			var commands = new List<IUndoableCommand<OperationContext>>();
 			TextPosition bufferPosition = displayContext.Caret.Position;
@@ -52,7 +52,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 			if (!displayContext.Caret.Selection.IsEmpty)
 			{
 				// We are going to be deleting, so we have a modified buffer position.
-				bufferPosition = displayContext.Caret.Selection.StartPosition;
+				bufferPosition = displayContext.Caret.Selection.BeginTextPosition;
 
 				// Create and add the delete command.
 				IUndoableCommand<OperationContext> deleteCommand =
@@ -99,7 +99,6 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 				displayContext.Caret.SetAndScrollToPosition(
 					operationContext.Results.Value.TextPosition);
 			}
-#endif
 		}
 
 		#endregion
