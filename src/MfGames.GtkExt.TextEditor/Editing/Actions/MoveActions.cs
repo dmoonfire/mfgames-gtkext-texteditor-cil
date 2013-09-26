@@ -914,14 +914,13 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			// Grab the anchor position of the selection since that will
 			// remain the same after the command.
 			Caret caret = controller.DisplayContext.Caret;
-			TextPosition anchorPosition = caret.Selection.FirstTextPosition;
-			TextPosition tailPosition = caret.Selection.LastTextPosition;
+			TextPosition beginPosition = caret.Selection.BeginTextPosition;
 
 			// Perform the move command.
 			action(controller);
 
-			// Restore the anchor position which will extend the selection back.
-			caret.Selection = new TextRange(anchorPosition, tailPosition);
+			// Restore the anchor position which will merge the selections together.
+			caret.Selection = new TextRange(beginPosition, caret.Selection.EndTextPosition);
 		}
 
 		#endregion
