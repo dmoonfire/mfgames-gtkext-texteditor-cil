@@ -11,6 +11,7 @@ using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.TextEditor.Interfaces;
 using MfGames.GtkExt.TextEditor.Models;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
+using MfGames.GtkExt.TextEditor.Models.Extensions;
 using MfGames.GtkExt.TextEditor.Models.Styles;
 using MfGames.Locking;
 using Action = System.Action;
@@ -283,7 +284,6 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			IDisplayContext displayContext,
 			TextRange previousSelection)
 		{
-#if REMOVED
 			// Make sure we're on the proper thread.
 			CheckGuiThread();
 
@@ -298,38 +298,34 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 				if (!previousSelection.IsEmpty
 					|| !currentSelection.IsEmpty)
 				{
-					// Clear out the cache for all the lines in the new and old selections.
-					int endLineIndex =
-						displayContext.LineBuffer.NormalizeLineIndex(
-							currentSelection.EndPosition.LinePosition);
-					int previousEndLineIndex =
-						displayContext.LineBuffer.NormalizeLineIndex(
-							previousSelection.EndPosition.LinePosition);
-
-					for (int lineIndex = currentSelection.StartPosition.LinePosition;
-						lineIndex <= endLineIndex;
-						lineIndex++)
-					{
-						CachedLine line = lines[lineIndex];
-						line.Reset();
-					}
-
-					for (int lineIndex = previousSelection.StartPosition.LinePosition;
-						lineIndex <= previousEndLineIndex;
-						lineIndex++)
-					{
-						CachedLine line = lines[lineIndex];
-						line.Reset();
-					}
+					// Clear out the cache for all the lines in the previous
+					// selected range.
+					ClearCacheLines(previousSelection);
+					ClearCacheLines(currentSelection);
 				}
 
 				// Call the base implementation.
-				// TODO base.UpdateSelection(displayContext, previousSelection);
+				base.UpdateSelection(displayContext, previousSelection);
 			}
 
 			// Process any queued changes.
 			ProcessQueuedLineChanges();
-#endif
+		}
+
+		private void ClearCacheLines(TextRange selection)
+		{
+			LinePosition firstLinePosition = selection.FirstLinePosition;
+			int firstLineIndex = firstLinePosition.GetLineIndex(LineBuffer);
+			LinePosition lastLinePosition = selection.LastLinePosition;
+			int lastLineIndex = lastLinePosition.GetLineIndex(LineBuffer);
+
+			for (int lineIndex = firstLineIndex;
+				lineIndex <= lastLineIndex;
+				lineIndex++)
+			{
+				CachedLine line = lines[lineIndex];
+				line.Reset();
+			}
 		}
 
 		/// <summary>
