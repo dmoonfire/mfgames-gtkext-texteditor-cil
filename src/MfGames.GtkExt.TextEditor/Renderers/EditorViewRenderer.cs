@@ -282,10 +282,10 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			if (containsLine)
 			{
 				// Apply the markup to the line.
-				return SelectionRenderer.GetSelectionMarkup(
-					markup,
-					new SingleLineTextRange(
-						new LinePosition(lineIndex), beginCharacterPosition, endCharacterPosition));
+				var linePosition = new LinePosition(lineIndex);
+				var singleLineTextRange = new SingleLineTextRange(
+					linePosition, beginCharacterPosition, endCharacterPosition);
+				return SelectionRenderer.GetSelectionMarkup(markup, singleLineTextRange);
 			}
 
 			// Return the resulting markup.

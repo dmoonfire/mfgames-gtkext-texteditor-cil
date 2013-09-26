@@ -271,7 +271,8 @@ namespace MfGames.GtkExt.TextEditor.Models
 			int lineIndex,
 			string text)
 		{
-			return Do(new SetTextOperation(lineIndex, text));
+			var operation = new SetTextOperation(lineIndex, text);
+			return Do(operation);
 		}
 
 		public void SetText(
