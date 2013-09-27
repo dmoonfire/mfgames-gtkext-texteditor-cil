@@ -2,7 +2,6 @@
 // Released under the MIT license
 // http://mfgames.com/mfgames-gtkext-cil/license
 
-using System;
 using Cairo;
 using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.TextEditor.Interfaces;
@@ -441,8 +440,8 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		{
 			// Get the line index, which needs to be a number in range.
 			EditorViewRenderer buffer = displayContext.Renderer;
-			int lineIndex = Math.Min(
-				bufferPosition.LinePosition.Index, displayContext.LineBuffer.LineCount - 1);
+			int lineIndex =
+				bufferPosition.LinePosition.GetLineIndex(displayContext.LineBuffer);
 
 			// Pull out some of the common things we'll be using in this method.
 			int bufferLineIndex = buffer.LineBuffer.NormalizeLineIndex(lineIndex);

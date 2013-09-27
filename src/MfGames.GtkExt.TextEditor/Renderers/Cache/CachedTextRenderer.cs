@@ -437,6 +437,12 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		/// <returns></returns>
 		private CachedLine GetCachedLine(int lineIndex)
 		{
+			if (lineIndex >= lines.Count)
+			{
+				return new CachedLine();
+			}
+
+			// Pull out the cached line.
 			CachedLine cachedLine = lines[lineIndex];
 			cachedLine.Cache(EditorViewRenderer, lineIndex);
 			return cachedLine;

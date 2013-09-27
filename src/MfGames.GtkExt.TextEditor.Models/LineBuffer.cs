@@ -208,14 +208,16 @@ namespace MfGames.GtkExt.TextEditor.Models
 
 		public string GetLineText(LinePosition line)
 		{
-			return GetLineText(line.Index, LineContexts.Unformatted);
+			int lineIndex = line.GetLineIndex(this);
+			return GetLineText(lineIndex, LineContexts.Unformatted);
 		}
 
 		public string GetLineText(
 			LinePosition line,
 			LineContexts lineContexts)
 		{
-			string results = GetLineText((int) line, lineContexts);
+			int lineIndex = line.GetLineIndex(this);
+			string results = GetLineText(lineIndex, lineContexts);
 			return results;
 		}
 
@@ -248,7 +250,8 @@ namespace MfGames.GtkExt.TextEditor.Models
 			TextPosition bufferPosition,
 			string text)
 		{
-			return Do(new InsertTextOperation(bufferPosition, text));
+			var operation = new InsertTextOperation(bufferPosition, text);
+			return Do(operation);
 		}
 
 		/// <summary>

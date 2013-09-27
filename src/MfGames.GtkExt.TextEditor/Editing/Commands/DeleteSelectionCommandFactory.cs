@@ -6,6 +6,7 @@ using MfGames.Commands;
 using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.TextEditor.Interfaces;
 using MfGames.GtkExt.TextEditor.Models;
+using MfGames.GtkExt.TextEditor.Models.Extensions;
 using MfGames.HierarchicalPaths;
 
 namespace MfGames.GtkExt.TextEditor.Editing.Commands
@@ -83,13 +84,17 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 				compositeCommand.Commands.Add(secondLineCommand);
 
 				// Delete all the lines between the two.
-				// TODO FIx this
-				for (int line = selection.BeginLinePosition.Index + 1;
-					line <= selection.EndLinePosition;
-					line++)
+				int startLineIndex =
+					selection.FirstLinePosition.GetLineIndex(displayContext.LineBuffer);
+				int endLineIndex =
+					selection.LastLinePosition.GetLineIndex(displayContext.LineBuffer);
+
+				for (int lineIndex = endLineIndex;
+					lineIndex > startLineIndex;
+					lineIndex--)
 				{
 					IDeleteLineCommand<OperationContext> deleteLineCommand =
-						controller.CommandController.CreateDeleteLineCommand(line);
+						controller.CommandController.CreateDeleteLineCommand(lineIndex);
 					compositeCommand.Commands.Add(deleteLineCommand);
 				}
 

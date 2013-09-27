@@ -116,8 +116,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 
 			// Calculate the character position, but we have to map UTF-8
 			// characters because Pango uses that instead of C# strings.
-			string lineText =
-				controller.DisplayContext.LineBuffer.GetLineText(lineIndex);
+			string lineText = controller.DisplayContext.LineBuffer.GetLineText(lineIndex);
 			unicodeIndex = NormalizeEmptyStrings(lineText, unicodeIndex);
 			int characterIndex = PangoUtility.TranslatePangoToStringIndex(
 				lineText, unicodeIndex);
@@ -236,8 +235,9 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			TextPosition position = displayContext.Caret.Position;
 			LinePosition linePosition = position.LinePosition;
 			CharacterPosition characterPosition = position.CharacterPosition;
+			int characterIndex = position.GetCharacterIndex(lineBuffer);
 
-			if (characterPosition == CharacterPosition.Begin)
+			if (characterIndex == 0)
 			{
 				if (linePosition.Index > 0)
 				{
@@ -249,7 +249,6 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			{
 				// We have to resolve the character index before we calculate
 				// the position since it may be symbolic.
-				int characterIndex = position.GetCharacterIndex(lineBuffer);
 				characterPosition = new CharacterPosition(characterIndex - 1);
 			}
 
@@ -765,8 +764,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 
 			// Calculate the character position, but we have to map UTF-8
 			// characters because Pango uses that instead of C# strings.
-			string lineText =
-				controller.DisplayContext.LineBuffer.GetLineText(lineIndex);
+			string lineText = controller.DisplayContext.LineBuffer.GetLineText(lineIndex);
 			unicodeIndex = NormalizeEmptyStrings(lineText, unicodeIndex);
 			int characterIndex = PangoUtility.TranslateStringToPangoIndex(
 				lineText, unicodeIndex);

@@ -25,7 +25,7 @@ namespace MfGames.GtkExt.TextEditor.Editing
 		/// <value>The buffer position.</value>
 		public TextPosition Position
 		{
-			[DebuggerStepThrough] get { return Selection.LastTextPosition; }
+			[DebuggerStepThrough] get { return Selection.EndTextPosition; }
 
 			[DebuggerStepThrough] set { Selection = new TextRange(value, value); }
 		}

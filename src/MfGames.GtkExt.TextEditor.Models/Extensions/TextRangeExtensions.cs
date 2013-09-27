@@ -17,12 +17,29 @@ namespace MfGames.GtkExt.TextEditor.Models.Extensions
 			out CharacterPosition beginCharacterPosition,
 			out CharacterPosition endCharacterPosition)
 		{
+			// If this is a single line, short cut the processing.
+			TextPosition firstTextPosition = textRange.FirstTextPosition;
+			TextPosition lastTextPosition = textRange.LastTextPosition;
+
+			int firstLineIndex = firstTextPosition.LinePosition.GetLineIndex(lineBuffer);
+
+			if (textRange.IsSameLine)
+			{
+				if (firstLineIndex == lineIndex)
+				{
+					beginCharacterPosition = firstTextPosition.CharacterPosition;
+					endCharacterPosition = lastTextPosition.CharacterPosition;
+					return true;
+				}
+
+				beginCharacterPosition = CharacterPosition.Begin;
+				endCharacterPosition = CharacterPosition.End;
+				return false;
+			}
+
 			// Figure out the line range index and see if the given line is with
 			// the range.
-			int firstLineIndex =
-				textRange.FirstTextPosition.LinePosition.GetLineIndex(lineBuffer);
-			int lastLineIndex =
-				textRange.EndTextPosition.LinePosition.GetLineIndex(lineBuffer);
+			int lastLineIndex = lastTextPosition.LinePosition.GetLineIndex(lineBuffer);
 
 			if (lineIndex < firstLineIndex
 				|| lineIndex > lastLineIndex)
@@ -35,8 +52,8 @@ namespace MfGames.GtkExt.TextEditor.Models.Extensions
 			// If the line is the same, we just use the same line.
 			if (firstLineIndex == lastLineIndex)
 			{
-				beginCharacterPosition = textRange.FirstTextPosition.CharacterPosition;
-				endCharacterPosition = textRange.LastTextPosition.CharacterPosition;
+				beginCharacterPosition = firstTextPosition.CharacterPosition;
+				endCharacterPosition = lastTextPosition.CharacterPosition;
 				return true;
 			}
 
@@ -44,7 +61,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Extensions
 			// then it is everything to the right of the starting.
 			if (firstLineIndex == lineIndex)
 			{
-				beginCharacterPosition = textRange.FirstTextPosition.CharacterPosition;
+				beginCharacterPosition = firstTextPosition.CharacterPosition;
 				endCharacterPosition = CharacterPosition.End;
 				return true;
 			}
@@ -53,7 +70,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Extensions
 			if (lastLineIndex == lineIndex)
 			{
 				beginCharacterPosition = CharacterPosition.Begin;
-				endCharacterPosition = textRange.LastTextPosition.CharacterPosition;
+				endCharacterPosition = lastTextPosition.CharacterPosition;
 				return true;
 			}
 
