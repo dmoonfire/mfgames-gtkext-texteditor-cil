@@ -237,10 +237,11 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			// add in an extra " " so GetCharacterIndex can handle end of file
 			// lengths.
 			string plainText = GetText(pangoMarkup) + " ";
-			int firstCharacterIndex =
-				characters.FirstCharacterPosition.GetCharacterIndex(plainText);
-			int lastCharacterIndex =
-				characters.LastCharacterPosition.GetCharacterIndex(plainText);
+			int firstCharacterIndex;
+			int lastCharacterIndex;
+
+			characters.GetFirstAndLastCharacterIndices(
+				plainText, out firstCharacterIndex, out lastCharacterIndex);
 
 			// Because of how the loop works, we have to set the startIndex to
 			// a sane default and only check to see if we found the endIndex.

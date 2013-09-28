@@ -49,17 +49,21 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 			var buffer = new StringBuilder(lineText);
 
 			// Normalize the character ranges.
-			startCharacterIndex =
-				TextRange.BeginCharacterPosition.GetCharacterIndex(
-					lineText, TextRange.EndCharacterPosition, WordSearchDirection.Left);
-			int endCharacterIndex =
-				TextRange.EndCharacterPosition.GetCharacterIndex(
-					lineText, TextRange.BeginCharacterPosition, WordSearchDirection.Right);
-			int length = endCharacterIndex - startCharacterIndex;
+			int firstCharacterIndex;
+			int lastCharacterIndex;
+			int endCharacterIndex;
 
-			originalText = lineText.Substring(startCharacterIndex, length);
+			TextRange.GetFirstAndLastCharacterIndices(
+				lineText, out firstCharacterIndex, out lastCharacterIndex);
+			TextRange.GetBeginAndEndCharacterIndices(
+				lineText, out beginCharacterIndex, out endCharacterIndex);
 
-			buffer.Remove(startCharacterIndex, length);
+			int length = lastCharacterIndex - firstCharacterIndex;
+
+			// Remove the text from the string, but save it so we can restore it.
+			originalText = lineText.Substring(firstCharacterIndex, length);
+
+			buffer.Remove(firstCharacterIndex, length);
 
 			// Set the line in the buffer.
 			lineText = buffer.ToString();
@@ -68,8 +72,11 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 			// If we are updating the position, we need to do it here.
 			if (UpdateTextPosition.HasFlag(DoTypes.Do))
 			{
+				var firstCharacterPosition = new CharacterPosition(firstCharacterIndex);
+				var firstTextPosition = new TextPosition(
+					TextRange.LinePosition, firstCharacterPosition);
 				originalPosition = state.Position;
-				state.Results = new LineBufferOperationResults(TextRange.BeginTextPosition);
+				state.Results = new LineBufferOperationResults(firstTextPosition);
 			}
 		}
 
@@ -88,7 +95,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 			var buffer = new StringBuilder(lineText);
 
 			// Normalize the character ranges.
-			buffer.Insert(startCharacterIndex, originalText);
+			buffer.Insert(beginCharacterIndex, originalText);
 
 			// Set the line in the buffer.
 			lineText = buffer.ToString();
@@ -137,9 +144,10 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 
 		#region Fields
 
+		private int beginCharacterIndex;
+
 		private TextPosition originalPosition;
 		private string originalText;
-		private int startCharacterIndex;
 
 		#endregion
 	}
