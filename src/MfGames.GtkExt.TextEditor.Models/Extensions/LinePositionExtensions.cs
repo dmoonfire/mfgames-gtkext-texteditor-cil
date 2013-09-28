@@ -12,9 +12,10 @@ namespace MfGames.GtkExt.TextEditor.Models.Extensions
 
 		public static int GetLineIndex(
 			this LinePosition linePosition,
-			LineBuffer lineBuffer)
+			LineBuffer lineBuffer,
+			LinePositionOptions options = LinePositionOptions.None)
 		{
-			int lineIndex = linePosition.GetLineIndex(lineBuffer.LineCount);
+			int lineIndex = linePosition.GetLineIndex(lineBuffer.LineCount, options);
 			return lineIndex;
 		}
 

@@ -417,9 +417,11 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		private void ClearCacheLines(TextRange selection)
 		{
 			LinePosition firstLinePosition = selection.FirstLinePosition;
-			int firstLineIndex = firstLinePosition.GetLineIndex(LineBuffer);
+			int firstLineIndex = firstLinePosition.GetLineIndex(
+				LineBuffer, LinePositionOptions.NoBoundsChecking);
 			LinePosition lastLinePosition = selection.LastLinePosition;
-			int lastLineIndex = lastLinePosition.GetLineIndex(LineBuffer);
+			int lastLineIndex = lastLinePosition.GetLineIndex(
+				LineBuffer, LinePositionOptions.NoBoundsChecking);
 
 			for (int lineIndex = firstLineIndex;
 				lineIndex <= lastLineIndex;
