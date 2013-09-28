@@ -2,7 +2,6 @@
 // Released under the MIT license
 // http://mfgames.com/mfgames-gtkext-cil/license
 
-using System.Collections.Generic;
 using MfGames.Commands;
 using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.TextEditor.Interfaces;
@@ -45,53 +44,32 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 			TextPosition position)
 		{
 			// If we don't have a selection, this is a simple insert command.
-			var commands = new List<IUndoableCommand<OperationContext>>();
 			TextPosition bufferPosition = displayContext.Caret.Position;
+			TextRange selection = displayContext.Caret.Selection;
 
-			if (!displayContext.Caret.Selection.IsEmpty)
+			if (!selection.IsEmpty)
 			{
-				// We are going to be deleting, so we have a modified buffer position.
-				bufferPosition = displayContext.Caret.Selection.BeginTextPosition;
-
-				// Create and add the delete command.
+				// Create and execute the delete command. We do this separately
+				// so they show up as a different undo item.
 				IUndoableCommand<OperationContext> deleteCommand =
 					DeleteSelectionCommandFactory.CreateCommand(controller, displayContext);
-				commands.Add(deleteCommand);
+
+				controller.CommandController.Do(deleteCommand, operationContext);
+
+				// We have to reset the position so the insert happens as if
+				// the text doesn't exist.
+				bufferPosition = selection.FirstTextPosition;
+				operationContext = new OperationContext(
+					operationContext.LineBuffer, bufferPosition);
 			}
 
 			// Create the insert command using the (potentially) modified selection.
 			string text = commandData.ToString();
 			IInsertTextCommand<OperationContext> insertCommand =
-				controller.CommandController.CreateInsertTextCommand(
-					new TextPosition(
-						bufferPosition.LinePosition, bufferPosition.CharacterPosition),
-					text);
+				controller.CommandController.CreateInsertTextCommand(bufferPosition, text);
 			insertCommand.UpdateTextPosition = DoTypes.All;
-			commands.Add(insertCommand);
 
-			// Figure out if we have a single command or more than one.
-			IUndoableCommand<OperationContext> doCommand;
-
-			if (commands.Count == 1)
-			{
-				doCommand = commands[0];
-			}
-			else
-			{
-				// We need a composite command for this operation.
-				var composite = new CompositeCommand<OperationContext>();
-
-				foreach (IUndoableCommand<OperationContext> command in commands)
-				{
-					composite.Commands.Add(command);
-				}
-
-				// Submit the composite command.
-				doCommand = composite;
-			}
-
-			// Execute the command.
-			controller.CommandController.Do(doCommand, operationContext);
+			controller.CommandController.Do(insertCommand, operationContext);
 
 			// If we have a text position, we need to set it.
 			if (operationContext.Results.HasValue)

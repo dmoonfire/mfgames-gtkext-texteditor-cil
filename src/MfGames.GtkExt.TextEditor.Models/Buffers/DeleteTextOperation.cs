@@ -51,12 +51,10 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 			// Normalize the character ranges.
 			int firstCharacterIndex;
 			int lastCharacterIndex;
-			int endCharacterIndex;
 
 			TextRange.GetFirstAndLastCharacterIndices(
 				lineText, out firstCharacterIndex, out lastCharacterIndex);
-			TextRange.GetBeginAndEndCharacterIndices(
-				lineText, out beginCharacterIndex, out endCharacterIndex);
+			beginCharacterIndex = firstCharacterIndex;
 
 			int length = lastCharacterIndex - firstCharacterIndex;
 
