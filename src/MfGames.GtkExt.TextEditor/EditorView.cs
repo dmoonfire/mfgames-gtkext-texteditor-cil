@@ -421,6 +421,12 @@ namespace MfGames.GtkExt.TextEditor
 		/// <returns></returns>
 		protected override bool OnButtonReleaseEvent(EventButton buttonEvent)
 		{
+			// Make sure we have the focus.
+			if (!HasFocus)
+			{
+				GrabFocus();
+			}
+
 			// Wrap the event in various objects and pass it into the controller.
 			var point = new PointD(buttonEvent.X, buttonEvent.Y);
 
