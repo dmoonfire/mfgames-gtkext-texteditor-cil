@@ -71,7 +71,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 			}
 			else
 			{
-				textPosition = displayContext.Caret.Selection.BeginTextPosition;
+				textPosition = displayContext.Caret.Selection.FirstTextPosition;
 			}
 
 			// Create the paste command for the text.
