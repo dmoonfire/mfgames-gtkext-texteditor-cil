@@ -51,10 +51,16 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 
 			// Save the source text length so we can delete it.
 			originalCharacterIndex = characterIndex;
+			originalPosition = state.Position;
 
 			// Set the line in the buffer.
+			var characterPosition = new CharacterPosition(characterIndex);
+			var bufferPosition = new TextPosition(
+				DestinationPosition.LinePosition, characterPosition);
+
 			destinationLine = buffer.ToString();
 			state.LineBuffer.SetText(DestinationPosition.LinePosition, destinationLine);
+			state.Results = new LineBufferOperationResults(bufferPosition);
 		}
 
 		public override void Redo(OperationContext state)
@@ -80,9 +86,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 			// If we are updating the position, we need to do it here.
 			if (UpdateTextPosition.HasFlag(DoTypes.Undo))
 			{
-				state.Results =
-					new LineBufferOperationResults(
-						new TextPosition(DestinationPosition.LinePosition, originalCharacterIndex));
+				state.Results = new LineBufferOperationResults(originalPosition);
 			}
 		}
 
@@ -103,6 +107,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 		#region Fields
 
 		private int originalCharacterIndex;
+		private TextPosition originalPosition;
 		private int sourceLength;
 
 		#endregion
