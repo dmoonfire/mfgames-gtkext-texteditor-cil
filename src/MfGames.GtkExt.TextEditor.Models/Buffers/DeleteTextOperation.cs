@@ -2,7 +2,6 @@
 // Released under the MIT license
 // http://mfgames.com/mfgames-gtkext-cil/license
 
-using System;
 using System.Diagnostics;
 using System.Text;
 using MfGames.Commands;
@@ -22,18 +21,6 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 		#region Properties
 
 		/// <summary>
-		/// Gets or sets the character range to delete.
-		/// </summary>
-		/// <value>The character range.</value>
-		public CharacterRange CharacterRange { get; set; }
-
-		/// <summary>
-		/// Gets or sets the index of the line.
-		/// </summary>
-		/// <value>The index of the line.</value>
-		public int LineIndex { get; set; }
-
-		/// <summary>
 		/// Gets the type of the operation representing this object.
 		/// </summary>
 		/// <value>The type of the operation.</value>
@@ -42,6 +29,12 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 			[DebuggerStepThrough] get { return LineBufferOperationType.DeleteText; }
 		}
 
+		/// <summary>
+		/// Gets or sets the character range to delete.
+		/// </summary>
+		/// <value>The character range.</value>
+		public SingleLineTextRange TextRange { get; set; }
+
 		#endregion
 
 		#region Methods
@@ -49,34 +42,39 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 		public override void Do(OperationContext state)
 		{
 			// Grab the line from the line buffer.
+			int lineIndex =
+				TextRange.LinePosition.GetLineIndex(state.LineBuffer.LineCount);
 			string lineText = state.LineBuffer.GetLineText(
-				LineIndex, LineContexts.Unformatted);
+				lineIndex, LineContexts.Unformatted);
 			var buffer = new StringBuilder(lineText);
 
 			// Normalize the character ranges.
-			startCharacterIndex =
-				new CharacterPosition(CharacterRange.StartIndex).NormalizeIndex(
-					lineText, CharacterRange.EndIndex, WordSearchDirection.Left);
-			int endCharacterIndex =
-				new CharacterPosition(CharacterRange.EndIndex).NormalizeIndex(
-					lineText, CharacterRange.StartIndex, WordSearchDirection.Right);
-			int length = endCharacterIndex - startCharacterIndex;
+			int firstCharacterIndex;
+			int lastCharacterIndex;
 
-			originalText = lineText.Substring(startCharacterIndex, length);
+			TextRange.GetFirstAndLastCharacterIndices(
+				lineText, out firstCharacterIndex, out lastCharacterIndex);
+			beginCharacterIndex = firstCharacterIndex;
 
-			buffer.Remove(startCharacterIndex, length);
+			int length = lastCharacterIndex - firstCharacterIndex;
+
+			// Remove the text from the string, but save it so we can restore it.
+			originalText = lineText.Substring(firstCharacterIndex, length);
+
+			buffer.Remove(firstCharacterIndex, length);
 
 			// Set the line in the buffer.
 			lineText = buffer.ToString();
-			state.LineBuffer.SetText(LineIndex, lineText);
+			state.LineBuffer.SetText(lineIndex, lineText);
 
 			// If we are updating the position, we need to do it here.
 			if (UpdateTextPosition.HasFlag(DoTypes.Do))
 			{
+				var firstCharacterPosition = new CharacterPosition(firstCharacterIndex);
+				var firstTextPosition = new TextPosition(
+					TextRange.LinePosition, firstCharacterPosition);
 				originalPosition = state.Position;
-				state.Results =
-					new LineBufferOperationResults(
-						new BufferPosition(LineIndex, startCharacterIndex));
+				state.Results = new LineBufferOperationResults(firstTextPosition);
 			}
 		}
 
@@ -88,24 +86,27 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 		public override void Undo(OperationContext state)
 		{
 			// Grab the line from the line buffer.
+			int lineIndex =
+				TextRange.LinePosition.GetLineIndex(state.LineBuffer.LineCount);
 			string lineText = state.LineBuffer.GetLineText(
-				LineIndex, LineContexts.Unformatted);
+				lineIndex, LineContexts.Unformatted);
 			var buffer = new StringBuilder(lineText);
 
 			// Normalize the character ranges.
-			buffer.Insert(startCharacterIndex, originalText);
+			buffer.Insert(beginCharacterIndex, originalText);
 
 			// Set the line in the buffer.
 			lineText = buffer.ToString();
-			state.LineBuffer.SetText(LineIndex, lineText);
+			state.LineBuffer.SetText(lineIndex, lineText);
 
 			// If we are updating the position, we need to do it here.
 			if (UpdateTextPosition.HasFlag(DoTypes.Undo))
 			{
 				state.Results =
 					new LineBufferOperationResults(
-						new BufferPosition(
-							originalPosition.Line.Index, originalPosition.Character.Index));
+						new TextPosition(
+							originalPosition.LinePosition.Index,
+							originalPosition.CharacterPosition.Index));
 			}
 		}
 
@@ -123,50 +124,28 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 			int lineIndex,
 			int startCharacterIndex,
 			int endCharacterIndex)
-			: this(lineIndex, new CharacterRange(startCharacterIndex, endCharacterIndex))
+			: this(
+				new SingleLineTextRange(lineIndex, startCharacterIndex, endCharacterIndex))
 		{
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="DeleteTextOperation"/> class.
+		/// Initializes a new instance of the <see cref="DeleteTextOperation" /> class.
 		/// </summary>
-		/// <param name="lineIndex">Index of the line.</param>
 		/// <param name="characterRange">The character range.</param>
-		public DeleteTextOperation(
-			int lineIndex,
-			CharacterRange characterRange)
+		public DeleteTextOperation(SingleLineTextRange characterRange)
 		{
-			if (lineIndex < 0)
-			{
-				throw new ArgumentOutOfRangeException(
-					"lineIndex", "Line index cannot be negative.");
-			}
-
-			LineIndex = lineIndex;
-			CharacterRange = characterRange;
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="DeleteTextOperation"/> class.
-		/// </summary>
-		/// <param name="bufferPosition">The buffer position.</param>
-		/// <param name="length">The length.</param>
-		public DeleteTextOperation(
-			BufferPosition bufferPosition,
-			int length)
-		{
-			LineIndex = bufferPosition.LineIndex;
-			CharacterRange = CharacterRange.FromLength(
-				bufferPosition.CharacterIndex, length);
+			TextRange = characterRange;
 		}
 
 		#endregion
 
 		#region Fields
 
+		private int beginCharacterIndex;
+
 		private TextPosition originalPosition;
 		private string originalText;
-		private int startCharacterIndex;
 
 		#endregion
 	}

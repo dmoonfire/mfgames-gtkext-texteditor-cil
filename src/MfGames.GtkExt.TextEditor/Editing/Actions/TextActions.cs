@@ -5,10 +5,12 @@
 using System.Text;
 using Gdk;
 using MfGames.Commands;
+using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.TextEditor.Editing.Commands;
 using MfGames.GtkExt.TextEditor.Interfaces;
 using MfGames.GtkExt.TextEditor.Models;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
+using MfGames.GtkExt.TextEditor.Models.Extensions;
 
 namespace MfGames.GtkExt.TextEditor.Editing.Actions
 {
@@ -33,7 +35,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 		{
 			// If we don't have anything selected, we don't do anything.
 			IDisplayContext displayContext = controller.DisplayContext;
-			BufferSegment selection = displayContext.Caret.Selection;
+			TextRange selection = displayContext.Caret.Selection;
 
 			if (selection.IsEmpty)
 			{
@@ -44,19 +46,20 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			// copy.
 			LineBuffer lineBuffer = displayContext.LineBuffer;
 
-			int endLineIndex =
-				lineBuffer.NormalizeLineIndex(selection.EndPosition.LineIndex);
+			int startLineIndex = selection.FirstLinePosition.GetLineIndex(lineBuffer);
+			int endLineIndex = selection.LastLinePosition.GetLineIndex(lineBuffer);
 			string firstLine = lineBuffer.GetLineText(
-				selection.StartPosition.LineIndex, LineContexts.Unformatted);
+				selection.FirstLinePosition, LineContexts.Unformatted);
 
-			if (endLineIndex == selection.StartPosition.LineIndex)
+			if (endLineIndex == startLineIndex)
 			{
 				// Single-line copy is much easier since we just need a substring.
-				string singleLineText =
-					firstLine.Substring(
-						selection.StartPosition.CharacterIndex,
-						selection.EndPosition.CharacterIndex
-							- selection.StartPosition.CharacterIndex);
+				int startCharacterIndex =
+					selection.FirstTextPosition.GetCharacterIndex(lineBuffer);
+				int endCharacterIndex =
+					selection.FirstTextPosition.GetCharacterIndex(lineBuffer);
+				string singleLineText = firstLine.Substring(
+					startCharacterIndex, endCharacterIndex - startCharacterIndex);
 
 				// Set the clipboard's text and return.
 				displayContext.Clipboard.Text = singleLineText;
@@ -66,12 +69,14 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 			// For multiple line copies, we need to copy every line from the first
 			// to the last. We already have the first, so just copy that.
 			var buffer = new StringBuilder();
-			buffer.Append(firstLine.Substring(selection.StartPosition.CharacterIndex));
+			int firstLineIndex =
+				selection.FirstTextPosition.CharacterPosition.GetCharacterIndex(firstLine);
+			buffer.Append(firstLine.Substring(firstLineIndex));
 			buffer.Append("\n");
 
 			// Loop through the second to just shy of the last line, adding
 			// each one as a full line.
-			for (int lineIndex = selection.StartPosition.LineIndex + 1;
+			for (int lineIndex = startLineIndex + 1;
 				lineIndex < endLineIndex;
 				lineIndex++)
 			{
@@ -81,9 +86,11 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 
 			// Add the last line, which is a substring, but we don't add a
 			// newline to the end of this one.
-			buffer.Append(
-				lineBuffer.GetLineText(endLineIndex, LineContexts.Unformatted)
-				          .Substring(0, selection.EndPosition.CharacterIndex));
+			string lastLineText = lineBuffer.GetLineText(
+				endLineIndex, LineContexts.Unformatted);
+			int lastCharacterIndex =
+				selection.EndCharacterPosition.GetCharacterIndex(lastLineText);
+			buffer.Append(lastLineText.Substring(0, lastCharacterIndex));
 
 			// Set the clipboard value.
 			displayContext.Clipboard.Text = buffer.ToString();
@@ -99,7 +106,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 		{
 			// If we don't have anything selected, we don't do anything.
 			IDisplayContext displayContext = controller.DisplayContext;
-			BufferSegment selection = displayContext.Caret.Selection;
+			TextRange selection = displayContext.Caret.Selection;
 
 			if (selection.IsEmpty)
 			{

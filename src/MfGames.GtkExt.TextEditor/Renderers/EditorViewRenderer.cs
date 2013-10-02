@@ -3,9 +3,11 @@
 // http://mfgames.com/mfgames-gtkext-cil/license
 
 using System;
+using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.TextEditor.Interfaces;
 using MfGames.GtkExt.TextEditor.Models;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
+using MfGames.GtkExt.TextEditor.Models.Extensions;
 using MfGames.GtkExt.TextEditor.Models.Styles;
 using Pango;
 using Rectangle = Cairo.Rectangle;
@@ -249,6 +251,15 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			return DisplayContext.Theme.LineStyles[styleName];
 		}
 
+		public LineBlockStyle GetLineStyle(
+			LinePosition linePosition,
+			LineContexts lineContexts = LineContexts.None)
+		{
+			int lineIndex = linePosition.GetLineIndex(LineBuffer);
+			LineBlockStyle results = GetLineStyle(lineIndex, lineContexts);
+			return results;
+		}
+
 		/// <summary>
 		/// Gets the Pango markup for a given line.
 		/// </summary>
@@ -263,16 +274,18 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			string markup = LineBuffer.GetLineMarkup(lineIndex, lineContexts);
 
 			// Check to see if we are in the selection.
-			int startCharacterIndex,
-				endCharacterIndex;
+			CharacterPosition beginCharacterPosition;
+			CharacterPosition endCharacterPosition;
 			bool containsLine = DisplayContext.Caret.Selection.ContainsLine(
-				lineIndex, out startCharacterIndex, out endCharacterIndex);
+				LineBuffer, lineIndex, out beginCharacterPosition, out endCharacterPosition);
 
 			if (containsLine)
 			{
 				// Apply the markup to the line.
-				return SelectionRenderer.GetSelectionMarkup(
-					markup, new CharacterRange(startCharacterIndex, endCharacterIndex));
+				var linePosition = new LinePosition(lineIndex);
+				var singleLineTextRange = new SingleLineTextRange(
+					linePosition, beginCharacterPosition, endCharacterPosition);
+				return SelectionRenderer.GetSelectionMarkup(markup, singleLineTextRange);
 			}
 
 			// Return the resulting markup.
@@ -366,7 +379,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// <param name="previousSelection">The previous selection.</param>
 		public virtual void UpdateSelection(
 			IDisplayContext displayContext,
-			BufferSegment previousSelection)
+			TextRange previousSelection)
 		{
 		}
 

@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.TextEditor.Models;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
 
@@ -197,7 +198,8 @@ namespace GtkExtDemo.TextEditor
 		{
 			LineBufferOperationResults results = base.Do(operation);
 
-			return CheckForStyleChanged((int) operation.BufferPosition.Line, results);
+			return CheckForStyleChanged(
+				(int) operation.TextPosition.LinePosition, results);
 		}
 
 		/// <summary>
@@ -212,7 +214,8 @@ namespace GtkExtDemo.TextEditor
 		{
 			LineBufferOperationResults results = base.Do(operation);
 
-			return CheckForStyleChanged(operation.LineIndex, results);
+			int lineIndex = operation.TextRange.FirstLinePosition.GetLineIndex(LineCount);
+			return CheckForStyleChanged(lineIndex, results);
 		}
 
 		/// <summary>
@@ -333,9 +336,10 @@ namespace GtkExtDemo.TextEditor
 			SetText(lineIndex, newLine);
 
 			// Adjust the buffer position and return it.
-			results.BufferPosition = new BufferPosition(
-				results.BufferPosition.LineIndex,
-				Math.Max(0, results.BufferPosition.CharacterIndex - difference));
+			int characterIndex =
+				results.TextPosition.CharacterPosition.GetCharacterIndex(newLine);
+			results.TextPosition = new TextPosition(
+				results.TextPosition.LinePosition, Math.Max(0, characterIndex - difference));
 
 			return results;
 		}

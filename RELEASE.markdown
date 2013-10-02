@@ -1,24 +1,12 @@
-Incremental release to improve performance and handling.
+Development to remove technical debt and artifacts associated with the migration to MfGames.Commands.
 
-# Signatures
+# Changes
 
-- Exposed the margin rendererer collection as a property. +Changed
-
-# Unicode
-
-- Additional work to handle Unicode characters with navigation and mouse clicking. +Changed
-- Moved the UTF-8 processing into MfGames.GtkExt
-
-# Improvements
-
-- Significantly improved performance with larger documents. +New
-- Up/Down key navigation now works with left padding of styles. +New
-- Added some locking around the cached renderer to allow it to handle getting events from other threads more gracefully, in specific the line changed events. +Changed
-- Added a background line cacher to speed up scrolling performance and line calculations. +New
-- If the popup menu callback removes all items, then the popup isn't shown. +Changed
-- If there is a selection while typing, the selection is replaced with text. +New
-- Some additional work on ensuring that changes to the GUI are done on the proper thread. +New
+- Removed legency references to BufferPosition and the integer-based system for MfGames.Commands.TextEditing LinePosition and CharacterPosition. +Changed
+- Various corrections to get `Select All`, copying, and pasting working properly. +Changed
+- Corrections to get the abstract text commands working with end of buffers and lines. +Changed
+- Added extension methods to wrap the GetCharacterIndex and GetLineIndex in LineBuffer-specific calls. +Changed
 
 # Dependencies
 
-- MfGames.GtkExt 0.2.0
+- MfGames.Command 0.2.0

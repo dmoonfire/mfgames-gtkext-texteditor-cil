@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
+using MfGames.GtkExt.TextEditor.Models.Extensions;
 
 namespace MfGames.GtkExt.TextEditor.Models
 {
@@ -62,45 +63,26 @@ namespace MfGames.GtkExt.TextEditor.Models
 			int count);
 
 		/// <summary>
-		/// Deletes the text from the buffer using a <see cref="DeleteTextOperation"/>.
+		/// Deletes the text from the buffer using a <see cref="DeleteTextOperation" />.
 		/// </summary>
-		/// <param name="lineIndex">Index of the line.</param>
-		/// <param name="startCharacterIndex">Start index of the character.</param>
-		/// <param name="endCharacterIndex">End index of the character.</param>
-		/// <returns></returns>
-		public LineBufferOperationResults DeleteText(
-			int lineIndex,
-			int startCharacterIndex,
-			int endCharacterIndex)
-		{
-			return DeleteText(
-				lineIndex, new CharacterRange(startCharacterIndex, endCharacterIndex));
-		}
-
-		/// <summary>
-		/// Deletes the text from the buffer using a <see cref="DeleteTextOperation"/>.
-		/// </summary>
-		/// <param name="bufferPosition">The buffer position.</param>
-		/// <param name="length">The length.</param>
-		/// <returns></returns>
-		public LineBufferOperationResults DeleteText(
-			BufferPosition bufferPosition,
-			int length)
-		{
-			return Do(new DeleteTextOperation(bufferPosition, length));
-		}
-
-		/// <summary>
-		/// Deletes the text from the buffer using a <see cref="DeleteTextOperation"/>.
-		/// </summary>
-		/// <param name="lineIndex">Index of the line.</param>
 		/// <param name="characterRange">The character range.</param>
 		/// <returns></returns>
 		public LineBufferOperationResults DeleteText(
-			int lineIndex,
-			CharacterRange characterRange)
+			SingleLineTextRange characterRange)
 		{
-			return Do(new DeleteTextOperation(lineIndex, characterRange));
+			return Do(new DeleteTextOperation(characterRange));
+		}
+
+		public LineBufferOperationResults DeleteText(
+			int lineIndex,
+			int beginCharacterIndex,
+			int endCharacterIndex)
+		{
+			var range = new SingleLineTextRange(
+				new LinePosition(lineIndex),
+				new CharacterPosition(beginCharacterIndex),
+				new CharacterPosition(endCharacterIndex));
+			return DeleteText(range);
 		}
 
 		/// <summary>
@@ -153,6 +135,15 @@ namespace MfGames.GtkExt.TextEditor.Models
 		public abstract int GetLineLength(
 			int lineIndex,
 			LineContexts lineContexts);
+
+		public int GetLineLength(
+			LinePosition linePosition,
+			LineContexts lineContexts = LineContexts.None)
+		{
+			int lineIndex = linePosition.GetLineIndex(this);
+			int results = GetLineLength(lineIndex, lineContexts);
+			return results;
+		}
 
 		/// <summary>
 		/// Gets the Pango markup for a given line.
@@ -217,14 +208,16 @@ namespace MfGames.GtkExt.TextEditor.Models
 
 		public string GetLineText(LinePosition line)
 		{
-			return GetLineText(line.Index, LineContexts.Unformatted);
+			int lineIndex = line.GetLineIndex(this);
+			return GetLineText(lineIndex, LineContexts.Unformatted);
 		}
 
 		public string GetLineText(
 			LinePosition line,
 			LineContexts lineContexts)
 		{
-			string results = GetLineText((int) line, lineContexts);
+			int lineIndex = line.GetLineIndex(this);
+			string results = GetLineText(lineIndex, lineContexts);
 			return results;
 		}
 
@@ -254,13 +247,11 @@ namespace MfGames.GtkExt.TextEditor.Models
 		/// <param name="bufferPosition">The buffer position.</param>
 		/// <param name="text">The text.</param>
 		public LineBufferOperationResults InsertText(
-			BufferPosition bufferPosition,
+			TextPosition bufferPosition,
 			string text)
 		{
-			return
-				Do(
-					new InsertTextOperation(
-						bufferPosition.LineIndex, bufferPosition.CharacterIndex, text));
+			var operation = new InsertTextOperation(bufferPosition, text);
+			return Do(operation);
 		}
 
 		/// <summary>
@@ -283,7 +274,8 @@ namespace MfGames.GtkExt.TextEditor.Models
 			int lineIndex,
 			string text)
 		{
-			return Do(new SetTextOperation(lineIndex, text));
+			var operation = new SetTextOperation(lineIndex, text);
+			return Do(operation);
 		}
 
 		public void SetText(

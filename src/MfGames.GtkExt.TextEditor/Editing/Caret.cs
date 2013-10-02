@@ -4,10 +4,9 @@
 
 using System.Diagnostics;
 using Cairo;
+using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.Extensions.Cairo;
 using MfGames.GtkExt.TextEditor.Interfaces;
-using MfGames.GtkExt.TextEditor.Models;
-using MfGames.GtkExt.TextEditor.Models.Buffers;
 using MfGames.GtkExt.TextEditor.Models.Styles;
 using MfGames.GtkExt.TextEditor.Renderers;
 
@@ -24,16 +23,20 @@ namespace MfGames.GtkExt.TextEditor.Editing
 		/// Gets or sets the buffer position of the caret.
 		/// </summary>
 		/// <value>The buffer position.</value>
-		public BufferPosition Position
+		public TextPosition Position
 		{
-			[DebuggerStepThrough] get { return Selection.TailPosition; }
+			[DebuggerStepThrough] get { return Selection.EndTextPosition; }
 
-			[DebuggerStepThrough]
-			set
-			{
-				Selection.TailPosition = value;
-				Selection.AnchorPosition = value;
-			}
+			[DebuggerStepThrough] set { Selection = new TextRange(value, value); }
+		}
+
+		/// <summary>
+		/// Contains the selection of the caret.
+		/// </summary>
+		public TextRange Selection
+		{
+			get { return selection; }
+			set { selection = value ?? TextRange.Empty; }
 		}
 
 		#endregion
@@ -96,7 +99,7 @@ namespace MfGames.GtkExt.TextEditor.Editing
 
 			// Shift the contents to compenstate for the margins.
 			LineBlockStyle style =
-				displayContext.Renderer.GetLineStyle(Position.LineIndex, LineContexts.None);
+				displayContext.Renderer.GetLineStyle(Position.LinePosition);
 
 			x += displayContext.TextX;
 			x += style.Left;
@@ -109,7 +112,7 @@ namespace MfGames.GtkExt.TextEditor.Editing
 		/// Sets the position and scroll to the new location.
 		/// </summary>
 		/// <param name="position">The position.</param>
-		public void SetAndScrollToPosition(BufferPosition position)
+		public void SetAndScrollToPosition(TextPosition position)
 		{
 			Position = position;
 			displayContext.ScrollToCaret(displayContext.Caret.Position);
@@ -127,18 +130,15 @@ namespace MfGames.GtkExt.TextEditor.Editing
 		public Caret(IDisplayContext displayContext)
 		{
 			this.displayContext = displayContext;
+			selection = TextRange.Empty;
 		}
 
 		#endregion
 
 		#region Fields
 
-		/// <summary>
-		/// Contains the selection of the caret.
-		/// </summary>
-		public BufferSegment Selection;
-
 		private readonly IDisplayContext displayContext;
+		private TextRange selection;
 
 		#endregion
 	}

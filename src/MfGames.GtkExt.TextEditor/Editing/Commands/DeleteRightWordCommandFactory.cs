@@ -41,13 +41,13 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 			OperationContext operationContext,
 			EditorViewController controller,
 			IDisplayContext displayContext,
-			BufferPosition position)
+			TextPosition position)
 		{
 			IDeleteTextCommand<OperationContext> deleteCommand =
 				controller.CommandController.CreateDeleteTextCommand(
 					new SingleLineTextRange(
-						displayContext.Caret.Position.LineIndex,
-						displayContext.Caret.Position.CharacterIndex,
+						displayContext.Caret.Position.LinePosition,
+						displayContext.Caret.Position.CharacterPosition,
 						CharacterPosition.Word));
 			deleteCommand.UpdateTextPosition = DoTypes.All;
 
@@ -58,7 +58,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 			if (operationContext.Results.HasValue)
 			{
 				displayContext.Caret.SetAndScrollToPosition(
-					operationContext.Results.Value.BufferPosition);
+					operationContext.Results.Value.TextPosition);
 			}
 		}
 

@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
 
 namespace MfGames.GtkExt.TextEditor.Models
@@ -48,7 +49,7 @@ namespace MfGames.GtkExt.TextEditor.Models
 			RaiseLinesDeleted(new LineRangeEventArgs(lineIndex, lineIndex + count - 1));
 
 			// Return the appropriate results.
-			return new LineBufferOperationResults(new BufferPosition(lineIndex, 0));
+			return new LineBufferOperationResults(new TextPosition(lineIndex, 0));
 		}
 
 		/// <summary>
@@ -75,16 +76,6 @@ namespace MfGames.GtkExt.TextEditor.Models
 			return (lineIndex + 1).ToString("N0");
 		}
 
-		/// <summary>
-		/// Gets the line without any manipulations.
-		/// </summary>
-		/// <param name="lineIndex">Index of the line.</param>
-		/// <returns></returns>
-		public string GetLineText(int lineIndex)
-		{
-			return lines[lineIndex];
-		}
-
 		public override string GetLineText(
 			int lineIndex,
 			LineContexts lineContexts)
@@ -109,8 +100,7 @@ namespace MfGames.GtkExt.TextEditor.Models
 			RaiseLinesInserted(new LineRangeEventArgs(lineIndex, lineIndex + count - 1));
 
 			// Return the appropriate results.
-			return
-				new LineBufferOperationResults(new BufferPosition(lineIndex + count, 0));
+			return new LineBufferOperationResults(new TextPosition(lineIndex + count, 0));
 		}
 
 		public override LineBufferOperationResults InsertText(
@@ -133,7 +123,7 @@ namespace MfGames.GtkExt.TextEditor.Models
 			// Return the appropriate results.
 			return
 				new LineBufferOperationResults(
-					new BufferPosition(lineIndex, characterIndex + text.Length));
+					new TextPosition(lineIndex, characterIndex + text.Length));
 		}
 
 		/// <summary>
@@ -170,14 +160,21 @@ namespace MfGames.GtkExt.TextEditor.Models
 			DeleteTextOperation operation)
 		{
 			// Get the text from the buffer, insert the text, and put it back.
-			int lineIndex = operation.LineIndex;
-			string line = lines[lineIndex];
-			int endCharacterIndex = Math.Min(
-				operation.CharacterRange.EndIndex, line.Length);
+			int lineIndex = operation.TextRange.LinePosition.GetLineIndex(lines.Count);
+			string lineText = lines[lineIndex];
+			int startCharacterIndex =
+				operation.TextRange.BeginCharacterPosition.GetCharacterIndex(
+					lineText,
+					operation.TextRange.EndCharacterPosition,
+					WordSearchDirection.Left);
+			int endCharacterIndex =
+				operation.TextRange.EndCharacterPosition.GetCharacterIndex(
+					lineText,
+					operation.TextRange.BeginCharacterPosition,
+					WordSearchDirection.Right);
 
-			string newLine = line.Remove(
-				operation.CharacterRange.StartIndex,
-				endCharacterIndex - operation.CharacterRange.StartIndex);
+			string newLine = lineText.Remove(
+				startCharacterIndex, endCharacterIndex - startCharacterIndex);
 
 			lines[lineIndex] = newLine;
 
@@ -185,9 +182,7 @@ namespace MfGames.GtkExt.TextEditor.Models
 			RaiseLineChanged(new LineChangedArgs(lineIndex));
 
 			// Return the appropriate results.
-			return
-				new LineBufferOperationResults(
-					new BufferPosition(lineIndex, operation.CharacterRange.StartIndex));
+			return new LineBufferOperationResults(operation.TextRange.BeginTextPosition);
 		}
 
 		/// <summary>
@@ -203,12 +198,14 @@ namespace MfGames.GtkExt.TextEditor.Models
 			lines[operation.LineIndex] = operation.Text;
 
 			// Fire a line changed operation.
-			RaiseLineChanged(new LineChangedArgs(operation.LineIndex));
+			var lineChangedArgs = new LineChangedArgs(operation.LineIndex);
+			RaiseLineChanged(lineChangedArgs);
 
 			// Return the appropriate results.
-			return
-				new LineBufferOperationResults(
-					new BufferPosition(operation.LineIndex, lines[operation.LineIndex].Length));
+			var bufferPosition = new TextPosition(
+				operation.LineIndex, CharacterPosition.End);
+			var results = new LineBufferOperationResults(bufferPosition);
+			return results;
 		}
 
 		/// <summary>

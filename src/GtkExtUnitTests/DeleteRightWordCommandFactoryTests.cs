@@ -4,6 +4,7 @@
 
 using Gtk;
 using MfGames.Commands;
+using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.TextEditor;
 using MfGames.GtkExt.TextEditor.Editing;
 using MfGames.GtkExt.TextEditor.Editing.Actions;
@@ -31,16 +32,16 @@ namespace UnitTests
 			var factory = new DeleteRightWordCommandFactory();
 			var reference = new CommandFactoryReference(factory.FactoryKey);
 
-			caret.Position = new BufferPosition(2, 9);
+			caret.Position = new TextPosition(2, 9);
 
 			// Act
 			factory.Do(controller, reference, controller.CommandFactory);
 
 			// Assert
 			Assert.AreEqual(
-				2, caret.Position.LineIndex, "Caret was on an unexpected line.");
+				2, caret.Position.LinePosition, "Caret was on an unexpected line.");
 			Assert.AreEqual(
-				9, caret.Position.CharacterIndex, "Caret was on an unexpected character.");
+				9, caret.Position.CharacterPosition, "Caret was on an unexpected character.");
 
 			Assert.AreEqual(3, lineBuffer.LineCount);
 			Assert.AreEqual(DefaultLine, lineBuffer.GetLineText(0));
@@ -61,7 +62,7 @@ namespace UnitTests
 			var undo = new UndoCommandFactory();
 			var reference = new CommandFactoryReference(factory.FactoryKey);
 
-			caret.Position = new BufferPosition(2, 9);
+			caret.Position = new TextPosition(2, 9);
 
 			factory.Do(controller, reference, controller.CommandFactory);
 
@@ -70,9 +71,9 @@ namespace UnitTests
 
 			// Assert
 			Assert.AreEqual(
-				2, caret.Position.LineIndex, "Caret was on an unexpected line.");
+				2, caret.Position.LinePosition, "Caret was on an unexpected line.");
 			Assert.AreEqual(
-				9, caret.Position.CharacterIndex, "Caret was on an unexpected character.");
+				9, caret.Position.CharacterPosition, "Caret was on an unexpected character.");
 
 			Assert.AreEqual(3, lineBuffer.LineCount);
 			Assert.AreEqual(DefaultLine, lineBuffer.GetLineText(0));

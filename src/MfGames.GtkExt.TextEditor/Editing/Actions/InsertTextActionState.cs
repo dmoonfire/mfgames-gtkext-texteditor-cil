@@ -2,9 +2,9 @@
 // Released under the MIT license
 // http://mfgames.com/mfgames-gtkext-cil/license
 
+using MfGames.Commands.TextEditing;
 using MfGames.Extensions.System.Collections.Generic;
 using MfGames.GtkExt.TextEditor.Interfaces;
-using MfGames.GtkExt.TextEditor.Models;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
 
 namespace MfGames.GtkExt.TextEditor.Editing.Actions
@@ -28,7 +28,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Actions
 		/// Gets or sets the end position.
 		/// </summary>
 		/// <value>The end position.</value>
-		public BufferPosition EndPosition
+		public TextPosition EndPosition
 		{
 			get { return Command.EndPosition; }
 			set { Command.EndPosition = value; }

@@ -292,7 +292,7 @@ namespace MfGames.GtkExt.TextEditor.Editing
 			// If we had a results, reset the buffer position.
 			if (results.HasValue)
 			{
-				command.EndPosition = results.Value.BufferPosition;
+				command.EndPosition = results.Value.TextPosition;
 			}
 
 			// Add the command to the manager.
@@ -310,7 +310,7 @@ namespace MfGames.GtkExt.TextEditor.Editing
 		/// <param name="bufferPosition">The buffer position.</param>
 		public void Do(
 			Command command,
-			BufferPosition bufferPosition)
+			TextPosition bufferPosition)
 		{
 			// Perform the commands.
 			Do(command);
@@ -366,7 +366,7 @@ namespace MfGames.GtkExt.TextEditor.Editing
 			if (isAction || isCharacter)
 			{
 				// Keep track of the original selection.
-				BufferSegment previousSelection = displayContext.Caret.Selection;
+				TextRange previousSelection = displayContext.Caret.Selection;
 
 				// Mark that we are starting a new action and fire events so
 				// other listeners and handle it.
@@ -425,11 +425,13 @@ namespace MfGames.GtkExt.TextEditor.Editing
 					var textPoint = new PointD(point.X - displayContext.TextX, point.Y);
 
 					// Get the previous selection.
-					BufferSegment previousSelection = displayContext.Caret.Selection;
+					TextRange previousSelection = displayContext.Caret.Selection;
 
 					// Set the tail of the anchor to the current mouse position.
-					displayContext.Caret.Selection.TailPosition =
-						MoveActions.GetBufferPosition(textPoint, this);
+					displayContext.Caret.Selection =
+						new TextRange(
+							displayContext.Caret.Selection.FirstTextPosition,
+							MoveActions.GetTextPosition(textPoint, this));
 
 					// Update the display.
 					displayContext.Renderer.UpdateSelection(displayContext, previousSelection);
@@ -485,7 +487,7 @@ namespace MfGames.GtkExt.TextEditor.Editing
 					// Grab the anchor position of the selection since that will
 					// remain the same after the command.
 					Caret caret = displayContext.Caret;
-					BufferSegment previousSelection = caret.Selection;
+					TextRange previousSelection = caret.Selection;
 
 					// Keep track of the selection so we can drag-select.
 					if (button == 1)
@@ -526,8 +528,10 @@ namespace MfGames.GtkExt.TextEditor.Editing
 					if ((modifier & ModifierType.ShiftMask) == ModifierType.ShiftMask)
 					{
 						// Restore the anchor position which will extend the selection back.
-						displayContext.Caret.Selection.AnchorPosition =
-							previousSelection.AnchorPosition;
+						displayContext.Caret.Selection =
+							new TextRange(
+								previousSelection.FirstTextPosition,
+								displayContext.Caret.Selection.LastTextPosition);
 
 						// Check to see if the selection changed.
 						if (previousSelection != displayContext.Caret.Selection)
@@ -587,7 +591,7 @@ namespace MfGames.GtkExt.TextEditor.Editing
 				if (point.X < displayContext.TextX)
 				{
 					// We didn't release in the text area.
-					BufferSegment currentSelection = displayContext.Caret.Selection;
+					TextRange currentSelection = displayContext.Caret.Selection;
 
 					displayContext.Caret.Selection = previousTextSelection;
 					displayContext.Renderer.UpdateSelection(displayContext, currentSelection);
@@ -691,7 +695,7 @@ namespace MfGames.GtkExt.TextEditor.Editing
 		private bool inAction;
 		private bool inTextSelect;
 		private readonly Dictionary<int, ActionEntry> keyBindings;
-		private BufferSegment previousTextSelection;
+		private TextRange previousTextSelection;
 		private readonly ActionStateCollection states;
 
 		#endregion

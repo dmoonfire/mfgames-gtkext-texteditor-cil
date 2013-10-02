@@ -25,11 +25,12 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 			// Figure out the indexes in the source line we'll be using to
 			// pull out a substring.
 			string sourceLine = state.LineBuffer.GetLineText(
-				SourceRange.Line, LineContexts.Unformatted);
-			int sourceBegin = SourceRange.CharacterBegin.NormalizeIndex(
-				sourceLine, SourceRange.CharacterEnd, WordSearchDirection.Left);
-			int sourceEnd = SourceRange.CharacterEnd.NormalizeIndex(
-				sourceLine, SourceRange.CharacterBegin, WordSearchDirection.Right);
+				SourceRange.LinePosition, LineContexts.Unformatted);
+			int sourceBegin =
+				SourceRange.BeginCharacterPosition.GetCharacterIndex(
+					sourceLine, SourceRange.EndCharacterPosition, WordSearchDirection.Left);
+			int sourceEnd = SourceRange.EndCharacterPosition.GetCharacterIndex(
+				sourceLine, SourceRange.BeginCharacterPosition, WordSearchDirection.Right);
 
 			// Grab the text from the source line. If the source begin is at the
 			// end of the string, then our source will always be a blank line.
@@ -41,19 +42,25 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 			// Insert the text from the source line into the destination.
 			string destinationLine =
 				state.LineBuffer.GetLineText(
-					DestinationPosition.Line, LineContexts.Unformatted);
+					DestinationPosition.LinePosition, LineContexts.Unformatted);
 			var buffer = new StringBuilder(destinationLine);
 			int characterIndex =
-				DestinationPosition.Character.NormalizeIndex(destinationLine);
+				DestinationPosition.CharacterPosition.GetCharacterIndex(destinationLine);
 
 			buffer.Insert(characterIndex, sourceText);
 
 			// Save the source text length so we can delete it.
 			originalCharacterIndex = characterIndex;
+			originalPosition = state.Position;
 
 			// Set the line in the buffer.
+			var characterPosition = new CharacterPosition(characterIndex);
+			var bufferPosition = new TextPosition(
+				DestinationPosition.LinePosition, characterPosition);
+
 			destinationLine = buffer.ToString();
-			state.LineBuffer.SetText(DestinationPosition.Line, destinationLine);
+			state.LineBuffer.SetText(DestinationPosition.LinePosition, destinationLine);
+			state.Results = new LineBufferOperationResults(bufferPosition);
 		}
 
 		public override void Redo(OperationContext state)
@@ -64,8 +71,9 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 		public override void Undo(OperationContext state)
 		{
 			// Grab the line from the line buffer.
-			string lineText = state.LineBuffer.GetLineText(
-				DestinationPosition.Line, LineContexts.Unformatted);
+			string lineText =
+				state.LineBuffer.GetLineText(
+					DestinationPosition.LinePosition, LineContexts.Unformatted);
 			var buffer = new StringBuilder(lineText);
 
 			// Normalize the character ranges.
@@ -73,14 +81,12 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 
 			// Set the line in the buffer.
 			lineText = buffer.ToString();
-			state.LineBuffer.SetText(DestinationPosition.Line, lineText);
+			state.LineBuffer.SetText(DestinationPosition.LinePosition, lineText);
 
 			// If we are updating the position, we need to do it here.
 			if (UpdateTextPosition.HasFlag(DoTypes.Undo))
 			{
-				state.Results =
-					new LineBufferOperationResults(
-						new BufferPosition(DestinationPosition.Line, originalCharacterIndex));
+				state.Results = new LineBufferOperationResults(originalPosition);
 			}
 		}
 
@@ -101,6 +107,7 @@ namespace MfGames.GtkExt.TextEditor.Models.Buffers
 		#region Fields
 
 		private int originalCharacterIndex;
+		private TextPosition originalPosition;
 		private int sourceLength;
 
 		#endregion

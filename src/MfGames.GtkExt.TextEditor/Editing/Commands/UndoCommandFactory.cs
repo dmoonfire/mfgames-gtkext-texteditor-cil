@@ -3,6 +3,7 @@
 // http://mfgames.com/mfgames-gtkext-cil/license
 
 using MfGames.Commands;
+using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.TextEditor.Interfaces;
 using MfGames.GtkExt.TextEditor.Models;
 using MfGames.HierarchicalPaths;
@@ -37,7 +38,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 			OperationContext operationContext,
 			EditorViewController controller,
 			IDisplayContext displayContext,
-			BufferPosition position)
+			TextPosition position)
 		{
 			if (controller.CommandController.CanUndo)
 			{
@@ -48,7 +49,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 				if (operationContext.Results.HasValue)
 				{
 					displayContext.Caret.SetAndScrollToPosition(
-						operationContext.Results.Value.BufferPosition);
+						operationContext.Results.Value.TextPosition);
 				}
 			}
 		}

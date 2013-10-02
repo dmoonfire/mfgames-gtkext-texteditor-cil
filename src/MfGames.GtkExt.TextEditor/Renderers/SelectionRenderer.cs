@@ -4,7 +4,7 @@
 
 using System;
 using System.Text;
-using MfGames.GtkExt.TextEditor.Models;
+using MfGames.Commands.TextEditing;
 
 namespace MfGames.GtkExt.TextEditor.Renderers
 {
@@ -24,7 +24,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// <returns>A Pango markup string with the selection applied.</returns>
 		public string GetSelectionMarkup(
 			string pangoMarkup,
-			CharacterRange characters)
+			SingleLineTextRange characters)
 		{
 			return GetSelectionMarkup(
 				pangoMarkup, characters, "span", " background='#CCCCFF'");
@@ -43,7 +43,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// </returns>
 		public string GetSelectionMarkup(
 			string markup,
-			CharacterRange characters,
+			SingleLineTextRange characters,
 			string selectionTag,
 			string selectionAttributes)
 		{
@@ -52,20 +52,6 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			{
 				// We can't really do anything with this.
 				return markup;
-			}
-
-			// If the selection covers the entire string, we have an optimized
-			// case and we can just return a selection that covers the entire
-			// string.
-			if (characters.StartIndex == 0
-				&& characters.EndIndex == markup.Length)
-			{
-				return string.Format(
-					"<{0}{1}>{2}</{3}>",
-					selectionTag,
-					selectionAttributes,
-					markup,
-					selectionTag);
 			}
 
 			// The primary concern for applying the selection is that we already
@@ -240,13 +226,23 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 		/// point the selection ends.</param>
 		private static void GetMarkupIndexes(
 			string pangoMarkup,
-			CharacterRange characters,
+			SingleLineTextRange characters,
 			out int startIndex,
 			out int endIndex,
 			out int leadingXmlDepth,
 			out int leadingXmlIndex,
 			out int trailingXmlDepth)
 		{
+			// Strip off the Pango formatting so we can calculate lengths. We
+			// add in an extra " " so GetCharacterIndex can handle end of file
+			// lengths.
+			string plainText = GetText(pangoMarkup) + " ";
+			int firstCharacterIndex;
+			int lastCharacterIndex;
+
+			characters.GetFirstAndLastCharacterIndices(
+				plainText, out firstCharacterIndex, out lastCharacterIndex);
+
 			// Because of how the loop works, we have to set the startIndex to
 			// a sane default and only check to see if we found the endIndex.
 			startIndex = -1;
@@ -255,7 +251,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 			leadingXmlIndex = -1;
 
 			// Check for the selection starting at the beginning.
-			if (characters.StartIndex == 0)
+			if (characters.FirstCharacterPosition == CharacterPosition.Begin)
 			{
 				startIndex = 0;
 			}
@@ -327,7 +323,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 								// We need to first check to see if we are at
 								// the selection point. If we are, then we want
 								// to start before we open a new tag.
-								if (characterIndex == characters.StartIndex)
+								if (characterIndex == firstCharacterIndex)
 								{
 									// Save the start index for the selection.
 									startIndex = markupIndexAnchor;
@@ -345,7 +341,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 									}
 								}
 							}
-							else if (characterIndex == characters.EndIndex)
+							else if (characterIndex == lastCharacterIndex)
 							{
 								// This is right before the selection ends.
 								// Since this is an opening tag, we want to
@@ -372,13 +368,13 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 
 				// Check to see if we have the start index.
 				if (startIndex == -1
-					&& characterIndex == characters.StartIndex)
+					&& characterIndex == firstCharacterIndex)
 				{
 					startIndex = markupIndexAnchor;
 				}
 
 				// Check to see if we are done processing.
-				if (characterIndex == characters.EndIndex)
+				if (characterIndex == lastCharacterIndex)
 				{
 					endIndex = markupIndexAnchor;
 					return;
@@ -484,6 +480,48 @@ namespace MfGames.GtkExt.TextEditor.Renderers
 				tags[depth] = tag;
 				depth++;
 			}
+		}
+
+		private static string GetText(string pangoMarkup)
+		{
+			// If we don't have markup, just return it.
+			if (!pangoMarkup.Contains("<"))
+			{
+				return pangoMarkup;
+			}
+
+			// Build up the string of the code without a markup.
+			var buffer = new StringBuilder();
+			bool inTag = false;
+
+			for (int i = 0;
+				i < pangoMarkup.Length;
+				i++)
+			{
+				char c = pangoMarkup[i];
+
+				if (c == '<')
+				{
+					inTag = true;
+					continue;
+				}
+
+				if (inTag)
+				{
+					if (c == '>')
+					{
+						inTag = false;
+					}
+
+					continue;
+				}
+
+				buffer.Append(c);
+			}
+
+			// Return the resulting string.
+			string results = buffer.ToString();
+			return results;
 		}
 
 		#endregion

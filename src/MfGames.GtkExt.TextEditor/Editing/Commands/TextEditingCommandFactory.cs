@@ -29,12 +29,13 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 			// Pull out some useful variables for processing.
 			var editViewController = (EditorViewController) context;
 			IDisplayContext displayContext = editViewController.DisplayContext;
-			BufferPosition position = displayContext.Caret.Position;
+			TextPosition position = displayContext.Caret.Position;
 
 			// Set up the operation context for this request.
-			var textPosition = new TextPosition(
-				displayContext.Caret.Position.LineIndex,
-				displayContext.Caret.Position.CharacterIndex);
+			var textPosition =
+				new TextPosition(
+					displayContext.Caret.Position.LinePosition,
+					displayContext.Caret.Position.CharacterPosition);
 			var operationContext = new OperationContext(
 				displayContext.LineBuffer, textPosition);
 
@@ -59,7 +60,7 @@ namespace MfGames.GtkExt.TextEditor.Editing.Commands
 			OperationContext operationContext,
 			EditorViewController editViewController,
 			IDisplayContext displayContext,
-			BufferPosition position);
+			TextPosition position);
 
 		#endregion
 	}

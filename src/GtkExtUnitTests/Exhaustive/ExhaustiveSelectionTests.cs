@@ -3,7 +3,7 @@
 // http://mfgames.com/mfgames-gtkext-cil/license
 
 using System;
-using MfGames.GtkExt.TextEditor.Models;
+using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.TextEditor.Renderers;
 using NUnit.Framework;
 
@@ -33,7 +33,7 @@ namespace MfGames.GtkExt.TextEditor.Tests
 		{
 			// Setup
 			var selectionRenderer = new SelectionRenderer();
-			var characters = new CharacterRange(startIndex, endIndex);
+			var characters = new SingleLineTextRange(0, startIndex, endIndex);
 
 			// Operation
 			string output = selectionRenderer.GetSelectionMarkup(

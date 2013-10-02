@@ -7,9 +7,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using Gtk;
+using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.TextEditor.Interfaces;
 using MfGames.GtkExt.TextEditor.Models;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
+using MfGames.GtkExt.TextEditor.Models.Extensions;
 using MfGames.GtkExt.TextEditor.Models.Styles;
 using MfGames.Locking;
 using Action = System.Action;
@@ -280,7 +282,7 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		/// <param name="previousSelection">The previous selection.</param>
 		public override void UpdateSelection(
 			IDisplayContext displayContext,
-			BufferSegment previousSelection)
+			TextRange previousSelection)
 		{
 			// Make sure we're on the proper thread.
 			CheckGuiThread();
@@ -291,38 +293,19 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			{
 				// Only update the caches if one of the current or previous
 				// selections was actually selecting something.
-				BufferSegment currentSelection = displayContext.Caret.Selection;
+				TextRange currentSelection = displayContext.Caret.Selection;
 
 				if (!previousSelection.IsEmpty
 					|| !currentSelection.IsEmpty)
 				{
-					// Clear out the cache for all the lines in the new and old selections.
-					int endLineIndex =
-						displayContext.LineBuffer.NormalizeLineIndex(
-							currentSelection.EndPosition.LineIndex);
-					int previousEndLineIndex =
-						displayContext.LineBuffer.NormalizeLineIndex(
-							previousSelection.EndPosition.LineIndex);
-
-					for (int lineIndex = currentSelection.StartPosition.LineIndex;
-						lineIndex <= endLineIndex;
-						lineIndex++)
-					{
-						CachedLine line = lines[lineIndex];
-						line.Reset();
-					}
-
-					for (int lineIndex = previousSelection.StartPosition.LineIndex;
-						lineIndex <= previousEndLineIndex;
-						lineIndex++)
-					{
-						CachedLine line = lines[lineIndex];
-						line.Reset();
-					}
+					// Clear out the cache for all the lines in the previous
+					// selected range.
+					ClearCacheLines(previousSelection);
+					ClearCacheLines(currentSelection);
 				}
 
 				// Call the base implementation.
-				// TODO base.UpdateSelection(displayContext, previousSelection);
+				base.UpdateSelection(displayContext, previousSelection);
 			}
 
 			// Process any queued changes.
@@ -431,6 +414,24 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 			lines.Clear();
 		}
 
+		private void ClearCacheLines(TextRange selection)
+		{
+			LinePosition firstLinePosition = selection.FirstLinePosition;
+			int firstLineIndex = firstLinePosition.GetLineIndex(
+				LineBuffer, LinePositionOptions.NoBoundsChecking);
+			LinePosition lastLinePosition = selection.LastLinePosition;
+			int lastLineIndex = lastLinePosition.GetLineIndex(
+				LineBuffer, LinePositionOptions.NoBoundsChecking);
+
+			for (int lineIndex = firstLineIndex;
+				lineIndex <= lastLineIndex;
+				lineIndex++)
+			{
+				CachedLine line = lines[lineIndex];
+				line.Reset();
+			}
+		}
+
 		/// <summary>
 		/// Gets the cached line and ensures it is populated.
 		/// </summary>
@@ -438,6 +439,12 @@ namespace MfGames.GtkExt.TextEditor.Renderers.Cache
 		/// <returns></returns>
 		private CachedLine GetCachedLine(int lineIndex)
 		{
+			if (lineIndex >= lines.Count)
+			{
+				return new CachedLine();
+			}
+
+			// Pull out the cached line.
 			CachedLine cachedLine = lines[lineIndex];
 			cachedLine.Cache(EditorViewRenderer, lineIndex);
 			return cachedLine;

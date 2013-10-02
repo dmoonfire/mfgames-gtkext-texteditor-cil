@@ -2,6 +2,7 @@
 // Released under the MIT license
 // http://mfgames.com/mfgames-gtkext-cil/license
 
+using MfGames.Commands.TextEditing;
 using MfGames.GtkExt.TextEditor.Editing;
 using MfGames.GtkExt.TextEditor.Editing.Commands;
 using MfGames.GtkExt.TextEditor.Interfaces;
@@ -38,7 +39,7 @@ namespace MfGames.Commands
 			OperationContext operationContext,
 			EditorViewController controller,
 			IDisplayContext displayContext,
-			BufferPosition position)
+			TextPosition position)
 		{
 			if (controller.CommandController.CanRedo)
 			{
@@ -48,8 +49,7 @@ namespace MfGames.Commands
 				// If we have a text position, we need to set it.
 				if (operationContext.Results.HasValue)
 				{
-					displayContext.Caret.Position =
-						operationContext.Results.Value.BufferPosition;
+					displayContext.Caret.Position = operationContext.Results.Value.TextPosition;
 				}
 			}
 		}

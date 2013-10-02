@@ -13,6 +13,7 @@ using MfGames.GtkExt.TextEditor.Editing;
 using MfGames.GtkExt.TextEditor.Events;
 using MfGames.GtkExt.TextEditor.Models;
 using MfGames.GtkExt.TextEditor.Models.Buffers;
+using MfGames.GtkExt.TextEditor.Models.Extensions;
 using MfGames.GtkExt.TextEditor.Models.Styles;
 using Alignment = Pango.Alignment;
 
@@ -178,12 +179,20 @@ namespace GtkExtDemo
 			if (caret.Selection.IsEmpty
 				|| caret.Selection.IsSameLine)
 			{
-				ReverseLine(command, caret.Position.LineIndex);
+				int lineIndex =
+					caret.Position.LinePosition.GetLineIndex(editorView.LineBuffer);
+				ReverseLine(command, lineIndex);
 			}
 			else
 			{
-				for (int lineIndex = caret.Selection.StartPosition.LineIndex;
-					lineIndex <= caret.Selection.EndPosition.LineIndex;
+				int startLineIndex =
+					caret.Selection.FirstTextPosition.LinePosition.GetLineIndex(
+						editorView.LineBuffer);
+				int endLineIndex =
+					caret.Selection.LastTextPosition.LinePosition.GetLineIndex(
+						editorView.LineBuffer);
+				for (int lineIndex = startLineIndex;
+					lineIndex <= endLineIndex;
 					lineIndex++)
 				{
 					ReverseLine(command, lineIndex);
